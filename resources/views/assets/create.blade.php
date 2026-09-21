@@ -146,15 +146,50 @@
 
         document.querySelector('input[name="photo"]').addEventListener('change', function(e) {
             const file = e.target.files[0];
-            const preview = document.getElementById('photo-preview');
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.classList.remove('hidden');
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const maxDimension = 1600;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height && width > maxDimension) {
+                        height = Math.round(height * (maxDimension / width));
+                        width = maxDimension;
+                    } else if (height > maxDimension) {
+                        width = Math.round(width * (maxDimension / height));
+                        height = maxDimension;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob(function(blob) {
+                        const compressedFile = new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(compressedFile);
+                        document.querySelector('input[name="photo"]').files = dataTransfer.files;
+
+                        const preview = document.getElementById('photo-preview');
+                        preview.src = URL.createObjectURL(compressedFile);
+                        preview.classList.remove('hidden');
+
+                        console.log('Ukuran asli:', (file.size / 1024).toFixed(0) + 'KB', '→ Ukuran setelah kompresi:', (compressedFile.size / 1024).toFixed(0) + 'KB');
+                    }, 'image/jpeg', 0.75);
                 };
-                reader.readAsDataURL(file);
-            }
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
         });
     </script>
 </x-app-layout>
