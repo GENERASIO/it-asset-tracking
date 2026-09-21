@@ -131,7 +131,7 @@
                                                     <input type="checkbox" name="ids[]" value="{{ $asset->id }}"
                                                            class="asset-checkbox mt-0.5" onclick="event.stopPropagation()">
                                                     @if ($asset->photo)
-                                                        <img src="{{ Storage::url($asset->photo) }}"
+                                                        <img src="{{ asset('uploads/assets/' . $asset->photo) }}"
                                                              class="w-10 h-10 object-cover rounded border">
                                                     @endif
                                                 </div>
@@ -163,7 +163,7 @@
                                             <p class="text-sm text-gray-700 dark:text-gray-300">{{ $asset->name }}</p>
                                         </div>
                                         @if ($asset->photo)
-                                            <img src="{{ Storage::url($asset->photo) }}" class="w-12 h-12 object-cover rounded border shrink-0">
+                                            <img src="{{ asset('uploads/assets/' . $asset->photo) }}" class="w-12 h-12 object-cover rounded border shrink-0">
                                         @endif
                                     </div>
 
@@ -226,7 +226,7 @@
                                             </td>
                                             <td class="px-4 py-2 hidden md:table-cell">
                                                 @if ($asset->photo)
-                                                    <img src="{{ Storage::url($asset->photo) }}" class="w-10 h-10 object-cover rounded border">
+                                                    <img src="{{ asset('uploads/assets/' . $asset->photo) }}" class="w-10 h-10 object-cover rounded border">
                                                 @else
                                                     <div class="w-10 h-10 rounded border bg-gray-50 dark:bg-gray-600"></div>
                                                 @endif

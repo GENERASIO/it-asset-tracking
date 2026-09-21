@@ -47,6 +47,13 @@ return [
             'report' => false,
         ],
 
+        'assets' => [
+            'driver' => 'local',
+            'root' => public_path('uploads/assets'),
+            'url' => env('APP_URL').'/uploads/assets',
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

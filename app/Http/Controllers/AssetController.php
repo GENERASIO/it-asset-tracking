@@ -105,7 +105,7 @@ class AssetController extends Controller
         );
 
         if ($request->hasFile('photo')) {
-            $validated['photo'] = $request->file('photo')->store('assets', 'public');
+            $validated['photo'] = $request->file('photo')->store('', 'assets');
         }
 
         Asset::create($validated);
@@ -153,9 +153,9 @@ class AssetController extends Controller
 
         if ($request->hasFile('photo')) {
             if ($asset->photo) {
-                Storage::disk('public')->delete($asset->photo);
+                Storage::disk('assets')->delete($asset->photo);
             }
-            $validated['photo'] = $request->file('photo')->store('assets', 'public');
+            $validated['photo'] = $request->file('photo')->store('', 'assets');
         }
 
         $asset->update($validated);
@@ -166,7 +166,7 @@ class AssetController extends Controller
     public function destroy(Asset $asset)
     {
         if ($asset->photo) {
-            Storage::disk('public')->delete($asset->photo);
+            Storage::disk('assets')->delete($asset->photo);
         }
         $asset->delete();
         return redirect()->route('assets.index')->with('success', 'Aset berhasil dihapus.');

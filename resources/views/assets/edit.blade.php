@@ -28,7 +28,7 @@
                         <div class="sm:col-span-2">
                             <label class="block text-sm font-medium text-gray-700">Foto Aset</label>
                             @if ($asset->photo)
-                                <img id="photo-preview" src="{{ Storage::url($asset->photo) }}" class="w-24 h-24 object-cover rounded-lg mb-2 mt-1">
+                                <img id="photo-preview" src="{{ asset('uploads/assets/' . $asset->photo) }}" class="w-24 h-24 object-cover rounded-lg mb-2 mt-1">
                             @else
                                 <img id="photo-preview" src="" alt="Preview" class="hidden mt-2 h-32 w-32 object-cover rounded-lg border">
                             @endif

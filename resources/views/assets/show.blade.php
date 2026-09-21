@@ -33,7 +33,7 @@
                 <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-4">
                     <div class="flex gap-4">
                         @if ($asset->photo)
-                            <img src="{{ Storage::url($asset->photo) }}" class="w-20 h-20 object-cover rounded-lg border shrink-0">
+                            <img src="{{ asset('uploads/assets/' . $asset->photo) }}" class="w-20 h-20 object-cover rounded-lg border shrink-0">
                         @else
                             <div class="w-20 h-20 rounded-lg border bg-gray-50 flex items-center justify-center text-gray-300 text-xs shrink-0">
                                 No Photo
