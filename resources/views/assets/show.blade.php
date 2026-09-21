@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Detail Aset</h2>
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">Detail Aset</h2>
     </x-slot>
 
     <div class="py-8">
@@ -29,7 +29,7 @@
                 };
             @endphp
 
-            <div class="bg-white shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
                 <div class="flex justify-between items-start gap-4">
                     <div class="flex gap-4">
                         @if ($asset->photo)
@@ -40,8 +40,8 @@
                             </div>
                         @endif
                         <div>
-                            <p class="font-mono font-bold text-2xl text-gray-800">{{ $asset->asset_code }}</p>
-                            <h3 class="text-lg text-gray-700 mt-1">{{ $asset->name }}</h3>
+                            <p class="font-mono font-bold text-2xl text-gray-800 dark:text-white">{{ $asset->asset_code }}</p>
+                            <h3 class="text-lg text-gray-700 dark:text-gray-300 mt-1">{{ $asset->name }}</h3>
                             <span class="inline-block mt-2 px-2 py-1 rounded-full text-xs font-medium {{ $statusColor }}">
                                 {{ ucfirst(str_replace('_',' ',$asset->status)) }}
                             </span>
@@ -62,48 +62,48 @@
                 <div class="grid grid-cols-2 gap-4 mt-6 text-sm">
                     <div>
                         <span class="text-gray-500">Kategori</span>
-                        <p class="font-medium">{{ $asset->category->name }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $asset->category->name }}</p>
                     </div>
                     <div>
                         <span class="text-gray-500">Lokasi</span>
-                        <p class="font-medium">{{ $asset->location->name }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $asset->location->name }}</p>
                     </div>
                     <div>
                         <span class="text-gray-500">Merk / Model</span>
-                        <p class="font-medium">{{ $asset->brand ?? '-' }} {{ $asset->model ?? '' }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $asset->brand ?? '-' }} {{ $asset->model ?? '' }}</p>
                     </div>
                     <div>
                         <span class="text-gray-500">Serial Number</span>
-                        <p class="font-medium">{{ $asset->serial_number ?? '-' }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $asset->serial_number ?? '-' }}</p>
                     </div>
                     <div>
                         <span class="text-gray-500">Dipegang Oleh</span>
-                        <p class="font-medium">{{ $asset->assignedUser->name ?? '-' }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $asset->assignedUser->name ?? '-' }}</p>
                     </div>
                     <div>
                         <span class="text-gray-500">Tanggal Pembelian</span>
-                        <p class="font-medium">{{ optional($asset->purchase_date)->format('d M Y') ?? '-' }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ optional($asset->purchase_date)->format('d M Y') ?? '-' }}</p>
                     </div>
                     <div>
                         <span class="text-gray-500">Harga Beli</span>
-                        <p class="font-medium">
+                        <p class="font-medium text-gray-900 dark:text-white">
                             {{ $asset->purchase_price ? 'Rp ' . number_format($asset->purchase_price, 0, ',', '.') : '-' }}
                         </p>
                     </div>
                     <div>
                         <span class="text-gray-500">Garansi Sampai</span>
-                        <p class="font-medium">{{ optional($asset->warranty_expired_at)->format('d M Y') ?? '-' }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ optional($asset->warranty_expired_at)->format('d M Y') ?? '-' }}</p>
                     </div>
                     <div class="col-span-2">
                         <span class="text-gray-500">Spesifikasi</span>
-                        <p class="font-medium whitespace-pre-line">{{ $asset->specification ?? '-' }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white whitespace-pre-line">{{ $asset->specification ?? '-' }}</p>
                     </div>
                 </div>
             </div>
 
             @if(auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff')
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="font-semibold text-gray-700 mb-3">Check-in / Check-out</h3>
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Check-in / Check-out</h3>
 
                 @if ($asset->status === 'available')
                     <form action="{{ route('assets.checkout', $asset) }}" method="POST" class="space-y-3">
@@ -129,7 +129,7 @@
                     </form>
                 @elseif ($asset->status === 'in_use')
                     <p class="text-sm text-gray-600 mb-3">
-                        Sedang dipegang oleh: <span class="font-medium">{{ $asset->assignedUser->name ?? '-' }}</span>
+                        Sedang dipegang oleh: <span class="font-medium text-gray-900 dark:text-white">{{ $asset->assignedUser->name ?? '-' }}</span>
                     </p>
                     <form action="{{ route('assets.checkin', $asset) }}" method="POST" class="space-y-3">
                         @csrf
@@ -159,11 +159,11 @@
             </div>
             @endif
 
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="font-semibold text-gray-700 mb-3">Riwayat Mutasi / Check-in-Check-out</h3>
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Riwayat Mutasi / Check-in-Check-out</h3>
                 @forelse ($asset->logs as $log)
-                    <div class="border-b py-2 text-sm">
-                        <span class="font-medium">{{ ucfirst(str_replace('_',' ',$log->action)) }}</span>
+                    <div class="border-b dark:border-gray-700 py-2 text-sm">
+                        <span class="font-medium text-gray-900 dark:text-white">{{ ucfirst(str_replace('_',' ',$log->action)) }}</span>
                         — {{ $log->fromUser->name ?? 'Gudang' }} → {{ $log->toUser->name ?? 'Gudang' }}
                         <span class="text-gray-400 block text-xs">{{ $log->created_at->format('d M Y H:i') }}</span>
                         @if ($log->notes)
@@ -175,8 +175,8 @@
                 @endforelse
             </div>
 
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="font-semibold text-gray-700 mb-3">Riwayat Maintenance</h3>
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Riwayat Maintenance</h3>
 
                 @if(auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff')
                 <form action="{{ route('maintenance-logs.store', $asset) }}" method="POST" class="space-y-3 mb-4 pb-4 border-b">
@@ -204,8 +204,8 @@
                 @endif
 
                 @forelse ($asset->maintenanceLogs as $log)
-                    <div class="border-b py-2 text-sm">
-                        <span class="font-medium">{{ $log->issue }}</span>
+                    <div class="border-b dark:border-gray-700 py-2 text-sm">
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $log->issue }}</span>
                         <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 ml-2">{{ ucfirst(str_replace('_',' ',$log->status)) }}</span>
                         <p class="text-gray-500 text-xs mt-1">Dilaporkan: {{ $log->reported_at->format('d M Y') }}</p>
                         @if ($log->action_taken)
@@ -284,18 +284,18 @@
                 $historyItems = $historyItems->sortByDesc('date')->values();
             @endphp
 
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="font-semibold text-gray-700 mb-4">Riwayat Lengkap</h3>
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">Riwayat Lengkap</h3>
 
                 @if ($historyItems->isEmpty())
                     <p class="text-gray-400 text-sm">Belum ada riwayat.</p>
                 @else
-                    <div class="relative border-l-2 border-gray-200 ml-2 space-y-6">
+                    <div class="relative border-l-2 border-gray-200 dark:border-gray-700 ml-2 space-y-6">
                         @foreach ($historyItems as $item)
                             <div class="relative pl-6">
-                                <span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-indigo-500 border-2 border-white"></span>
+                                <span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-brand-500 border-2 border-white dark:border-gray-800"></span>
                                 <p class="text-xs text-gray-400">{{ $item['type'] }}</p>
-                                <p class="text-sm font-medium text-gray-800">{{ $item['description'] }}</p>
+                                <p class="text-sm font-medium text-gray-800 dark:text-white">{{ $item['description'] }}</p>
                                 @if ($item['notes'])
                                     <p class="text-xs text-gray-500 mt-0.5">{{ $item['notes'] }}</p>
                                 @endif

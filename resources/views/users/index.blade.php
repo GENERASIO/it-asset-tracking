@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Kelola User</h2>
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">Kelola User</h2>
     </x-slot>
 
     <div class="py-8">
@@ -18,12 +18,12 @@
                 </div>
             @endif
 
-            <div class="bg-white shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
                 <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
                     <form method="GET" class="flex flex-wrap gap-2">
                         <input type="text" name="search" value="{{ request('search') }}"
                                placeholder="Cari nama / email..."
-                               class="border-gray-300 rounded-lg text-sm">
+                               class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
                         <button type="submit" class="bg-gray-200 px-3 py-2 rounded-lg text-sm">Cari</button>
                     </form>
 
@@ -35,7 +35,7 @@
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-50 text-gray-600">
+                        <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
                             <tr>
                                 <th class="px-4 py-2">Nama</th>
                                 <th class="px-4 py-2">Email</th>
@@ -47,15 +47,15 @@
                         </thead>
                         <tbody>
                             @forelse ($users as $user)
-                                <tr class="border-b">
-                                    <td class="px-4 py-2">{{ $user->name }}</td>
-                                    <td class="px-4 py-2">{{ $user->email }}</td>
+                                <tr class="border-b dark:border-gray-700">
+                                    <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $user->name }}</td>
+                                    <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $user->email }}</td>
                                     <td class="px-4 py-2">
-                                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200">
                                             {{ ucfirst(str_replace('_', ' ', $user->role)) }}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-2">{{ $user->location->name ?? '-' }}</td>
+                                    <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $user->location->name ?? '-' }}</td>
                                     <td class="px-4 py-2">
                                         @if ($user->is_active)
                                             <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Aktif</span>

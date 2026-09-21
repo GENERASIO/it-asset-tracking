@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Laporan &amp; Analitik</h2>
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">Laporan &amp; Analitik</h2>
     </x-slot>
 
     @php
@@ -25,23 +25,23 @@
 
             <div class="flex flex-wrap justify-between items-center gap-3">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
-                    <div class="bg-white rounded-xl shadow p-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
                         <p class="text-sm text-gray-500">Total Aset</p>
-                        <p class="text-3xl font-bold text-gray-800 mt-1">{{ $totalAssets }}</p>
+                        <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ $totalAssets }}</p>
                     </div>
-                    <div class="bg-white rounded-xl shadow p-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
                         <p class="text-sm text-gray-500">Total Nilai Aset</p>
-                        <p class="text-2xl font-bold text-gray-800 mt-1">
+                        <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
                             Rp {{ number_format($totalAssetValue ?? 0, 0, ',', '.') }}
                         </p>
                     </div>
-                    <div class="bg-white rounded-xl shadow p-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
                         <p class="text-sm text-gray-500">Jumlah Kategori</p>
-                        <p class="text-3xl font-bold text-gray-800 mt-1">{{ $totalCategories }}</p>
+                        <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ $totalCategories }}</p>
                     </div>
-                    <div class="bg-white rounded-xl shadow p-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
                         <p class="text-sm text-gray-500">Jumlah Lokasi</p>
-                        <p class="text-3xl font-bold text-gray-800 mt-1">{{ $totalLocations }}</p>
+                        <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ $totalLocations }}</p>
                     </div>
                 </div>
             </div>
@@ -54,29 +54,29 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white rounded-xl shadow p-5">
-                    <h3 class="font-semibold text-gray-700 mb-3">Aset per Kategori</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aset per Kategori</h3>
                     <div class="relative" style="height: 280px;">
                         <canvas id="chartCategory"></canvas>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow p-5">
-                    <h3 class="font-semibold text-gray-700 mb-3">Aset per Lokasi</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aset per Lokasi</h3>
                     <div class="relative" style="height: 280px;">
                         <canvas id="chartLocation"></canvas>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow p-5">
-                    <h3 class="font-semibold text-gray-700 mb-3">Aset per Status</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aset per Status</h3>
                     <div class="relative" style="height: 280px;">
                         <canvas id="chartStatus"></canvas>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow p-5">
-                    <h3 class="font-semibold text-gray-700 mb-3">Trend Pembelian Aset (12 Bulan Terakhir)</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Trend Pembelian Aset (12 Bulan Terakhir)</h3>
                     <div class="relative" style="height: 280px;">
                         <canvas id="chartTrend"></canvas>
                     </div>

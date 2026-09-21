@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Daftar Aset IT</h2>
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">Daftar Aset IT</h2>
     </x-slot>
 
     @php
@@ -22,13 +22,13 @@
                 </div>
             @endif
 
-            <div class="bg-white shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
 
                 <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
                     <form method="GET" class="flex flex-wrap gap-2">
                         <input type="text" name="search" value="{{ request('search') }}"
                                placeholder="Cari kode / nama aset..."
-                               class="border-gray-300 rounded-lg text-sm">
+                               class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
 
                         <select name="category_id" class="border-gray-300 rounded-lg text-sm">
                             <option value="">Semua Kategori</option>
@@ -88,7 +88,7 @@
                     <div class="flex gap-4 overflow-x-auto pb-4">
                         @foreach ($statusColumns as $key => $meta)
                             @php $columnAssets = $assets->get($key, collect()); @endphp
-                            <div class="board-column bg-gray-50 rounded-lg p-3 w-72 shrink-0" data-status="{{ $key }}">
+                            <div class="board-column bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 w-72 shrink-0" data-status="{{ $key }}">
                                 <div class="flex items-center justify-between mb-3 px-1 {{ $meta['header'] }} rounded-lg py-2">
                                     <span class="font-semibold text-sm {{ $meta['text'] }}">{{ $meta['label'] }}</span>
                                     <span class="text-xs px-2 py-0.5 rounded-full {{ $meta['badge'] }}">{{ $columnAssets->count() }}</span>
@@ -96,7 +96,7 @@
 
                                 <div class="board-column-body space-y-3 min-h-[80px]">
                                     @forelse ($columnAssets as $asset)
-                                        <div class="asset-card bg-white shadow rounded-lg p-3 cursor-move"
+                                        <div class="asset-card bg-white dark:bg-gray-700 shadow rounded-lg p-3 cursor-move"
                                              data-asset-id="{{ $asset->id }}"
                                              onclick="handleAssetCardClick(event, '{{ route('assets.show', $asset) }}')">
                                             <div class="flex items-start justify-between gap-2 mb-1">
@@ -107,8 +107,8 @@
                                                          class="w-10 h-10 object-cover rounded border">
                                                 @endif
                                             </div>
-                                            <p class="font-mono font-bold text-sm text-gray-800">{{ $asset->asset_code }}</p>
-                                            <p class="text-sm text-gray-700">{{ $asset->name }}</p>
+                                            <p class="font-mono font-bold text-sm text-gray-800 dark:text-white">{{ $asset->asset_code }}</p>
+                                            <p class="text-sm text-gray-700 dark:text-gray-300">{{ $asset->name }}</p>
                                             <p class="text-xs text-gray-500 mt-1">
                                                 {{ $asset->category->name ?? '-' }} · {{ $asset->location->name ?? '-' }}
                                             </p>

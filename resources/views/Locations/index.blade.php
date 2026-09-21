@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Lokasi / Outlet</h2>
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">Lokasi / Outlet</h2>
     </x-slot>
 
     <div class="py-8">
@@ -12,9 +12,9 @@
                 </div>
             @endif
 
-            <div class="bg-white shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-semibold text-gray-700">Daftar Lokasi</h3>
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300">Daftar Lokasi</h3>
                     <a href="{{ route('locations.create') }}"
                        class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600">
                         + Tambah Lokasi
@@ -22,7 +22,7 @@
                 </div>
 
                 <table class="w-full text-sm text-left">
-                    <thead class="bg-gray-50 text-gray-600">
+                    <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
                         <tr>
                             <th class="px-4 py-2">Nama</th>
                             <th class="px-4 py-2">Kode</th>
@@ -32,10 +32,10 @@
                     </thead>
                     <tbody>
                         @forelse ($locations as $location)
-                            <tr class="border-b">
-                                <td class="px-4 py-2">{{ $location->name }}</td>
-                                <td class="px-4 py-2 font-mono">{{ $location->code }}</td>
-                                <td class="px-4 py-2">{{ $location->address ?? '-' }}</td>
+                            <tr class="border-b dark:border-gray-700">
+                                <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $location->name }}</td>
+                                <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">{{ $location->code }}</td>
+                                <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $location->address ?? '-' }}</td>
                                 <td class="px-4 py-2 text-right space-x-2">
                                     <a href="{{ route('locations.edit', $location) }}"
                                        class="text-brand-500 hover:underline">Edit</a>
