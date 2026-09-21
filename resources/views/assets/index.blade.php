@@ -57,76 +57,92 @@
                                 Import
                             </button>
                         </form>
+                    </div>
+                </div>
+
+                <form id="bulk-print-form" action="{{ route('barcode.print-batch') }}" method="POST" target="_blank">
+                    @csrf
+
+                    <div class="flex flex-wrap justify-end items-center gap-2 mb-4">
+                        <button type="submit"
+                                class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 whitespace-nowrap">
+                            🖨️ Cetak Label Terpilih
+                        </button>
 
                         <a href="{{ route('assets.create') }}"
                            class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 whitespace-nowrap">
                             + Tambah Aset
                         </a>
                     </div>
-                </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-50 text-gray-600">
-                            <tr>
-                                <th class="px-4 py-2">Kode Aset</th>
-                                <th class="px-4 py-2">Nama</th>
-                                <th class="px-4 py-2">Kategori</th>
-                                <th class="px-4 py-2">Lokasi</th>
-                                <th class="px-4 py-2">Dipegang Oleh</th>
-                                <th class="px-4 py-2">Status</th>
-                                <th class="px-4 py-2 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($assets as $asset)
-                                @php
-                                    $statusColor = match($asset->status) {
-                                        'available' => 'bg-green-100 text-green-700',
-                                        'in_use' => 'bg-blue-100 text-blue-700',
-                                        'maintenance' => 'bg-yellow-100 text-yellow-700',
-                                        'broken' => 'bg-red-100 text-red-700',
-                                        'retired' => 'bg-gray-100 text-gray-500',
-                                        default => 'bg-gray-100 text-gray-500',
-                                    };
-                                @endphp
-                                <tr class="border-b">
-                                    <td class="px-4 py-2 font-mono font-semibold">
-                                        <a href="{{ route('assets.show', $asset) }}" class="text-indigo-600 hover:underline">
-                                            {{ $asset->asset_code }}
-                                        </a>
-                                    </td>
-                                    <td class="px-4 py-2">{{ $asset->name }}</td>
-                                    <td class="px-4 py-2">{{ $asset->category->name }}</td>
-                                    <td class="px-4 py-2">{{ $asset->location->name }}</td>
-                                    <td class="px-4 py-2">{{ $asset->assignedUser->name ?? '-' }}</td>
-                                    <td class="px-4 py-2">
-                                        <span class="px-2 py-1 rounded-full text-xs font-medium {{ $statusColor }}">
-                                            {{ ucfirst(str_replace('_',' ',$asset->status)) }}
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-2 text-right space-x-2 whitespace-nowrap">
-                                        <a href="{{ route('barcode.print', $asset) }}" target="_blank"
-                                           class="text-gray-600 hover:underline">Label</a>
-                                        <a href="{{ route('assets.edit', $asset) }}"
-                                           class="text-indigo-600 hover:underline">Edit</a>
-                                        <form action="{{ route('assets.destroy', $asset) }}" method="POST" class="inline"
-                                              onsubmit="return confirm('Yakin hapus aset ini?');">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:underline">Hapus</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50 text-gray-600">
                                 <tr>
-                                    <td colspan="7" class="px-4 py-6 text-center text-gray-400">
-                                        Belum ada aset. Klik "+ Tambah Aset" untuk mulai.
-                                    </td>
+                                    <th class="px-4 py-2">
+                                        <input type="checkbox" id="select-all-assets" onclick="toggleAllAssetCheckboxes(this)">
+                                    </th>
+                                    <th class="px-4 py-2">Kode Aset</th>
+                                    <th class="px-4 py-2">Nama</th>
+                                    <th class="px-4 py-2">Kategori</th>
+                                    <th class="px-4 py-2">Lokasi</th>
+                                    <th class="px-4 py-2">Dipegang Oleh</th>
+                                    <th class="px-4 py-2">Status</th>
+                                    <th class="px-4 py-2 text-right">Aksi</th>
                                 </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                @forelse ($assets as $asset)
+                                    @php
+                                        $statusColor = match($asset->status) {
+                                            'available' => 'bg-green-100 text-green-700',
+                                            'in_use' => 'bg-blue-100 text-blue-700',
+                                            'maintenance' => 'bg-yellow-100 text-yellow-700',
+                                            'broken' => 'bg-red-100 text-red-700',
+                                            'retired' => 'bg-gray-100 text-gray-500',
+                                            default => 'bg-gray-100 text-gray-500',
+                                        };
+                                    @endphp
+                                    <tr class="border-b">
+                                        <td class="px-4 py-2">
+                                            <input type="checkbox" name="ids[]" value="{{ $asset->id }}" class="asset-checkbox">
+                                        </td>
+                                        <td class="px-4 py-2 font-mono font-semibold">
+                                            <a href="{{ route('assets.show', $asset) }}" class="text-indigo-600 hover:underline">
+                                                {{ $asset->asset_code }}
+                                            </a>
+                                        </td>
+                                        <td class="px-4 py-2">{{ $asset->name }}</td>
+                                        <td class="px-4 py-2">{{ $asset->category->name }}</td>
+                                        <td class="px-4 py-2">{{ $asset->location->name }}</td>
+                                        <td class="px-4 py-2">{{ $asset->assignedUser->name ?? '-' }}</td>
+                                        <td class="px-4 py-2">
+                                            <span class="px-2 py-1 rounded-full text-xs font-medium {{ $statusColor }}">
+                                                {{ ucfirst(str_replace('_',' ',$asset->status)) }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-2 text-right space-x-2 whitespace-nowrap">
+                                            <a href="{{ route('barcode.print', $asset) }}" target="_blank"
+                                               class="text-gray-600 hover:underline">Label</a>
+                                            <a href="{{ route('assets.edit', $asset) }}"
+                                               class="text-indigo-600 hover:underline">Edit</a>
+                                            <button type="button" class="text-red-600 hover:underline"
+                                                    onclick="confirmDeleteAsset('{{ route('assets.destroy', $asset) }}')">
+                                                Hapus
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="px-4 py-6 text-center text-gray-400">
+                                            Belum ada aset. Klik "+ Tambah Aset" untuk mulai.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
 
                 <div class="mt-4">
                     {{ $assets->links() }}
@@ -134,4 +150,25 @@
             </div>
         </div>
     </div>
+
+    <form id="delete-asset-form" method="POST" class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
+
+    <script>
+        function toggleAllAssetCheckboxes(source) {
+            document.querySelectorAll('.asset-checkbox').forEach(function (checkbox) {
+                checkbox.checked = source.checked;
+            });
+        }
+
+        function confirmDeleteAsset(url) {
+            if (confirm('Yakin hapus aset ini?')) {
+                var form = document.getElementById('delete-asset-form');
+                form.action = url;
+                form.submit();
+            }
+        }
+    </script>
 </x-app-layout>

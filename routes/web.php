@@ -38,6 +38,7 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::post('/assets/{asset}/maintenance-logs', [MaintenanceLogController::class, 'store'])->name('maintenance-logs.store');
     Route::put('/maintenance-logs/{maintenanceLog}', [MaintenanceLogController::class, 'update'])->name('maintenance-logs.update');
     Route::get('/barcode/{asset}/print', [BarcodeController::class, 'print'])->name('barcode.print');
+    Route::post('/barcode/print-batch', [BarcodeController::class, 'printBatch'])->name('barcode.print-batch');
     Route::get('/scan/mobile', [ScanController::class, 'mobile'])->name('scan.mobile');
     Route::get('/scan/desktop', [ScanController::class, 'desktop'])->name('scan.desktop');
     Route::post('/scan/lookup', [ScanController::class, 'lookup'])->name('scan.lookup');
