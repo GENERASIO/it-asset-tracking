@@ -30,7 +30,7 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
-    Route::resource('assets', AssetController::class);
+    Route::resource('assets', AssetController::class)->except(['show']);
     Route::patch('/assets/{asset}/update-status', [AssetController::class, 'updateStatus'])->name('assets.update-status');
     Route::get('/assets-export', [AssetController::class, 'export'])->name('assets.export');
     Route::post('/assets-import', [AssetController::class, 'import'])->name('assets.import');
@@ -43,6 +43,10 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::get('/scan/mobile', [ScanController::class, 'mobile'])->name('scan.mobile');
     Route::get('/scan/desktop', [ScanController::class, 'desktop'])->name('scan.desktop');
     Route::post('/scan/lookup', [ScanController::class, 'lookup'])->name('scan.lookup');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/assets/{asset}', [AssetController::class, 'show'])->name('assets.show');
 });
 
 require __DIR__.'/auth.php';

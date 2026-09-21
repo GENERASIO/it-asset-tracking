@@ -48,11 +48,13 @@
                         </div>
                     </div>
                     <div class="space-x-2 whitespace-nowrap">
-                        <a href="{{ route('barcode.print', $asset) }}" target="_blank"
-                           class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm">Cetak Label</a>
-                        <a href="{{ route('assets.edit', $asset) }}"
-                           class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm">Edit</a>
-                        <a href="{{ route('assets.index') }}"
+                        @if(auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff')
+                            <a href="{{ route('barcode.print', $asset) }}" target="_blank"
+                               class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm">Cetak Label</a>
+                            <a href="{{ route('assets.edit', $asset) }}"
+                               class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm">Edit</a>
+                        @endif
+                        <a href="{{ auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff' ? route('assets.index') : route('dashboard') }}"
                            class="text-gray-500 px-3 py-2 text-sm">Kembali</a>
                     </div>
                 </div>
@@ -99,6 +101,7 @@
                 </div>
             </div>
 
+            @if(auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff')
             <div class="bg-white shadow rounded-lg p-6">
                 <h3 class="font-semibold text-gray-700 mb-3">Check-in / Check-out</h3>
 
@@ -154,6 +157,7 @@
                     </p>
                 @endif
             </div>
+            @endif
 
             <div class="bg-white shadow rounded-lg p-6">
                 <h3 class="font-semibold text-gray-700 mb-3">Riwayat Mutasi / Check-in-Check-out</h3>
@@ -174,6 +178,7 @@
             <div class="bg-white shadow rounded-lg p-6">
                 <h3 class="font-semibold text-gray-700 mb-3">Riwayat Maintenance</h3>
 
+                @if(auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff')
                 <form action="{{ route('maintenance-logs.store', $asset) }}" method="POST" class="space-y-3 mb-4 pb-4 border-b">
                     @csrf
                     <div>
@@ -196,6 +201,7 @@
                         Laporkan Maintenance
                     </button>
                 </form>
+                @endif
 
                 @forelse ($asset->maintenanceLogs as $log)
                     <div class="border-b py-2 text-sm">
@@ -206,7 +212,7 @@
                             <p class="text-gray-500 text-xs">Tindakan: {{ $log->action_taken }}</p>
                         @endif
 
-                        @if ($log->status !== 'done')
+                        @if ($log->status !== 'done' && (auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff'))
                             <form action="{{ route('maintenance-logs.update', $log) }}" method="POST"
                                   class="border-t pt-2 mt-2 text-xs space-y-1">
                                 @csrf
