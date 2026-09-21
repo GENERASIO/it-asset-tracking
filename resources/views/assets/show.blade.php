@@ -30,12 +30,12 @@
             @endphp
 
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                <div class="flex justify-between items-start gap-4">
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-4">
                     <div class="flex gap-4">
                         @if ($asset->photo)
-                            <img src="{{ Storage::url($asset->photo) }}" class="w-20 h-20 object-cover rounded-lg border">
+                            <img src="{{ Storage::url($asset->photo) }}" class="w-20 h-20 object-cover rounded-lg border shrink-0">
                         @else
-                            <div class="w-20 h-20 rounded-lg border bg-gray-50 flex items-center justify-center text-gray-300 text-xs">
+                            <div class="w-20 h-20 rounded-lg border bg-gray-50 flex items-center justify-center text-gray-300 text-xs shrink-0">
                                 No Photo
                             </div>
                         @endif
@@ -47,19 +47,19 @@
                             </span>
                         </div>
                     </div>
-                    <div class="space-x-2 whitespace-nowrap">
+                    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto whitespace-nowrap">
                         @if(auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff')
                             <a href="{{ route('barcode.print', $asset) }}" target="_blank"
-                               class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Cetak Label</a>
+                               class="text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Cetak Label</a>
                             <a href="{{ route('assets.edit', $asset) }}"
-                               class="bg-brand-500 hover:bg-brand-600 text-white px-3 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Edit</a>
+                               class="text-center bg-brand-500 hover:bg-brand-600 text-white px-3 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Edit</a>
                         @endif
                         <a href="{{ auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff' ? route('assets.index') : route('dashboard') }}"
-                           class="text-gray-500 px-3 py-2 text-sm">Kembali</a>
+                           class="text-center text-gray-500 px-3 py-2 text-sm">Kembali</a>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mt-6 text-sm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 text-sm">
                     <div>
                         <span class="text-gray-500">Kategori</span>
                         <p class="font-medium text-gray-900 dark:text-white">{{ $asset->category->name }}</p>
@@ -94,7 +94,7 @@
                         <span class="text-gray-500">Garansi Sampai</span>
                         <p class="font-medium text-gray-900 dark:text-white">{{ optional($asset->warranty_expired_at)->format('d M Y') ?? '-' }}</p>
                     </div>
-                    <div class="col-span-2">
+                    <div class="sm:col-span-2">
                         <span class="text-gray-500">Spesifikasi</span>
                         <p class="font-medium text-gray-900 dark:text-white whitespace-pre-line">{{ $asset->specification ?? '-' }}</p>
                     </div>

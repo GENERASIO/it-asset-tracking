@@ -10,14 +10,14 @@
                     @csrf
                     @method('PUT')
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                        <div class="col-span-2 mb-2">
+                        <div class="sm:col-span-2 mb-2">
                             <span class="text-xs text-gray-500">Kode Aset</span>
                             <p class="font-mono font-bold text-lg text-gray-800">{{ $asset->asset_code }}</p>
                         </div>
 
-                        <div class="col-span-2">
+                        <div class="sm:col-span-2">
                             <label class="block text-sm font-medium text-gray-700">Nama Aset</label>
                             <input type="text" name="name" value="{{ old('name', $asset->name) }}"
                                    placeholder="Contoh: Laptop Dell Latitude 5420"
@@ -25,7 +25,7 @@
                             @error('name') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 
-                        <div class="col-span-2">
+                        <div class="sm:col-span-2">
                             <label class="block text-sm font-medium text-gray-700">Foto Aset</label>
                             @if ($asset->photo)
                                 <img src="{{ Storage::url($asset->photo) }}" class="w-24 h-24 object-cover rounded-lg mb-2 mt-1">
@@ -74,13 +74,13 @@
                                    class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
                         </div>
 
-                        <div class="col-span-2">
+                        <div class="sm:col-span-2">
                             <label class="block text-sm font-medium text-gray-700">Serial Number</label>
                             <input type="text" name="serial_number" value="{{ old('serial_number', $asset->serial_number) }}"
                                    class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
                         </div>
 
-                        <div class="col-span-2">
+                        <div class="sm:col-span-2">
                             <label class="block text-sm font-medium text-gray-700">Spesifikasi</label>
                             <textarea name="specification" rows="3"
                                       placeholder="Contoh: Intel i5, RAM 8GB, SSD 256GB"
@@ -131,11 +131,11 @@
                         </div>
                     </div>
 
-                    <div class="flex gap-2 pt-2">
+                    <div class="flex flex-col sm:flex-row gap-2 pt-2">
                         <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg transition-all duration-150 hover:scale-105 active:scale-95">
                             Perbarui Aset
                         </button>
-                        <a href="{{ route('assets.index') }}" class="px-4 py-2 text-gray-600">
+                        <a href="{{ route('assets.index') }}" class="px-4 py-2 text-center text-gray-600">
                             Batal
                         </a>
                     </div>

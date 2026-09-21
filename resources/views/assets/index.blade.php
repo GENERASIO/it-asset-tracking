@@ -113,7 +113,7 @@
                     </div>
 
                     @if ($view === 'board')
-                        <div class="flex gap-4 overflow-x-auto pb-4">
+                        <div class="flex gap-4 overflow-x-auto scroll-smooth pb-4">
                             @foreach ($statusColumns as $key => $meta)
                                 @php $columnAssets = $assets->get($key, collect()); @endphp
                                 <div class="board-column bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 w-72 shrink-0" data-status="{{ $key }}">
@@ -152,27 +152,66 @@
                             @endforeach
                         </div>
                     @else
-                        <div class="overflow-x-auto">
+                        {{-- Mobile card-list (< sm) --}}
+                        <div class="sm:hidden space-y-3">
+                            @forelse ($assets as $asset)
+                                <div data-asset-row="{{ $asset->id }}"
+                                     class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-white dark:bg-gray-800 transition-colors duration-300">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div>
+                                            <p class="font-mono font-bold text-sm text-gray-800 dark:text-white">{{ $asset->asset_code }}</p>
+                                            <p class="text-sm text-gray-700 dark:text-gray-300">{{ $asset->name }}</p>
+                                        </div>
+                                        @if ($asset->photo)
+                                            <img src="{{ Storage::url($asset->photo) }}" class="w-12 h-12 object-cover rounded border shrink-0">
+                                        @endif
+                                    </div>
+
+                                    <select class="status-select w-full mt-3 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm py-2"
+                                            data-asset-id="{{ $asset->id }}" onchange="handleStatusChange(this)">
+                                        @foreach ($statusColumns as $key => $meta)
+                                            <option value="{{ $key }}" @selected($asset->status === $key)>{{ $meta['label'] }}</option>
+                                        @endforeach
+                                    </select>
+
+                                    <div class="flex gap-2 mt-3">
+                                        <a href="{{ route('assets.show', $asset) }}"
+                                           class="flex-1 text-center bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 rounded-lg text-sm transition-all duration-150 active:scale-95">
+                                            Detail
+                                        </a>
+                                        <a href="{{ route('assets.edit', $asset) }}"
+                                           class="flex-1 text-center bg-brand-500 text-white py-2 rounded-lg text-sm transition-all duration-150 active:scale-95">
+                                            Edit
+                                        </a>
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-center text-gray-400 py-6">Belum ada aset. Klik "+ Tambah Aset" untuk mulai.</p>
+                            @endforelse
+                        </div>
+
+                        {{-- Desktop table (>= sm) --}}
+                        <div class="hidden sm:block overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 sticky top-0">
                                     <tr>
                                         <th class="px-4 py-2">
                                             <input type="checkbox" id="select-all-assets" onclick="toggleAllAssetCheckboxes(this)">
                                         </th>
-                                        <th class="px-4 py-2">Foto</th>
+                                        <th class="px-4 py-2 hidden md:table-cell">Foto</th>
                                         <th class="px-4 py-2">
                                             <a href="{{ $sortUrl('asset_code') }}" class="hover:underline">Kode Aset {{ $sortArrow('asset_code') }}</a>
                                         </th>
                                         <th class="px-4 py-2">
                                             <a href="{{ $sortUrl('name') }}" class="hover:underline">Nama {{ $sortArrow('name') }}</a>
                                         </th>
-                                        <th class="px-4 py-2">
+                                        <th class="px-4 py-2 hidden md:table-cell">
                                             <a href="{{ $sortUrl('category') }}" class="hover:underline">Kategori {{ $sortArrow('category') }}</a>
                                         </th>
-                                        <th class="px-4 py-2">
+                                        <th class="px-4 py-2 hidden lg:table-cell">
                                             <a href="{{ $sortUrl('location') }}" class="hover:underline">Lokasi {{ $sortArrow('location') }}</a>
                                         </th>
-                                        <th class="px-4 py-2">Dipegang Oleh</th>
+                                        <th class="px-4 py-2 hidden lg:table-cell">Dipegang Oleh</th>
                                         <th class="px-4 py-2">
                                             <a href="{{ $sortUrl('status') }}" class="hover:underline">Status {{ $sortArrow('status') }}</a>
                                         </th>
@@ -181,11 +220,11 @@
                                 </thead>
                                 <tbody>
                                     @forelse ($assets as $asset)
-                                        <tr id="asset-row-{{ $asset->id }}" class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-300">
+                                        <tr data-asset-row="{{ $asset->id }}" class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-300">
                                             <td class="px-4 py-2">
                                                 <input type="checkbox" name="ids[]" value="{{ $asset->id }}" class="asset-checkbox">
                                             </td>
-                                            <td class="px-4 py-2">
+                                            <td class="px-4 py-2 hidden md:table-cell">
                                                 @if ($asset->photo)
                                                     <img src="{{ Storage::url($asset->photo) }}" class="w-10 h-10 object-cover rounded border">
                                                 @else
@@ -198,9 +237,9 @@
                                                 </a>
                                             </td>
                                             <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $asset->name }}</td>
-                                            <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $asset->category->name ?? '-' }}</td>
-                                            <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $asset->location->name ?? '-' }}</td>
-                                            <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $asset->assignedUser->name ?? '-' }}</td>
+                                            <td class="px-4 py-2 text-gray-900 dark:text-white hidden md:table-cell">{{ $asset->category->name ?? '-' }}</td>
+                                            <td class="px-4 py-2 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->location->name ?? '-' }}</td>
+                                            <td class="px-4 py-2 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->assignedUser->name ?? '-' }}</td>
                                             <td class="px-4 py-2">
                                                 <select class="status-select border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-xs"
                                                         data-asset-id="{{ $asset->id }}" onchange="handleStatusChange(this)">
@@ -266,7 +305,7 @@
         function handleStatusChange(selectEl) {
             const assetId = selectEl.dataset.assetId;
             const newStatus = selectEl.value;
-            const row = document.getElementById('asset-row-' + assetId);
+            const rows = document.querySelectorAll('[data-asset-row="' + assetId + '"]');
             const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
             fetch(`/assets/${assetId}/update-status`, {
@@ -281,10 +320,10 @@
                 if (! response.ok) {
                     throw new Error('Gagal memperbarui status aset.');
                 }
-                if (row) {
+                rows.forEach((row) => {
                     row.classList.add('bg-green-100', 'dark:bg-green-900/40');
                     setTimeout(() => row.classList.remove('bg-green-100', 'dark:bg-green-900/40'), 1000);
-                }
+                });
             }).catch(() => {
                 alert('Gagal memperbarui status aset. Halaman akan dimuat ulang.');
                 window.location.reload();

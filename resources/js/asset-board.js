@@ -11,6 +11,9 @@ window.addEventListener('DOMContentLoaded', () => {
             group: 'assets',
             animation: 150,
             ghostClass: 'opacity-50',
+            delay: 150,
+            delayOnTouchOnly: true,
+            touchStartThreshold: 5,
             onEnd: (event) => {
                 const card = event.item;
                 const newStatus = event.to.closest('.board-column')?.dataset.status;

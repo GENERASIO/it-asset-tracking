@@ -10,8 +10,8 @@
                             <img src="{{ asset('images/logo.png') }}" alt="YAY Group" class="h-8 w-auto">
                         </div>
                         <div class="leading-tight">
-                            <div class="font-semibold text-white">PT. YAY Enak Semua</div>
-                            <div class="text-xs text-brand-100">IT Asset Tracking</div>
+                            <div class="font-semibold text-white text-sm sm:text-base">PT. YAY Enak Semua</div>
+                            <div class="text-xs text-brand-100 hidden sm:inline">IT Asset Tracking</div>
                         </div>
                     </a>
                 </div>
@@ -50,9 +50,9 @@
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-white/20 transition mr-3">
-                    <span class="dark:hidden">🌙</span>
-                    <span class="hidden dark:inline">☀️</span>
+                <button onclick="toggleDarkMode()" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-white/20 transition mr-3">
+                    <span class="dark:hidden text-lg">🌙</span>
+                    <span class="hidden dark:inline text-lg">☀️</span>
                 </button>
 
                 <x-dropdown align="right" width="48">
@@ -89,7 +89,7 @@
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-brand-100 hover:text-white hover:bg-brand-600 focus:outline-none focus:bg-brand-600 focus:text-white transition duration-150 ease-in-out">
+                <button @click="open = ! open" class="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md text-brand-100 hover:text-white hover:bg-brand-600 focus:outline-none focus:bg-brand-600 focus:text-white transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -138,9 +138,9 @@
                     <div class="font-medium text-base text-gray-800 dark:text-white">{{ Auth::user()->name }}</div>
                     <div class="font-medium text-sm text-gray-500 dark:text-gray-400">{{ Auth::user()->email }}</div>
                 </div>
-                <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                    <span class="dark:hidden">🌙</span>
-                    <span class="hidden dark:inline">☀️</span>
+                <button onclick="toggleDarkMode()" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <span class="dark:hidden text-lg">🌙</span>
+                    <span class="hidden dark:inline text-lg">☀️</span>
                 </button>
             </div>
 
