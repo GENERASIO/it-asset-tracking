@@ -6,7 +6,9 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" class="flex items-center">
-                        <img src="{{ asset('images/logo.png') }}" alt="YAY Group" class="h-10 w-auto mr-2">
+                        <div class="bg-white rounded-lg px-3 py-1.5 flex items-center mr-2">
+                            <img src="{{ asset('images/logo.png') }}" alt="YAY Group" class="h-8 w-auto">
+                        </div>
                         <div class="leading-tight">
                             <div class="font-semibold text-white">PT. YAY Enak Semua</div>
                             <div class="text-xs text-brand-100">IT Asset Tracking</div>
@@ -23,10 +25,6 @@
                     @if (in_array(Auth::user()->role, ['super_admin', 'it_staff']))
                         <x-nav-link :href="route('assets.index')" :active="request()->routeIs('assets.*')">
                             {{ __('Aset') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('scan.mobile')" :active="request()->routeIs('scan.*')">
-                            {{ __('Scan') }}
                         </x-nav-link>
 
                         <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
@@ -111,10 +109,6 @@
             @if (in_array(Auth::user()->role, ['super_admin', 'it_staff']))
                 <x-responsive-nav-link :href="route('assets.index')" :active="request()->routeIs('assets.*')">
                     {{ __('Aset') }}
-                </x-responsive-nav-link>
-
-                <x-responsive-nav-link :href="route('scan.mobile')" :active="request()->routeIs('scan.*')">
-                    {{ __('Scan') }}
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">

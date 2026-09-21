@@ -95,10 +95,6 @@
                            class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 transition-all duration-150 hover:scale-105 active:scale-95">
                             + Tambah Aset
                         </a>
-                        <a href="{{ route('scan.mobile') }}"
-                           class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 transition-all duration-150 hover:scale-105 active:scale-95">
-                            📷 Scan Aset
-                        </a>
                         <a href="{{ route('assets.index') }}"
                            class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-150 hover:scale-105 active:scale-95">
                             Lihat Semua Aset
