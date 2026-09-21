@@ -3,10 +3,10 @@
 <head>
     <title>Label Aset - {{ $asset->asset_code }}</title>
     <style>
-        @page { size: 40mm 25mm; margin: 0; }
+        @page { size: 35mm 40mm; margin: 0; }
         body { margin: 0; font-family: Arial, sans-serif; }
         .label {
-            width: 40mm; height: 25mm; padding: 2mm;
+            width: 35mm; height: 40mm; padding: 2mm;
             box-sizing: border-box; text-align: center;
         }
         .label img { width: 100%; height: auto; }

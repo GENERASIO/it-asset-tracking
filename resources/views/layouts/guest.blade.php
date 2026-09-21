@@ -16,6 +16,11 @@
     </head>
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
+            <div class="text-center mb-4">
+                <div class="font-semibold text-lg text-gray-800">PT. YAY Enak Semua</div>
+                <div class="text-xs text-gray-400">IT Asset Tracking</div>
+            </div>
+
             <div>
                 <a href="/">
                     <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
