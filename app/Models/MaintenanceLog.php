@@ -11,6 +11,11 @@ class MaintenanceLog extends Model
         'reported_at', 'resolved_at', 'status', 'created_by',
     ];
 
+    protected $casts = [
+        'reported_at' => 'date',
+        'resolved_at' => 'date',
+    ];
+
     public function asset()
     {
         return $this->belongsTo(Asset::class);

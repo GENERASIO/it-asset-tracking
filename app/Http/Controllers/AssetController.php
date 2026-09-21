@@ -83,7 +83,12 @@ class AssetController extends Controller
 
     public function show(Asset $asset)
     {
-        $asset->load(['category', 'location', 'assignedUser', 'logs.fromUser', 'logs.toUser', 'maintenanceLogs']);
+        $asset->load([
+            'category', 'location', 'assignedUser',
+            'logs.fromUser', 'logs.toUser', 'logs.handledBy',
+            'maintenanceLogs.createdBy',
+        ]);
+
         return view('assets.show', compact('asset'));
     }
 

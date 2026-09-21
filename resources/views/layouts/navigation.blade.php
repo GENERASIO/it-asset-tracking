@@ -28,6 +28,10 @@
                         <x-nav-link :href="route('scan.mobile')" :active="request()->routeIs('scan.*')">
                             {{ __('Scan') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                            {{ __('Laporan') }}
+                        </x-nav-link>
                     @endif
 
                     @if (Auth::user()->role === 'super_admin')
@@ -106,6 +110,10 @@
 
                 <x-responsive-nav-link :href="route('scan.mobile')" :active="request()->routeIs('scan.*')">
                     {{ __('Scan') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                    {{ __('Laporan') }}
                 </x-responsive-nav-link>
             @endif
 

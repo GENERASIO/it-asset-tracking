@@ -250,6 +250,65 @@
                 @endforelse
             </div>
 
+            @php
+                $historyItems = collect();
+
+                foreach ($asset->logs as $log) {
+                    $description = match ($log->action) {
+                        'check_out' => 'Check-out ke ' . ($log->toUser->name ?? '-'),
+                        'check_in' => 'Check-in dari ' . ($log->fromUser->name ?? '-') . ', status jadi ' . ucfirst(str_replace('_', ' ', $log->status_after)),
+                        'transfer' => 'Transfer dari ' . ($log->fromUser->name ?? 'Gudang') . ' ke ' . ($log->toUser->name ?? 'Gudang'),
+                        'status_change' => 'Status berubah dari ' . ucfirst(str_replace('_', ' ', $log->status_before)) . ' ke ' . ucfirst(str_replace('_', ' ', $log->status_after)),
+                        default => ucfirst(str_replace('_', ' ', $log->action)),
+                    };
+
+                    $historyItems->push([
+                        'type' => 'Mutasi — ' . ucfirst(str_replace('_', ' ', $log->action)),
+                        'description' => $description,
+                        'user' => $log->handledBy->name ?? '-',
+                        'date' => $log->created_at,
+                        'notes' => $log->notes,
+                    ]);
+                }
+
+                foreach ($asset->maintenanceLogs as $log) {
+                    $historyItems->push([
+                        'type' => 'Maintenance',
+                        'description' => $log->issue . ' (Status: ' . ucfirst(str_replace('_', ' ', $log->status)) . ')',
+                        'user' => $log->createdBy->name ?? '-',
+                        'date' => $log->created_at,
+                        'notes' => $log->action_taken,
+                    ]);
+                }
+
+                $historyItems = $historyItems->sortByDesc('date')->values();
+            @endphp
+
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="font-semibold text-gray-700 mb-4">Riwayat Lengkap</h3>
+
+                @if ($historyItems->isEmpty())
+                    <p class="text-gray-400 text-sm">Belum ada riwayat.</p>
+                @else
+                    <div class="relative border-l-2 border-gray-200 ml-2 space-y-6">
+                        @foreach ($historyItems as $item)
+                            <div class="relative pl-6">
+                                <span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-indigo-500 border-2 border-white"></span>
+                                <p class="text-xs text-gray-400">{{ $item['type'] }}</p>
+                                <p class="text-sm font-medium text-gray-800">{{ $item['description'] }}</p>
+                                @if ($item['notes'])
+                                    <p class="text-xs text-gray-500 mt-0.5">{{ $item['notes'] }}</p>
+                                @endif
+                                <p class="text-xs text-gray-400 mt-1">
+                                    Oleh {{ $item['user'] }} · {{ $item['date']->translatedFormat('d F Y H:i') }}
+                                    ({{ $item['date']->diffForHumans() }})
+                                </p>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
         </div>
     </div>
 </x-app-layout>

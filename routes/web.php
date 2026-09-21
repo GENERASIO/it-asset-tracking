@@ -9,6 +9,7 @@ use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MaintenanceLogController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,8 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::get('/scan/mobile', [ScanController::class, 'mobile'])->name('scan.mobile');
     Route::get('/scan/desktop', [ScanController::class, 'desktop'])->name('scan.desktop');
     Route::post('/scan/lookup', [ScanController::class, 'lookup'])->name('scan.lookup');
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export-pdf');
 });
 
 Route::middleware(['auth'])->group(function () {
