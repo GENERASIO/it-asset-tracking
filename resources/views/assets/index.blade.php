@@ -48,12 +48,12 @@
                             @endforeach
                         </select>
 
-                        <button type="submit" class="bg-gray-200 px-3 py-2 rounded-lg text-sm">Filter</button>
+                        <button type="submit" class="bg-gray-200 px-3 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Filter</button>
                     </form>
 
                     <div class="flex flex-wrap items-center gap-2">
                         <a href="{{ route('assets.export') }}"
-                           class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 whitespace-nowrap">
+                           class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
                             Export Excel
                         </a>
 
@@ -63,7 +63,7 @@
                             <input type="file" name="file" accept=".xlsx,.xls,.csv" required
                                    class="border-gray-300 rounded-lg text-sm">
                             <button type="submit"
-                                    class="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 whitespace-nowrap">
+                                    class="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
                                 Import
                             </button>
                         </form>
@@ -75,12 +75,12 @@
 
                     <div class="flex flex-wrap justify-end items-center gap-2 mb-4">
                         <button type="submit"
-                                class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 whitespace-nowrap">
+                                class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
                             🖨️ Cetak Label Terpilih
                         </button>
 
                         <a href="{{ route('assets.create') }}"
-                           class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap">
+                           class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
                             + Tambah Aset
                         </a>
                     </div>
@@ -96,7 +96,7 @@
 
                                 <div class="board-column-body space-y-3 min-h-[80px]">
                                     @forelse ($columnAssets as $asset)
-                                        <div class="asset-card bg-white dark:bg-gray-700 shadow rounded-lg p-3 cursor-move"
+                                        <div class="asset-card bg-white dark:bg-gray-700 shadow rounded-lg p-3 cursor-move transition-shadow duration-200 hover:shadow-md"
                                              data-asset-id="{{ $asset->id }}"
                                              onclick="handleAssetCardClick(event, '{{ route('assets.show', $asset) }}')">
                                             <div class="flex items-start justify-between gap-2 mb-1">

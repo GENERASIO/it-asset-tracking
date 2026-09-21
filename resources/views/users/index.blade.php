@@ -18,7 +18,7 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
                 <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
                     <form method="GET" class="flex flex-wrap gap-2">
                         <input type="text" name="search" value="{{ request('search') }}"
@@ -28,7 +28,7 @@
                     </form>
 
                     <a href="{{ route('users.create') }}"
-                       class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap">
+                       class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
                         + Tambah User
                     </a>
                 </div>

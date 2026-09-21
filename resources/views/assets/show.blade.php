@@ -29,7 +29,7 @@
                 };
             @endphp
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
                 <div class="flex justify-between items-start gap-4">
                     <div class="flex gap-4">
                         @if ($asset->photo)
@@ -50,9 +50,9 @@
                     <div class="space-x-2 whitespace-nowrap">
                         @if(auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff')
                             <a href="{{ route('barcode.print', $asset) }}" target="_blank"
-                               class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm">Cetak Label</a>
+                               class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Cetak Label</a>
                             <a href="{{ route('assets.edit', $asset) }}"
-                               class="bg-brand-500 hover:bg-brand-600 text-white px-3 py-2 rounded-lg text-sm">Edit</a>
+                               class="bg-brand-500 hover:bg-brand-600 text-white px-3 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Edit</a>
                         @endif
                         <a href="{{ auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff' ? route('assets.index') : route('dashboard') }}"
                            class="text-gray-500 px-3 py-2 text-sm">Kembali</a>
@@ -102,7 +102,7 @@
             </div>
 
             @if(auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff')
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Check-in / Check-out</h3>
 
                 @if ($asset->status === 'available')
@@ -123,7 +123,7 @@
                             <textarea name="notes" rows="2"
                                       class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm text-sm"></textarea>
                         </div>
-                        <button type="submit" class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600">
+                        <button type="submit" class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 transition-all duration-150 hover:scale-105 active:scale-95">
                             Check-out Aset
                         </button>
                     </form>
@@ -147,7 +147,7 @@
                             <textarea name="notes" rows="2"
                                       class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm text-sm"></textarea>
                         </div>
-                        <button type="submit" class="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-700">
+                        <button type="submit" class="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-700 transition-all duration-150 hover:scale-105 active:scale-95">
                             Check-in Aset
                         </button>
                     </form>
@@ -159,7 +159,7 @@
             </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Riwayat Mutasi / Check-in-Check-out</h3>
                 @forelse ($asset->logs as $log)
                     <div class="border-b dark:border-gray-700 py-2 text-sm">
@@ -175,7 +175,7 @@
                 @endforelse
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Riwayat Maintenance</h3>
 
                 @if(auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff')
@@ -197,7 +197,7 @@
                                value="{{ old('reported_at', now()->format('Y-m-d')) }}"
                                class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm text-sm">
                     </div>
-                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700">
+                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-all duration-150 hover:scale-105 active:scale-95">
                         Laporkan Maintenance
                     </button>
                 </form>
@@ -239,7 +239,7 @@
                                         <option value="retired">Retired</option>
                                     </select>
                                 </div>
-                                <button type="submit" class="bg-gray-700 text-white text-xs px-3 py-1 rounded">
+                                <button type="submit" class="bg-gray-700 text-white text-xs px-3 py-1 rounded transition-all duration-150 hover:scale-105 active:scale-95">
                                     Update
                                 </button>
                             </form>
@@ -284,7 +284,7 @@
                 $historyItems = $historyItems->sortByDesc('date')->values();
             @endphp
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">Riwayat Lengkap</h3>
 
                 @if ($historyItems->isEmpty())

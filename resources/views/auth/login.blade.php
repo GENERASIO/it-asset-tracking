@@ -44,4 +44,16 @@
             </x-primary-button>
         </div>
     </form>
+
+    <script>
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                const btn = this.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="inline-block animate-spin mr-2">⏳</span> Memproses...';
+                }
+            });
+        });
+    </script>
 </x-guest-layout>

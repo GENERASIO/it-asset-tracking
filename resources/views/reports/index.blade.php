@@ -25,21 +25,21 @@
 
             <div class="flex flex-wrap justify-between items-center gap-3">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                         <p class="text-sm text-gray-500">Total Aset</p>
                         <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ $totalAssets }}</p>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                         <p class="text-sm text-gray-500">Total Nilai Aset</p>
                         <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
                             Rp {{ number_format($totalAssetValue ?? 0, 0, ',', '.') }}
                         </p>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                         <p class="text-sm text-gray-500">Jumlah Kategori</p>
                         <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ $totalCategories }}</p>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                         <p class="text-sm text-gray-500">Jumlah Lokasi</p>
                         <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ $totalLocations }}</p>
                     </div>
@@ -48,34 +48,34 @@
 
             <div class="flex justify-end">
                 <a href="{{ route('reports.export-pdf') }}"
-                   class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700">
+                   class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-all duration-150 hover:scale-105 active:scale-95">
                     📄 Export ke PDF
                 </a>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aset per Kategori</h3>
                     <div class="relative" style="height: 280px;">
                         <canvas id="chartCategory"></canvas>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aset per Lokasi</h3>
                     <div class="relative" style="height: 280px;">
                         <canvas id="chartLocation"></canvas>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aset per Status</h3>
                     <div class="relative" style="height: 280px;">
                         <canvas id="chartStatus"></canvas>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Trend Pembelian Aset (12 Bulan Terakhir)</h3>
                     <div class="relative" style="height: 280px;">
                         <canvas id="chartTrend"></canvas>

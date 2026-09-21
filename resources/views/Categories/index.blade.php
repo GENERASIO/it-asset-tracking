@@ -12,11 +12,11 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300">Daftar Kategori</h3>
                     <a href="{{ route('categories.create') }}"
-                       class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600">
+                       class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 transition-all duration-150 hover:scale-105 active:scale-95">
                         + Tambah Kategori
                     </a>
                 </div>

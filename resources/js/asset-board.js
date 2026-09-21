@@ -10,6 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
         Sortable.create(column, {
             group: 'assets',
             animation: 150,
+            ghostClass: 'opacity-50',
             onEnd: (event) => {
                 const card = event.item;
                 const newStatus = event.to.closest('.board-column')?.dataset.status;

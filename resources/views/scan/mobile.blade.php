@@ -10,7 +10,7 @@
         <div id="reader" class="w-full rounded-lg overflow-hidden border border-gray-300"></div>
 
         <div id="result" class="mt-4 hidden">
-            <div class="bg-white shadow rounded-lg p-4">
+            <div class="bg-white shadow rounded-lg p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
                 <p class="text-xs text-gray-500">Kode Aset</p>
                 <p id="r-code" class="font-mono font-bold text-lg text-gray-800"></p>
                 <p id="r-name" class="text-gray-800"></p>
@@ -19,11 +19,11 @@
 
                 <div class="flex gap-2 mt-4">
                     <a id="btn-detail" href="#"
-                       class="flex-1 text-center bg-brand-500 hover:bg-brand-600 text-white py-2 rounded-lg text-sm">
+                       class="flex-1 text-center bg-brand-500 hover:bg-brand-600 text-white py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">
                         Lihat Detail
                     </a>
                     <button id="btn-scan-again"
-                            class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg text-sm">
+                            class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">
                         Scan Lagi
                     </button>
                 </div>

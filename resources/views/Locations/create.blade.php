@@ -5,7 +5,7 @@
 
     <div class="py-8">
         <div class="max-w-lg mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow rounded-lg p-6">
+            <div class="bg-white shadow rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
                 <form action="{{ route('locations.store') }}" method="POST" class="space-y-4">
                     @csrf
 
@@ -33,7 +33,7 @@
                     </div>
 
                     <div class="flex gap-2">
-                        <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg">
+                        <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg transition-all duration-150 hover:scale-105 active:scale-95">
                             Simpan
                         </button>
                         <a href="{{ route('locations.index') }}" class="px-4 py-2 text-gray-600">

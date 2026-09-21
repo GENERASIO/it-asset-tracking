@@ -5,7 +5,7 @@
 
     <div class="py-8">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow rounded-lg p-6">
+            <div class="bg-white shadow rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
                <form action="{{ route('assets.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf
 
@@ -120,7 +120,7 @@
                     </div>
 
                     <div class="flex gap-2 pt-2">
-                        <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg">
+                        <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg transition-all duration-150 hover:scale-105 active:scale-95">
                             Simpan Aset
                         </button>
                         <a href="{{ route('assets.index') }}" class="px-4 py-2 text-gray-600">
@@ -131,4 +131,16 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                const btn = this.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="inline-block animate-spin mr-2">⏳</span> Memproses...';
+                }
+            });
+        });
+    </script>
 </x-app-layout>
