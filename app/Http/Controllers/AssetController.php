@@ -17,27 +17,59 @@ class AssetController extends Controller
 {
     public function index(Request $request)
     {
+        $requestedView = $request->query('view');
+
+        if (in_array($requestedView, ['board', 'table'], true)) {
+            session(['assets_view' => $requestedView]);
+            $view = $requestedView;
+        } else {
+            $view = session('assets_view', 'board');
+        }
+
         $query = Asset::with(['category', 'location', 'assignedUser']);
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('asset_code', 'like', '%' . $request->search . '%')
-                  ->orWhere('name', 'like', '%' . $request->search . '%');
+                $q->where('assets.asset_code', 'like', '%' . $request->search . '%')
+                  ->orWhere('assets.name', 'like', '%' . $request->search . '%');
             });
         }
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $query->where('assets.status', $request->status);
         }
 
         if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+            $query->where('assets.category_id', $request->category_id);
         }
 
-        $assets = $query->latest()->get()->groupBy('status');
+        if ($view === 'table') {
+            $sortable = [
+                'asset_code' => 'assets.asset_code',
+                'name' => 'assets.name',
+                'category' => 'categories.name',
+                'location' => 'locations.name',
+                'status' => 'assets.status',
+                'created_at' => 'assets.created_at',
+            ];
+
+            $sort = $request->query('sort', 'created_at');
+            $direction = $request->query('direction') === 'asc' ? 'asc' : 'desc';
+            $sortColumn = $sortable[$sort] ?? 'assets.created_at';
+
+            $assets = $query->select('assets.*')
+                ->leftJoin('categories', 'categories.id', '=', 'assets.category_id')
+                ->leftJoin('locations', 'locations.id', '=', 'assets.location_id')
+                ->orderBy($sortColumn, $direction)
+                ->paginate(25)
+                ->withQueryString();
+        } else {
+            $assets = $query->latest()->get()->groupBy('status');
+        }
+
         $categories = Category::orderBy('name')->get();
 
-        return view('assets.index', compact('assets', 'categories'));
+        return view('assets.index', compact('assets', 'categories', 'view'));
     }
 
     public function create()
