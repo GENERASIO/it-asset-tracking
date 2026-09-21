@@ -2,7 +2,7 @@
     <div class="p-4 max-w-md mx-auto">
         <div class="flex items-center justify-between mb-3">
             <h1 class="text-lg font-bold text-gray-800">📷 Scan Aset</h1>
-            <a href="{{ route('assets.index') }}" class="text-sm text-indigo-600">Daftar Aset</a>
+            <a href="{{ route('assets.index') }}" class="text-sm text-brand-500">Daftar Aset</a>
         </div>
 
         <div id="camera-error" class="hidden mb-3 bg-red-50 text-red-700 p-3 rounded-lg text-sm"></div>
@@ -19,7 +19,7 @@
 
                 <div class="flex gap-2 mt-4">
                     <a id="btn-detail" href="#"
-                       class="flex-1 text-center bg-indigo-600 text-white py-2 rounded-lg text-sm">
+                       class="flex-1 text-center bg-brand-500 hover:bg-brand-600 text-white py-2 rounded-lg text-sm">
                         Lihat Detail
                     </a>
                     <button id="btn-scan-again"

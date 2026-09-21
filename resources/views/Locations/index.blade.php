@@ -16,7 +16,7 @@
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-semibold text-gray-700">Daftar Lokasi</h3>
                     <a href="{{ route('locations.create') }}"
-                       class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+                       class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600">
                         + Tambah Lokasi
                     </a>
                 </div>
@@ -38,7 +38,7 @@
                                 <td class="px-4 py-2">{{ $location->address ?? '-' }}</td>
                                 <td class="px-4 py-2 text-right space-x-2">
                                     <a href="{{ route('locations.edit', $location) }}"
-                                       class="text-indigo-600 hover:underline">Edit</a>
+                                       class="text-brand-500 hover:underline">Edit</a>
                                     <form action="{{ route('locations.destroy', $location) }}"
                                           method="POST" class="inline"
                                           onsubmit="return confirm('Yakin hapus lokasi ini?');">

@@ -52,7 +52,7 @@
                             <a href="{{ route('barcode.print', $asset) }}" target="_blank"
                                class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm">Cetak Label</a>
                             <a href="{{ route('assets.edit', $asset) }}"
-                               class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm">Edit</a>
+                               class="bg-brand-500 hover:bg-brand-600 text-white px-3 py-2 rounded-lg text-sm">Edit</a>
                         @endif
                         <a href="{{ auth()->user()->role === 'super_admin' || auth()->user()->role === 'it_staff' ? route('assets.index') : route('dashboard') }}"
                            class="text-gray-500 px-3 py-2 text-sm">Kembali</a>
@@ -123,7 +123,7 @@
                             <textarea name="notes" rows="2"
                                       class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm text-sm"></textarea>
                         </div>
-                        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+                        <button type="submit" class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600">
                             Check-out Aset
                         </button>
                     </form>

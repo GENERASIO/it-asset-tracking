@@ -132,7 +132,7 @@
                     </div>
 
                     <div class="flex gap-2 pt-2">
-                        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg">
+                        <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg">
                             Perbarui Aset
                         </button>
                         <a href="{{ route('assets.index') }}" class="px-4 py-2 text-gray-600">

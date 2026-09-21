@@ -28,7 +28,7 @@
                     </form>
 
                     <a href="{{ route('users.create') }}"
-                       class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 whitespace-nowrap">
+                       class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap">
                         + Tambah User
                     </a>
                 </div>
@@ -65,7 +65,7 @@
                                     </td>
                                     <td class="px-4 py-2 text-right space-x-2 whitespace-nowrap">
                                         <a href="{{ route('users.edit', $user) }}"
-                                           class="text-indigo-600 hover:underline">Edit</a>
+                                           class="text-brand-500 hover:underline">Edit</a>
                                         <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline"
                                               onsubmit="return confirm('Yakin hapus user ini?');">
                                             @csrf @method('DELETE')

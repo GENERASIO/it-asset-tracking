@@ -92,11 +92,11 @@
                     <h3 class="font-semibold text-gray-700 mb-3">Aksi Cepat</h3>
                     <div class="flex flex-wrap gap-3">
                         <a href="{{ route('assets.create') }}"
-                           class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+                           class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600">
                             + Tambah Aset
                         </a>
                         <a href="{{ route('scan.mobile') }}"
-                           class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-900">
+                           class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600">
                             📷 Scan Aset
                         </a>
                         <a href="{{ route('assets.index') }}"
@@ -123,7 +123,7 @@
                         @forelse ($recentAssets as $asset)
                             <div class="flex justify-between items-center border-b py-2 text-sm">
                                 <div>
-                                    <a href="{{ route('assets.show', $asset) }}" class="font-mono font-semibold text-indigo-600">
+                                    <a href="{{ route('assets.show', $asset) }}" class="font-mono font-semibold text-brand-500">
                                         {{ $asset->asset_code }}
                                     </a>
                                     <p class="text-gray-600">{{ $asset->name }}</p>
@@ -141,7 +141,7 @@
                         @forelse ($warrantySoon as $asset)
                             <div class="flex justify-between items-center border-b py-2 text-sm">
                                 <div>
-                                    <a href="{{ route('assets.show', $asset) }}" class="font-mono font-semibold text-indigo-600">
+                                    <a href="{{ route('assets.show', $asset) }}" class="font-mono font-semibold text-brand-500">
                                         {{ $asset->asset_code }}
                                     </a>
                                     <p class="text-gray-600">{{ $asset->name }}</p>
