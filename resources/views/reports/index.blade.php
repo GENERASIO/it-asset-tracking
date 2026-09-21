@@ -56,22 +56,30 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-white rounded-xl shadow p-5">
                     <h3 class="font-semibold text-gray-700 mb-3">Aset per Kategori</h3>
-                    <canvas id="chartCategory"></canvas>
+                    <div class="relative" style="height: 280px;">
+                        <canvas id="chartCategory"></canvas>
+                    </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow p-5">
                     <h3 class="font-semibold text-gray-700 mb-3">Aset per Lokasi</h3>
-                    <canvas id="chartLocation"></canvas>
+                    <div class="relative" style="height: 280px;">
+                        <canvas id="chartLocation"></canvas>
+                    </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow p-5">
                     <h3 class="font-semibold text-gray-700 mb-3">Aset per Status</h3>
-                    <canvas id="chartStatus"></canvas>
+                    <div class="relative" style="height: 280px;">
+                        <canvas id="chartStatus"></canvas>
+                    </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow p-5">
                     <h3 class="font-semibold text-gray-700 mb-3">Trend Pembelian Aset (12 Bulan Terakhir)</h3>
-                    <canvas id="chartTrend"></canvas>
+                    <div class="relative" style="height: 280px;">
+                        <canvas id="chartTrend"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -102,6 +110,10 @@
                     backgroundColor: ['#6366f1', '#22c55e', '#eab308', '#ef4444', '#3b82f6', '#a855f7', '#f97316', '#14b8a6'],
                 }],
             },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            },
         });
 
         new Chart(document.getElementById('chartLocation'), {
@@ -115,6 +127,8 @@
                 }],
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
             },
         });
@@ -130,6 +144,8 @@
                 }],
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
             },
         });
@@ -148,6 +164,8 @@
                 }],
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
             },
         });
