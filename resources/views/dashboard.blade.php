@@ -9,6 +9,49 @@
             @if (isset($stats))
                 {{-- DASHBOARD SUPER ADMIN / IT STAFF --}}
 
+                @if ($warrantyAlerts->count() > 0)
+                    <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+                        <h3 class="font-semibold text-yellow-800 mb-2">⚠️ Garansi Akan Habis</h3>
+                        <div class="space-y-1">
+                            @foreach ($warrantyAlerts as $asset)
+                                <div class="flex justify-between items-center text-sm">
+                                    <a href="{{ route('assets.show', $asset) }}" class="text-yellow-900 hover:underline">
+                                        <span class="font-mono font-semibold">{{ $asset->asset_code }}</span>
+                                        — {{ $asset->name }}
+                                    </a>
+                                    <span class="text-xs text-yellow-700 font-medium whitespace-nowrap">
+                                        {{ $asset->warranty_expired_at->translatedFormat('d F Y') }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                @if ($overdueMaintenances->count() > 0)
+                    <div class="bg-red-50 border border-red-300 rounded-lg p-4">
+                        <h3 class="font-semibold text-red-800 mb-2">🔧 Maintenance Menggantung</h3>
+                        <div class="space-y-1">
+                            @foreach ($overdueMaintenances as $log)
+                                <div class="flex justify-between items-center text-sm">
+                                    <div>
+                                        @if ($log->asset)
+                                            <a href="{{ route('assets.show', $log->asset) }}" class="text-red-900 hover:underline">
+                                                <span class="font-mono font-semibold">{{ $log->asset->asset_code }}</span>
+                                                — {{ $log->asset->name }}
+                                            </a>
+                                        @endif
+                                        <p class="text-red-700 text-xs">{{ $log->issue }}</p>
+                                    </div>
+                                    <span class="text-xs text-red-700 font-medium whitespace-nowrap">
+                                        {{ $log->created_at->diffForHumans() }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="bg-white rounded-xl shadow p-5">
                         <p class="text-sm text-gray-500">Total Aset</p>

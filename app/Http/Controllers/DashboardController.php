@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\Category;
 use App\Models\Location;
+use App\Models\MaintenanceLog;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -33,7 +34,19 @@ class DashboardController extends Controller
                 ->take(5)
                 ->get();
 
-            return view('dashboard', compact('stats', 'recentAssets', 'warrantySoon'));
+            $warrantyAlerts = Asset::whereNotNull('warranty_expired_at')
+                ->where('warranty_expired_at', '<=', now()->addDays(30))
+                ->where('warranty_expired_at', '>=', now())
+                ->orderBy('warranty_expired_at')
+                ->get();
+
+            $overdueMaintenances = MaintenanceLog::where('status', '!=', 'done')
+                ->where('created_at', '<=', now()->subDays(7))
+                ->with('asset')
+                ->orderBy('created_at')
+                ->get();
+
+            return view('dashboard', compact('stats', 'recentAssets', 'warrantySoon', 'warrantyAlerts', 'overdueMaintenances'));
         }
 
         // Role "user" biasa: lihat aset miliknya sendiri
