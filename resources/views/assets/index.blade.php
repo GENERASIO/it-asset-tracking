@@ -94,7 +94,7 @@
                                     <span class="text-xs px-2 py-0.5 rounded-full {{ $meta['badge'] }}">{{ $columnAssets->count() }}</span>
                                 </div>
 
-                                <div class="space-y-3 min-h-[80px]">
+                                <div class="board-column-body space-y-3 min-h-[80px]">
                                     @forelse ($columnAssets as $asset)
                                         <div class="asset-card bg-white shadow rounded-lg p-3 cursor-move"
                                              data-asset-id="{{ $asset->id }}"

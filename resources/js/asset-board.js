@@ -1,7 +1,7 @@
 import Sortable from 'sortablejs';
 
 window.addEventListener('DOMContentLoaded', () => {
-    const columns = document.querySelectorAll('.board-column');
+    const columns = document.querySelectorAll('.board-column-body');
     if (! columns.length) return;
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -12,12 +12,14 @@ window.addEventListener('DOMContentLoaded', () => {
             animation: 150,
             onEnd: (event) => {
                 const card = event.item;
-                const newStatus = event.to.dataset.status;
-                const oldStatus = event.from.dataset.status;
+                const newStatus = event.to.closest('.board-column')?.dataset.status;
+                const oldStatus = event.from.closest('.board-column')?.dataset.status;
 
-                if (newStatus === oldStatus) return;
+                if (! newStatus || newStatus === oldStatus) return;
 
                 const assetId = card.dataset.assetId;
+
+                console.log(card.dataset);
 
                 fetch(`/assets/${assetId}/update-status`, {
                     method: 'PATCH',
