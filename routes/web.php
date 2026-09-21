@@ -31,6 +31,7 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
 Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::resource('assets', AssetController::class);
+    Route::patch('/assets/{asset}/update-status', [AssetController::class, 'updateStatus'])->name('assets.update-status');
     Route::get('/assets-export', [AssetController::class, 'export'])->name('assets.export');
     Route::post('/assets-import', [AssetController::class, 'import'])->name('assets.import');
     Route::post('/assets/{asset}/checkout', [AssetLogController::class, 'checkout'])->name('assets.checkout');

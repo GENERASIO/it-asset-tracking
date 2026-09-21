@@ -3,6 +3,16 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Daftar Aset IT</h2>
     </x-slot>
 
+    @php
+        $statusColumns = [
+            'available' => ['label' => 'Available', 'text' => 'text-green-700', 'badge' => 'bg-green-100 text-green-700', 'header' => 'bg-green-50'],
+            'in_use' => ['label' => 'In Use', 'text' => 'text-blue-700', 'badge' => 'bg-blue-100 text-blue-700', 'header' => 'bg-blue-50'],
+            'maintenance' => ['label' => 'Maintenance', 'text' => 'text-yellow-700', 'badge' => 'bg-yellow-100 text-yellow-700', 'header' => 'bg-yellow-50'],
+            'broken' => ['label' => 'Broken', 'text' => 'text-red-700', 'badge' => 'bg-red-100 text-red-700', 'header' => 'bg-red-50'],
+            'retired' => ['label' => 'Retired', 'text' => 'text-gray-600', 'badge' => 'bg-gray-100 text-gray-600', 'header' => 'bg-gray-50'],
+        ];
+    @endphp
+
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
@@ -31,9 +41,9 @@
 
                         <select name="status" class="border-gray-300 rounded-lg text-sm">
                             <option value="">Semua Status</option>
-                            @foreach (['available','in_use','maintenance','broken','retired'] as $s)
-                                <option value="{{ $s }}" @selected(request('status') == $s)>
-                                    {{ ucfirst(str_replace('_',' ',$s)) }}
+                            @foreach ($statusColumns as $key => $meta)
+                                <option value="{{ $key }}" @selected(request('status') == $key)>
+                                    {{ $meta['label'] }}
                                 </option>
                             @endforeach
                         </select>
@@ -75,100 +85,55 @@
                         </a>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left">
-                            <thead class="bg-gray-50 text-gray-600">
-                                <tr>
-                                    <th class="px-4 py-2">
-                                        <input type="checkbox" id="select-all-assets" onclick="toggleAllAssetCheckboxes(this)">
-                                    </th>
-                                    <th class="px-4 py-2">Kode Aset</th>
-                                    <th class="px-4 py-2">Nama</th>
-                                    <th class="px-4 py-2">Kategori</th>
-                                    <th class="px-4 py-2">Lokasi</th>
-                                    <th class="px-4 py-2">Dipegang Oleh</th>
-                                    <th class="px-4 py-2">Status</th>
-                                    <th class="px-4 py-2 text-right">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($assets as $asset)
-                                    @php
-                                        $statusColor = match($asset->status) {
-                                            'available' => 'bg-green-100 text-green-700',
-                                            'in_use' => 'bg-blue-100 text-blue-700',
-                                            'maintenance' => 'bg-yellow-100 text-yellow-700',
-                                            'broken' => 'bg-red-100 text-red-700',
-                                            'retired' => 'bg-gray-100 text-gray-500',
-                                            default => 'bg-gray-100 text-gray-500',
-                                        };
-                                    @endphp
-                                    <tr class="border-b">
-                                        <td class="px-4 py-2">
-                                            <input type="checkbox" name="ids[]" value="{{ $asset->id }}" class="asset-checkbox">
-                                        </td>
-                                        <td class="px-4 py-2 font-mono font-semibold">
-                                            <a href="{{ route('assets.show', $asset) }}" class="text-indigo-600 hover:underline">
-                                                {{ $asset->asset_code }}
-                                            </a>
-                                        </td>
-                                        <td class="px-4 py-2">{{ $asset->name }}</td>
-                                        <td class="px-4 py-2">{{ $asset->category->name }}</td>
-                                        <td class="px-4 py-2">{{ $asset->location->name }}</td>
-                                        <td class="px-4 py-2">{{ $asset->assignedUser->name ?? '-' }}</td>
-                                        <td class="px-4 py-2">
-                                            <span class="px-2 py-1 rounded-full text-xs font-medium {{ $statusColor }}">
-                                                {{ ucfirst(str_replace('_',' ',$asset->status)) }}
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-2 text-right space-x-2 whitespace-nowrap">
-                                            <a href="{{ route('barcode.print', $asset) }}" target="_blank"
-                                               class="text-gray-600 hover:underline">Label</a>
-                                            <a href="{{ route('assets.edit', $asset) }}"
-                                               class="text-indigo-600 hover:underline">Edit</a>
-                                            <button type="button" class="text-red-600 hover:underline"
-                                                    onclick="confirmDeleteAsset('{{ route('assets.destroy', $asset) }}')">
-                                                Hapus
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8" class="px-4 py-6 text-center text-gray-400">
-                                            Belum ada aset. Klik "+ Tambah Aset" untuk mulai.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                    <div class="flex gap-4 overflow-x-auto pb-4">
+                        @foreach ($statusColumns as $key => $meta)
+                            @php $columnAssets = $assets->get($key, collect()); @endphp
+                            <div class="board-column bg-gray-50 rounded-lg p-3 w-72 shrink-0" data-status="{{ $key }}">
+                                <div class="flex items-center justify-between mb-3 px-1 {{ $meta['header'] }} rounded-lg py-2">
+                                    <span class="font-semibold text-sm {{ $meta['text'] }}">{{ $meta['label'] }}</span>
+                                    <span class="text-xs px-2 py-0.5 rounded-full {{ $meta['badge'] }}">{{ $columnAssets->count() }}</span>
+                                </div>
+
+                                <div class="space-y-3 min-h-[80px]">
+                                    @forelse ($columnAssets as $asset)
+                                        <div class="asset-card bg-white shadow rounded-lg p-3 cursor-move"
+                                             data-asset-id="{{ $asset->id }}"
+                                             onclick="handleAssetCardClick(event, '{{ route('assets.show', $asset) }}')">
+                                            <div class="flex items-start justify-between gap-2 mb-1">
+                                                <input type="checkbox" name="ids[]" value="{{ $asset->id }}"
+                                                       class="asset-checkbox mt-0.5" onclick="event.stopPropagation()">
+                                                @if ($asset->photo)
+                                                    <img src="{{ Storage::url($asset->photo) }}"
+                                                         class="w-10 h-10 object-cover rounded border">
+                                                @endif
+                                            </div>
+                                            <p class="font-mono font-bold text-sm text-gray-800">{{ $asset->asset_code }}</p>
+                                            <p class="text-sm text-gray-700">{{ $asset->name }}</p>
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                {{ $asset->category->name ?? '-' }} · {{ $asset->location->name ?? '-' }}
+                                            </p>
+                                            @if ($asset->assignedUser)
+                                                <p class="text-xs text-gray-400 mt-1">{{ $asset->assignedUser->name }}</p>
+                                            @endif
+                                        </div>
+                                    @empty
+                                        <p class="text-xs text-gray-400 text-center py-4">Tidak ada aset.</p>
+                                    @endforelse
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </form>
-
-                <div class="mt-4">
-                    {{ $assets->links() }}
-                </div>
             </div>
         </div>
     </div>
 
-    <form id="delete-asset-form" method="POST" class="hidden">
-        @csrf
-        @method('DELETE')
-    </form>
-
     <script>
-        function toggleAllAssetCheckboxes(source) {
-            document.querySelectorAll('.asset-checkbox').forEach(function (checkbox) {
-                checkbox.checked = source.checked;
-            });
-        }
-
-        function confirmDeleteAsset(url) {
-            if (confirm('Yakin hapus aset ini?')) {
-                var form = document.getElementById('delete-asset-form');
-                form.action = url;
-                form.submit();
-            }
+        function handleAssetCardClick(event, url) {
+            if (event.target.closest('.asset-checkbox')) return;
+            window.location = url;
         }
     </script>
+
+    @vite(['resources/js/asset-board.js'])
 </x-app-layout>

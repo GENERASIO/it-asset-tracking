@@ -34,7 +34,7 @@ class AssetController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        $assets = $query->latest()->paginate(15)->withQueryString();
+        $assets = $query->latest()->get()->groupBy('status');
         $categories = Category::orderBy('name')->get();
 
         return view('assets.index', compact('assets', 'categories'));
@@ -149,5 +149,23 @@ class AssetController extends Controller
         Excel::import(new AssetsImport, $request->file('file'));
 
         return redirect()->route('assets.index')->with('success', 'Data aset berhasil diimpor.');
+    }
+
+    public function updateStatus(Request $request, Asset $asset)
+    {
+        $request->validate(['status' => 'required|in:available,in_use,maintenance,broken,retired']);
+
+        $oldStatus = $asset->status;
+        $asset->update(['status' => $request->status]);
+
+        \App\Models\AssetLog::create([
+            'asset_id' => $asset->id,
+            'action' => 'status_change',
+            'status_before' => $oldStatus,
+            'status_after' => $request->status,
+            'handled_by' => $request->user()->id,
+        ]);
+
+        return response()->json(['success' => true]);
     }
 }
