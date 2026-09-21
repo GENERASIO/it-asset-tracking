@@ -4,13 +4,13 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center gap-2">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
-                    <a href="{{ route('dashboard') }}" class="leading-tight">
-                        <div class="font-semibold text-gray-800">PT. YAY Enak Semua</div>
-                        <div class="text-xs text-gray-400">IT Asset Tracking</div>
+                <div class="shrink-0 flex items-center">
+                    <a href="{{ route('dashboard') }}" class="flex items-center">
+                        <img src="{{ asset('images/logo.png') }}" alt="YAY Group" class="h-10 w-auto mr-2">
+                        <div class="leading-tight">
+                            <div class="font-semibold text-gray-800">PT. YAY Enak Semua</div>
+                            <div class="text-xs text-gray-400">IT Asset Tracking</div>
+                        </div>
                     </a>
                 </div>
 
