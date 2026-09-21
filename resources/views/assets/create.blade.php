@@ -20,8 +20,9 @@
 
                         <div class="sm:col-span-2">
                             <label class="block text-sm font-medium text-gray-700">Foto Aset</label>
-                            <input type="file" name="photo" accept="image/*"
+                            <input type="file" name="photo" accept="image/*" capture="environment"
                                    class="mt-1 w-full border-gray-300 rounded-lg shadow-sm text-sm">
+                            <img id="photo-preview" src="" alt="Preview" class="hidden mt-2 h-32 w-32 object-cover rounded-lg border">
                             @error('photo') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 
@@ -141,6 +142,19 @@
                     btn.innerHTML = '<span class="inline-block animate-spin mr-2">⏳</span> Memproses...';
                 }
             });
+        });
+
+        document.querySelector('input[name="photo"]').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('photo-preview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
         });
     </script>
 </x-app-layout>
