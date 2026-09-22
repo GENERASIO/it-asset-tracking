@@ -50,8 +50,8 @@
         @foreach ($assets as $asset)
             <div class="label">
                 <img src="data:image/png;base64,{{ $asset->qrcode }}" alt="barcode">
-                <p>{{ $asset->asset_code }}</p>
-                <p class="asset-name">{{ $asset->name ?: '-' }}</p>
+                <p class="asset-code" style="color: #000 !important; font-family: 'Courier New', monospace; font-weight: bold; font-size: 9pt; margin-top: 2mm;">{{ $asset->asset_code }}</p>
+                <p class="asset-name" style="color: #000 !important; font-size: 7pt; margin-top: 1mm;">{{ $asset->name ?: '-' }}</p>
             </div>
         @endforeach
     </div>
