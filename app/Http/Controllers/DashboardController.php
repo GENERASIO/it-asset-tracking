@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Models\AssetLog;
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\MaintenanceLog;
@@ -46,7 +47,48 @@ class DashboardController extends Controller
                 ->orderBy('created_at')
                 ->get();
 
-            return view('dashboard', compact('stats', 'recentAssets', 'warrantySoon', 'warrantyAlerts', 'overdueMaintenances'));
+            $assetLogActivities = AssetLog::with(['asset', 'handledBy'])
+                ->latest()
+                ->take(10)
+                ->get()
+                ->map(function ($log) {
+                    return [
+                        'type' => 'asset_log',
+                        'user_name' => optional($log->handledBy)->name ?? 'System',
+                        'action' => $log->action,
+                        'asset_code' => optional($log->asset)->asset_code ?? '-',
+                        'description' => match ($log->action) {
+                            'check_out' => 'melakukan checkout',
+                            'check_in' => 'melakukan checkin',
+                            'transfer' => 'memindahkan',
+                            'status_change' => 'mengubah status',
+                            default => $log->action,
+                        },
+                        'created_at' => $log->created_at,
+                    ];
+                });
+
+            $maintenanceActivities = MaintenanceLog::with(['asset', 'createdBy'])
+                ->latest()
+                ->take(10)
+                ->get()
+                ->map(function ($log) {
+                    return [
+                        'type' => 'maintenance',
+                        'user_name' => optional($log->createdBy)->name ?? 'System',
+                        'action' => 'maintenance',
+                        'asset_code' => optional($log->asset)->asset_code ?? '-',
+                        'description' => 'melaporkan maintenance pada',
+                        'created_at' => $log->created_at,
+                    ];
+                });
+
+            $recentActivities = $assetLogActivities->concat($maintenanceActivities)
+                ->sortByDesc('created_at')
+                ->take(10)
+                ->values();
+
+            return view('dashboard', compact('stats', 'recentAssets', 'warrantySoon', 'warrantyAlerts', 'overdueMaintenances', 'recentActivities'));
         }
 
         // Role "user" biasa: lihat aset miliknya sendiri

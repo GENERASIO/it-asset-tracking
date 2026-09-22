@@ -158,6 +158,29 @@
                     </div>
                 </div>
 
+                {{-- RECENT ACTIVITIES --}}
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+                    <p class="font-medium text-sm mb-4 dark:text-white">Aktivitas Terbaru</p>
+
+                    @forelse($recentActivities as $activity)
+                        <div class="flex gap-3 py-2.5 {{ !$loop->last ? 'border-b border-gray-100 dark:border-gray-700' : '' }}">
+                            <div class="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-xs font-medium text-purple-700 dark:text-purple-300 flex-shrink-0">
+                                {{ collect(explode(' ', $activity['user_name']))->map(fn($n) => strtoupper(substr($n, 0, 1)))->take(2)->join('') }}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm dark:text-gray-200">
+                                    <span class="font-medium">{{ $activity['user_name'] }}</span>
+                                    {{ $activity['description'] }}
+                                    <span class="font-mono text-xs bg-gray-50 dark:bg-gray-700 px-1.5 py-0.5 rounded">{{ $activity['asset_code'] }}</span>
+                                </p>
+                                <p class="text-xs text-gray-400 mt-0.5">{{ $activity['created_at']->diffForHumans() }}</p>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-400 text-center py-4">Belum ada aktivitas.</p>
+                    @endforelse
+                </div>
+
             @elseif (isset($myAssets))
                 {{-- DASHBOARD USER BIASA --}}
 
