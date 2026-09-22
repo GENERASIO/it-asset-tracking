@@ -25,6 +25,11 @@
         <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     </head>
     <body class="font-sans text-gray-900 dark:text-white antialiased">
+        <button onclick="toggleDarkMode()" class="fixed top-4 right-4 p-2 rounded-lg bg-white/20 dark:bg-black/20 hover:bg-white/30 dark:hover:bg-black/30 transition">
+            <span class="dark:hidden">🌙</span>
+            <span class="hidden dark:inline">☀️</span>
+        </button>
+
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
             <div class="flex justify-center mb-4">
                 <img src="{{ asset('images/logo.png') }}" alt="YAY Group" class="h-20 w-auto">
