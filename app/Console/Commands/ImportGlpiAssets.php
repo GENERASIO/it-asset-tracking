@@ -80,7 +80,7 @@ class ImportGlpiAssets extends Command
             // data Lokasi tetap harus dipetakan ke suatu Location — pakai fallback "Tidak Diketahui".
             $rawLocation = trim($row['Locations'] ?? '');
             $locationName = !empty($rawLocation) ? str_replace(' > ', ' - ', $rawLocation) : 'Tidak Diketahui';
-            if (!isset($locationCache[$locationName])) {
+            if (!array_key_exists($locationName, $locationCache)) {
                 $location = Location::where('name', $locationName)->first();
                 if (!$location) {
                     $code = $this->generateCode($locationName, 'location');
@@ -100,7 +100,7 @@ class ImportGlpiAssets extends Command
             // === KATEGORI ===
             $rawType = trim($row['Types'] ?? '');
             $categoryName = $this->typeMap[$rawType] ?? ($rawType ?: 'Lainnya');
-            if (!isset($categoryCache[$categoryName])) {
+            if (!array_key_exists($categoryName, $categoryCache)) {
                 $category = Category::where('name', $categoryName)->first();
                 if (!$category) {
                     $code = $this->generateCode($categoryName, 'category');
@@ -117,7 +117,7 @@ class ImportGlpiAssets extends Command
             $categoryId = $categoryCache[$categoryName];
 
             // === USER (pemegang aset) ===
-            if (!isset($userCache[$name])) {
+            if (!array_key_exists($name, $userCache)) {
                 $user = User::where('name', $name)->first();
                 if (!$user) {
                     $email = $this->generateEmail($name);
