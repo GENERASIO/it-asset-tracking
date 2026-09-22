@@ -10,3 +10,32 @@ body {
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+.sortable-ghost {
+    opacity: 0.4;
+    background: #f3f4f6 !important;
+}
+.dark .sortable-ghost {
+    background: #374151 !important;
+}
+
+.sortable-chosen {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    transform: scale(1.02);
+}
+
+.sortable-drag {
+    opacity: 0.9;
+    cursor: grabbing !important;
+}
+
+.board-column-droppable {
+    transition: background-color 0.2s ease;
+}
+
+.board-column-hover {
+    background-color: rgba(59, 130, 246, 0.08) !important;
+    outline: 2px dashed rgba(59, 130, 246, 0.4);
+    outline-offset: -4px;
+    border-radius: 12px;
+}

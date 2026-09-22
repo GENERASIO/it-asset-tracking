@@ -9,12 +9,32 @@ window.addEventListener('DOMContentLoaded', () => {
     columns.forEach((column) => {
         Sortable.create(column, {
             group: 'assets',
-            animation: 150,
-            ghostClass: 'opacity-50',
-            delay: 150,
+            animation: 200,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            dragClass: 'sortable-drag',
+            delay: 100,
             delayOnTouchOnly: true,
             touchStartThreshold: 5,
+            onStart: (evt) => {
+                document.querySelectorAll('.board-column').forEach((col) => {
+                    col.classList.add('board-column-droppable');
+                });
+                evt.from.closest('.board-column')?.classList.add('board-column-source');
+            },
+            onMove: (evt) => {
+                document.querySelectorAll('.board-column-hover').forEach((col) => {
+                    col.classList.remove('board-column-hover');
+                });
+                evt.to.closest('.board-column')?.classList.add('board-column-hover');
+                return true;
+            },
             onEnd: (event) => {
+                document.querySelectorAll('.board-column').forEach((col) => {
+                    col.classList.remove('board-column-droppable', 'board-column-source', 'board-column-hover');
+                });
+
                 const card = event.item;
                 const newStatus = event.to.closest('.board-column')?.dataset.status;
                 const oldStatus = event.from.closest('.board-column')?.dataset.status;

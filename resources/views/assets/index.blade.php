@@ -116,7 +116,7 @@
                         <div class="flex gap-4 overflow-x-auto scroll-smooth pb-4">
                             @foreach ($statusColumns as $key => $meta)
                                 @php $columnAssets = $assets->get($key, collect()); @endphp
-                                <div class="board-column bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 w-72 shrink-0" data-status="{{ $key }}">
+                                <div class="board-column bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 w-72 shrink-0 transition-colors duration-200" data-status="{{ $key }}">
                                     <div class="flex items-center justify-between mb-3 px-1 {{ $meta['header'] }} rounded-lg py-2">
                                         <span class="font-semibold text-sm {{ $meta['text'] }}">{{ $meta['label'] }}</span>
                                         <span class="text-xs px-2 py-0.5 rounded-full {{ $meta['badge'] }}">{{ $columnAssets->count() }}</span>
