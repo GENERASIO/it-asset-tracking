@@ -53,30 +53,36 @@
                 @endif
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
+                    <a href="{{ route('assets.index', ['view' => 'table']) }}"
+                       class="block bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5 cursor-pointer">
                         <p class="text-sm text-gray-500">Total Aset</p>
                         <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ $stats['total'] }}</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5 border-l-4 border-green-500">
+                    </a>
+                    <a href="{{ route('assets.index', ['status' => 'available', 'view' => 'table']) }}"
+                       class="block bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5 border-l-4 border-green-500 cursor-pointer">
                         <p class="text-sm text-gray-500">Available</p>
-                        <p class="text-3xl font-bold text-green-600 mt-1">{{ $stats['available'] }}</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5 border-l-4 border-blue-500">
+                        <p class="text-3xl font-bold text-green-600 dark:text-green-400 mt-1">{{ $stats['available'] }}</p>
+                    </a>
+                    <a href="{{ route('assets.index', ['status' => 'in_use', 'view' => 'table']) }}"
+                       class="block bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5 border-l-4 border-blue-500 cursor-pointer">
                         <p class="text-sm text-gray-500">In Use</p>
-                        <p class="text-3xl font-bold text-blue-600 mt-1">{{ $stats['in_use'] }}</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5 border-l-4 border-yellow-500">
+                        <p class="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-1">{{ $stats['in_use'] }}</p>
+                    </a>
+                    <a href="{{ route('assets.index', ['status' => 'maintenance', 'view' => 'table']) }}"
+                       class="block bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5 border-l-4 border-yellow-500 cursor-pointer">
                         <p class="text-sm text-gray-500">Maintenance</p>
-                        <p class="text-3xl font-bold text-yellow-600 mt-1">{{ $stats['maintenance'] }}</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5 border-l-4 border-red-500">
+                        <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">{{ $stats['maintenance'] }}</p>
+                    </a>
+                    <a href="{{ route('assets.index', ['status' => 'broken', 'view' => 'table']) }}"
+                       class="block bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5 border-l-4 border-red-500 cursor-pointer">
                         <p class="text-sm text-gray-500">Broken</p>
-                        <p class="text-3xl font-bold text-red-600 mt-1">{{ $stats['broken'] }}</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5 border-l-4 border-gray-400">
+                        <p class="text-3xl font-bold text-red-600 dark:text-red-400 mt-1">{{ $stats['broken'] }}</p>
+                    </a>
+                    <a href="{{ route('assets.index', ['status' => 'retired', 'view' => 'table']) }}"
+                       class="block bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5 border-l-4 border-gray-400 cursor-pointer">
                         <p class="text-sm text-gray-500">Retired</p>
-                        <p class="text-3xl font-bold text-gray-500 mt-1">{{ $stats['retired'] }}</p>
-                    </div>
+                        <p class="text-3xl font-bold text-gray-500 dark:text-gray-400 mt-1">{{ $stats['retired'] }}</p>
+                    </a>
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                         <p class="text-sm text-gray-500">Kategori</p>
                         <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ $stats['categories'] }}</p>
