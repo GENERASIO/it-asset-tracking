@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AgentTokenController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\AssetController;
@@ -29,10 +30,13 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('locations', LocationController::class);
     Route::resource('users', UserController::class)->except(['show']);
+    Route::resource('agent-tokens', AgentTokenController::class)->only(['index', 'store', 'destroy']);
+    Route::get('agent-tokens/download/{os}', [AgentTokenController::class, 'downloadPackage'])->name('agent-tokens.download');
 });
 
 Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::resource('assets', AssetController::class)->except(['show']);
+    Route::delete('/assets/{asset}/photos/{photo}', [AssetController::class, 'destroyPhoto'])->name('assets.photos.destroy');
     Route::patch('/assets/{asset}/update-status', [AssetController::class, 'updateStatus'])->name('assets.update-status');
     Route::get('/assets-export', [AssetController::class, 'export'])->name('assets.export');
     Route::post('/assets-import', [AssetController::class, 'import'])->name('assets.import');

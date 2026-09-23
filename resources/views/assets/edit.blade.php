@@ -26,21 +26,43 @@
                         </div>
 
                         <div class="sm:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700">Foto Aset</label>
-                            @if ($asset->photo)
-                                <img id="photo-preview" src="{{ asset('uploads/assets/' . $asset->photo) }}" class="w-24 h-24 object-cover rounded-lg mb-2 mt-1">
-                            @else
-                                <img id="photo-preview" src="" alt="Preview" class="hidden mt-2 h-32 w-32 object-cover rounded-lg border">
+                            <label class="block text-sm font-medium text-gray-700">Foto Aset ({{ $asset->photos->count() }}/5)</label>
+
+                            @if ($asset->photos->isNotEmpty())
+                                <div class="flex flex-wrap gap-2 mt-1 mb-2">
+                                    @foreach ($asset->photos as $photo)
+                                        <div class="relative group">
+                                            <img src="{{ $photo->url }}" class="w-20 h-20 object-cover rounded-lg border">
+                                            <form action="{{ route('assets.photos.destroy', [$asset, $photo]) }}" method="POST"
+                                                  onsubmit="return confirm('Hapus foto ini?');"
+                                                  class="absolute -top-1.5 -right-1.5">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="w-5 h-5 rounded-full bg-red-600 text-white text-xs flex items-center justify-center leading-none">
+                                                    ×
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endforeach
+                                </div>
                             @endif
-                            <input type="file" name="photo" accept="image/*" capture="environment"
-                                   class="mt-1 w-full border-gray-300 rounded-lg shadow-sm text-sm">
-                            <p class="text-xs text-gray-400 mt-1">Kosongkan kalau tidak ingin ganti foto.</p>
-                            @error('photo') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+
+                            @if ($asset->photos->count() < 5)
+                                <input type="file" name="photos[]" accept="image/*" capture="environment" multiple
+                                       class="mt-1 w-full border-gray-300 rounded-lg shadow-sm text-sm">
+                                <div id="photo-preview-list" class="flex flex-wrap gap-2 mt-2"></div>
+                                <p class="text-xs text-gray-400 mt-1">Tambah foto baru (sisa slot: {{ 5 - $asset->photos->count() }}).</p>
+                            @else
+                                <p class="text-xs text-gray-400 mt-1">Sudah mencapai maksimal 5 foto. Hapus salah satu dulu untuk menambah.</p>
+                            @endif
+                            @error('photos') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                            @error('photos.*') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Kategori</label>
-                            <select name="category_id" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
+                            <select id="category_id" name="category_id" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
                                 <option value="">-- Pilih Kategori --</option>
                                 @foreach ($categories as $cat)
                                     <option value="{{ $cat->id }}" @selected(old('category_id', $asset->category_id) == $cat->id)>
@@ -48,12 +70,15 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @if (auth()->user()->role === 'super_admin')
+                                <x-quick-add-category-modal target-select-id="category_id" />
+                            @endif
                             @error('category_id') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Lokasi</label>
-                            <select name="location_id" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
+                            <select id="location_id" name="location_id" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
                                 <option value="">-- Pilih Lokasi --</option>
                                 @foreach ($locations as $loc)
                                     <option value="{{ $loc->id }}" @selected(old('location_id', $asset->location_id) == $loc->id)>
@@ -61,6 +86,9 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @if (auth()->user()->role === 'super_admin')
+                                <x-quick-add-location-modal target-select-id="location_id" />
+                            @endif
                             @error('location_id') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 
@@ -91,7 +119,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Dipegang Oleh (opsional)</label>
-                            <select name="assigned_to" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
+                            <select id="assigned_to" name="assigned_to" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
                                 <option value="">-- Tidak Ada --</option>
                                 @foreach ($users as $user)
                                     <option value="{{ $user->id }}" @selected(old('assigned_to', $asset->assigned_to) == $user->id)>
@@ -99,6 +127,9 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @if (auth()->user()->role === 'super_admin')
+                                <x-quick-add-user-modal target-select-id="assigned_to" :locations="$locations" />
+                            @endif
                         </div>
 
                         <div>
@@ -157,52 +188,66 @@
             });
         });
 
-        document.querySelector('input[name="photo"]').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        function compressImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const maxDimension = 1600;
+                        let width = img.width;
+                        let height = img.height;
 
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const maxDimension = 1600;
-                    let width = img.width;
-                    let height = img.height;
+                        if (width > height && width > maxDimension) {
+                            height = Math.round(height * (maxDimension / width));
+                            width = maxDimension;
+                        } else if (height > maxDimension) {
+                            width = Math.round(width * (maxDimension / height));
+                            height = maxDimension;
+                        }
 
-                    if (width > height && width > maxDimension) {
-                        height = Math.round(height * (maxDimension / width));
-                        width = maxDimension;
-                    } else if (height > maxDimension) {
-                        width = Math.round(width * (maxDimension / height));
-                        height = maxDimension;
-                    }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
 
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    canvas.toBlob(function(blob) {
-                        const compressedFile = new File([blob], file.name, {
-                            type: 'image/jpeg',
-                            lastModified: Date.now()
-                        });
-
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(compressedFile);
-                        document.querySelector('input[name="photo"]').files = dataTransfer.files;
-
-                        const preview = document.getElementById('photo-preview');
-                        preview.src = URL.createObjectURL(compressedFile);
-                        preview.classList.remove('hidden');
-
-                        console.log('Ukuran asli:', (file.size / 1024).toFixed(0) + 'KB', '→ Ukuran setelah kompresi:', (compressedFile.size / 1024).toFixed(0) + 'KB');
-                    }, 'image/jpeg', 0.75);
+                        canvas.toBlob(function(blob) {
+                            const compressedFile = new File([blob], file.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            console.log('Ukuran asli:', (file.size / 1024).toFixed(0) + 'KB', '→ setelah kompresi:', (compressedFile.size / 1024).toFixed(0) + 'KB');
+                            resolve(compressedFile);
+                        }, 'image/jpeg', 0.75);
+                    };
+                    img.src = event.target.result;
                 };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
+                reader.readAsDataURL(file);
+            });
+        }
+
+        const photoInput = document.querySelector('input[name="photos[]"]');
+        if (photoInput) {
+            photoInput.addEventListener('change', async function(e) {
+                const files = Array.from(e.target.files);
+                if (!files.length) return;
+
+                const compressedFiles = await Promise.all(files.map(compressImage));
+
+                const dataTransfer = new DataTransfer();
+                compressedFiles.forEach((f) => dataTransfer.items.add(f));
+                photoInput.files = dataTransfer.files;
+
+                const list = document.getElementById('photo-preview-list');
+                list.innerHTML = '';
+                compressedFiles.forEach((f) => {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(f);
+                    img.className = 'h-20 w-20 object-cover rounded-lg border';
+                    list.appendChild(img);
+                });
+            });
+        }
     </script>
 </x-app-layout>

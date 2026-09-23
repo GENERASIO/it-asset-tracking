@@ -17,6 +17,8 @@
 /public/*.zip
 /public/hot
 /public/storage
+/public/uploads/assets/*
+!/public/uploads/assets/.gitkeep
 /storage/*.key
 /storage/pail
 /vendor

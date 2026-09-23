@@ -54,6 +54,10 @@ class UserController extends Controller
 
         $user->forceFill(['email_verified_at' => now()])->save();
 
+        if ($request->wantsJson()) {
+            return response()->json(['user' => $user->only('id', 'name', 'email')], 201);
+        }
+
         return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan.');
     }
 

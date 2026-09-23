@@ -46,11 +46,71 @@
                 </div>
             </div>
 
-            <div class="flex justify-end">
-                <a href="{{ route('reports.export-pdf') }}"
-                   class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-all duration-150 hover:scale-105 active:scale-95">
-                    📄 Export ke PDF
-                </a>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                <form method="GET" class="flex flex-wrap items-end gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Filter Berdasarkan</label>
+                        <select name="date_field" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                            <option value="created_at" @selected($filters['date_field'] === 'created_at')>Tanggal Dicatat</option>
+                            <option value="purchase_date" @selected($filters['date_field'] === 'purchase_date')>Tanggal Pembelian</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Dari Tanggal</label>
+                        <input type="date" name="date_from" value="{{ $filters['date_from'] }}"
+                               class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Sampai Tanggal</label>
+                        <input type="date" name="date_to" value="{{ $filters['date_to'] }}"
+                               class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Kategori</label>
+                        <select name="category_id" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                            <option value="">Semua Kategori</option>
+                            @foreach ($categories as $cat)
+                                <option value="{{ $cat->id }}" @selected($filters['category_id'] == $cat->id)>{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Lokasi</label>
+                        <select name="location_id" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                            <option value="">Semua Lokasi</option>
+                            @foreach ($locations as $loc)
+                                <option value="{{ $loc->id }}" @selected($filters['location_id'] == $loc->id)>{{ $loc->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Status</label>
+                        <select name="status" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                            <option value="">Semua Status</option>
+                            @foreach ($statusLabels as $key => $label)
+                                <option value="{{ $key }}" @selected($filters['status'] === $key)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button type="submit"
+                                class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 transition-all duration-150 hover:scale-105 active:scale-95">
+                            Terapkan Filter
+                        </button>
+                        @if (array_filter($filters))
+                            <a href="{{ route('reports.index') }}"
+                               class="bg-gray-100 dark:bg-gray-700 dark:text-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">
+                                Reset
+                            </a>
+                        @endif
+                    </div>
+
+                    <a href="{{ route('reports.export-pdf', $filters) }}"
+                       class="ml-auto bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
+                        📄 Export ke PDF
+                    </a>
+                </form>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -52,6 +52,20 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Inisial nama untuk avatar (mis. "Aris Munandar" -> "AM", "aris" -> "A").
+     */
+    public function getInitialsAttribute(): string
+    {
+        $words = array_values(array_filter(preg_split('/\s+/', trim($this->name ?? ''))));
+
+        if (count($words) >= 2) {
+            return strtoupper(mb_substr($words[0], 0, 1) . mb_substr($words[1], 0, 1));
+        }
+
+        return strtoupper(mb_substr($words[0] ?? '', 0, 1));
+    }
+
     public function location()
     {
         return $this->belongsTo(Location::class);

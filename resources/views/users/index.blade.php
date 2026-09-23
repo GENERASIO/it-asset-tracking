@@ -27,10 +27,16 @@
                         <button type="submit" class="bg-gray-200 px-3 py-2 rounded-lg text-sm">Cari</button>
                     </form>
 
-                    <a href="{{ route('users.create') }}"
-                       class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
-                        + Tambah User
-                    </a>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ route('agent-tokens.index') }}"
+                           class="bg-gray-100 dark:bg-gray-700 dark:text-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
+                            Kelola Agent Token
+                        </a>
+                        <a href="{{ route('users.create') }}"
+                           class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
+                            + Tambah User
+                        </a>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto">

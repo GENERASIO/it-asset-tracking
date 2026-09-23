@@ -26,7 +26,11 @@ class LocationController extends Controller
             'address' => 'nullable|string|max:255',
         ]);
 
-        Location::create($validated);
+        $location = Location::create($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json(['location' => $location->only('id', 'name', 'code')], 201);
+        }
 
         return redirect()->route('locations.index')->with('success', 'Lokasi berhasil ditambahkan.');
     }

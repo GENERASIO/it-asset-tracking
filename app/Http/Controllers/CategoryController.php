@@ -25,7 +25,11 @@ class CategoryController extends Controller
             'code' => 'required|string|max:5|unique:categories,code',
         ]);
 
-        Category::create($validated);
+        $category = Category::create($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json(['category' => $category->only('id', 'name', 'code')], 201);
+        }
 
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan.');
     }

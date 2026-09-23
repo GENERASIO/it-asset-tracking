@@ -26,7 +26,7 @@
         ));
     @endphp
 
-    <div class="py-8">
+    <div class="py-8" x-data="{ quickView: null }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if (session('success'))
@@ -220,7 +220,24 @@
                                 </thead>
                                 <tbody>
                                     @forelse ($assets as $asset)
-                                        <tr data-asset-row="{{ $asset->id }}" class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-300">
+                                        <tr data-asset-row="{{ $asset->id }}"
+                                            data-asset="{{ json_encode([
+                                                'code' => $asset->asset_code,
+                                                'name' => $asset->name,
+                                                'category' => $asset->category->name ?? '-',
+                                                'location' => $asset->location->name ?? '-',
+                                                'statusLabel' => $statusColumns[$asset->status]['label'] ?? ucfirst($asset->status),
+                                                'statusBadge' => $statusColumns[$asset->status]['badge'] ?? 'bg-gray-100 text-gray-600',
+                                                'brandModel' => trim(($asset->brand ?? '').' '.($asset->model ?? '')) ?: '-',
+                                                'serial' => $asset->serial_number ?? '-',
+                                                'assignedTo' => $asset->assignedUser->name ?? '-',
+                                                'warranty' => optional($asset->warranty_expired_at)->format('d M Y') ?? '-',
+                                                'photo' => $asset->photo ? asset('uploads/assets/'.$asset->photo) : null,
+                                                'showUrl' => route('assets.show', $asset),
+                                                'editUrl' => route('assets.edit', $asset),
+                                            ]) }}"
+                                            @click="if (!$event.target.closest('a, button, .asset-checkbox, .status-select')) { quickView = JSON.parse($el.dataset.asset) }"
+                                            class="cursor-pointer border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-300">
                                             <td class="px-4 py-2">
                                                 <input type="checkbox" name="ids[]" value="{{ $asset->id }}" class="asset-checkbox">
                                             </td>
@@ -232,9 +249,9 @@
                                                 @endif
                                             </td>
                                             <td class="px-4 py-2 font-mono font-semibold whitespace-nowrap">
-                                                <a href="{{ route('assets.show', $asset) }}" class="text-brand-500 hover:underline">
+                                                <span class="text-brand-500">
                                                     {{ $asset->asset_code }}
-                                                </a>
+                                                </span>
                                             </td>
                                             <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $asset->name }}</td>
                                             <td class="px-4 py-2 text-gray-900 dark:text-white hidden md:table-cell">{{ $asset->category->name ?? '-' }}</td>
@@ -273,6 +290,88 @@
                         </div>
                     @endif
                 </form>
+            </div>
+        </div>
+
+        <!-- Quick View Drawer -->
+        <div x-show="quickView" style="display: none;" class="fixed inset-0 z-50">
+            <div class="absolute inset-0 bg-black/30" @click="quickView = null"></div>
+
+            <div x-show="quickView"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="translate-x-full"
+                 class="absolute right-0 top-0 h-full w-full sm:w-96 bg-white dark:bg-gray-800 shadow-xl flex flex-col">
+                <template x-if="quickView">
+                    <div class="flex flex-col h-full">
+                        <!-- Header -->
+                        <div class="bg-gradient-to-br from-indigo-950 via-purple-900 to-violet-800 px-5 py-4 flex items-center justify-between shrink-0">
+                            <p class="font-mono font-bold text-white text-lg truncate" x-text="quickView.code"></p>
+                            <button type="button" @click="quickView = null" class="text-white/80 hover:text-white transition">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+                            <template x-if="quickView.photo">
+                                <img :src="quickView.photo" class="w-full h-40 object-cover rounded-lg border dark:border-gray-700">
+                            </template>
+
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Nama</p>
+                                <p class="font-medium text-gray-900 dark:text-white" x-text="quickView.name"></p>
+                            </div>
+
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Status</p>
+                                <span class="inline-block mt-0.5 px-2 py-1 rounded-full text-xs font-medium" :class="quickView.statusBadge" x-text="quickView.statusLabel"></span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Kategori</p>
+                                    <p class="font-medium text-gray-900 dark:text-white" x-text="quickView.category"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Lokasi</p>
+                                    <p class="font-medium text-gray-900 dark:text-white" x-text="quickView.location"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Merk / Model</p>
+                                    <p class="font-medium text-gray-900 dark:text-white" x-text="quickView.brandModel"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Serial Number</p>
+                                    <p class="font-medium text-gray-900 dark:text-white" x-text="quickView.serial"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Dipegang Oleh</p>
+                                    <p class="font-medium text-gray-900 dark:text-white" x-text="quickView.assignedTo"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Garansi Sampai</p>
+                                    <p class="font-medium text-gray-900 dark:text-white" x-text="quickView.warranty"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="border-t border-gray-100 dark:border-gray-700 p-4 flex gap-2 shrink-0">
+                            <a :href="quickView.showUrl" class="flex-1 text-center bg-gray-100 dark:bg-gray-700 dark:text-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">
+                                Lihat Detail Lengkap
+                            </a>
+                            <a :href="quickView.editUrl" class="flex-1 text-center bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">
+                                Edit
+                            </a>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>

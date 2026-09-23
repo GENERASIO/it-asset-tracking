@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\AssetsExport;
 use App\Imports\AssetsImport;
 use App\Models\Asset;
+use App\Models\AssetPhoto;
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\User;
@@ -96,7 +97,8 @@ class AssetController extends Controller
             'purchase_date' => 'nullable|date',
             'purchase_price' => 'nullable|numeric',
             'warranty_expired_at' => 'nullable|date',
-            'photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'photos' => 'required|array|min:1|max:5',
+            'photos.*' => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $validated['asset_code'] = AssetCodeGenerator::generate(
@@ -104,11 +106,11 @@ class AssetController extends Controller
             $validated['location_id']
         );
 
-        if ($request->hasFile('photo')) {
-            $validated['photo'] = $request->file('photo')->store('', 'assets');
-        }
+        $photos = $validated['photos'];
+        unset($validated['photos']);
 
-        Asset::create($validated);
+        $asset = Asset::create($validated);
+        $this->storePhotos($asset, $photos);
 
         return redirect()->route('assets.index')->with('success', 'Aset berhasil ditambahkan.');
     }
@@ -116,7 +118,7 @@ class AssetController extends Controller
     public function show(Asset $asset)
     {
         $asset->load([
-            'category', 'location', 'assignedUser',
+            'category', 'location', 'assignedUser', 'photos',
             'logs.fromUser', 'logs.toUser', 'logs.handledBy',
             'maintenanceLogs.createdBy',
         ]);
@@ -135,6 +137,8 @@ class AssetController extends Controller
 
     public function update(Request $request, Asset $asset)
     {
+        $existingCount = $asset->photos()->count();
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -148,28 +152,62 @@ class AssetController extends Controller
             'purchase_date' => 'nullable|date',
             'purchase_price' => 'nullable|numeric',
             'warranty_expired_at' => 'nullable|date',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'photos' => ['nullable', 'array', function ($attribute, $value, $fail) use ($existingCount) {
+                if ($existingCount + count($value) > 5) {
+                    $fail('Total foto maksimal 5. Hapus foto lama dulu kalau mau tambah yang baru.');
+                }
+            }],
+            'photos.*' => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        if ($request->hasFile('photo')) {
-            if ($asset->photo) {
-                Storage::disk('assets')->delete($asset->photo);
-            }
-            $validated['photo'] = $request->file('photo')->store('', 'assets');
-        }
+        $photos = $validated['photos'] ?? [];
+        unset($validated['photos']);
 
         $asset->update($validated);
+        $this->storePhotos($asset, $photos);
 
         return redirect()->route('assets.index')->with('success', 'Aset berhasil diperbarui.');
     }
 
     public function destroy(Asset $asset)
     {
-        if ($asset->photo) {
-            Storage::disk('assets')->delete($asset->photo);
+        foreach ($asset->photos as $photo) {
+            Storage::disk('assets')->delete($photo->path);
         }
         $asset->delete();
         return redirect()->route('assets.index')->with('success', 'Aset berhasil dihapus.');
+    }
+
+    public function destroyPhoto(Asset $asset, AssetPhoto $photo)
+    {
+        abort_unless($photo->asset_id === $asset->id, 404);
+
+        Storage::disk('assets')->delete($photo->path);
+        $photo->delete();
+        $asset->syncPrimaryPhoto();
+
+        return back()->with('success', 'Foto berhasil dihapus.');
+    }
+
+    protected function storePhotos(Asset $asset, array $photos): void
+    {
+        if (empty($photos)) {
+            return;
+        }
+
+        $nextOrder = $asset->photos()->max('sort_order');
+        $nextOrder = is_null($nextOrder) ? 0 : $nextOrder + 1;
+
+        foreach ($photos as $photo) {
+            $path = $photo->store('', 'assets');
+
+            $asset->photos()->create([
+                'path' => $path,
+                'sort_order' => $nextOrder++,
+            ]);
+        }
+
+        $asset->syncPrimaryPhoto();
     }
 
     public function export()

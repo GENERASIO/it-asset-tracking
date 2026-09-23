@@ -21,6 +21,27 @@
     <h1>Laporan &amp; Analitik Aset IT</h1>
     <p class="subtitle">Dicetak pada {{ now()->translatedFormat('d F Y H:i') }}</p>
 
+    @php
+        $filterParts = [];
+        if (!empty($filters['date_from']) || !empty($filters['date_to'])) {
+            $dateFieldLabel = $filters['date_field'] === 'purchase_date' ? 'Tanggal Pembelian' : 'Tanggal Dicatat';
+            $filterParts[] = 'Periode ('.$dateFieldLabel.'): '.($filters['date_from'] ?: '...').' s/d '.($filters['date_to'] ?: '...');
+        }
+        if (!empty($filters['category_id'])) {
+            $filterParts[] = 'Kategori: '.optional($categories->firstWhere('id', $filters['category_id']))->name;
+        }
+        if (!empty($filters['location_id'])) {
+            $filterParts[] = 'Lokasi: '.optional($locations->firstWhere('id', $filters['location_id']))->name;
+        }
+        if (!empty($filters['status'])) {
+            $filterParts[] = 'Status: '.ucfirst(str_replace('_', ' ', $filters['status']));
+        }
+    @endphp
+
+    @if (count($filterParts))
+        <p class="subtitle"><strong>Filter aktif:</strong> {{ implode(' · ', $filterParts) }}</p>
+    @endif
+
     <div class="summary-box">
         <p><strong>Total Aset:</strong> {{ $totalAssets }}</p>
         <p><strong>Total Nilai Aset:</strong> Rp {{ number_format($totalAssetValue ?? 0, 0, ',', '.') }}</p>
