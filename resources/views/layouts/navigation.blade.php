@@ -124,12 +124,23 @@
     </div>
 
     <!-- Desktop Sidebar (icon rail + nav list) -->
-    <div class="hidden lg:flex lg:sticky lg:top-0 lg:h-screen lg:shrink-0">
+    <div class="hidden lg:flex lg:sticky lg:top-0 lg:h-screen lg:shrink-0"
+         x-data="{ collapsed: localStorage.getItem('sidebarCollapsed') === 'true' }"
+         x-init="$watch('collapsed', value => localStorage.setItem('sidebarCollapsed', value))">
         <!-- Icon Rail -->
         <div class="flex flex-col items-center w-16 h-full shrink-0 bg-gradient-to-b from-indigo-950 via-purple-900 to-violet-800 border-r border-indigo-900 py-4 gap-3">
             <a href="{{ route('dashboard') }}" class="w-10 h-10 rounded-lg bg-white flex items-center justify-center shrink-0">
                 <img src="{{ asset('images/logo.png') }}" alt="YAY Group" class="h-6 w-auto">
             </a>
+
+            <button type="button" @click="collapsed = !collapsed"
+                    class="w-8 h-8 rounded-lg text-white/70 hover:text-white hover:bg-white/10 flex items-center justify-center transition shrink-0"
+                    :title="collapsed ? 'Perluas menu' : 'Ciutkan menu'">
+                <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': collapsed }"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+            </button>
 
             @include('layouts.partials.notification-bell')
 
@@ -202,8 +213,9 @@
         </div>
 
         <!-- Nav List Panel -->
-        <aside class="flex flex-col w-52 h-full shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-        <div class="h-16 flex flex-col justify-center px-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
+        <aside class="flex flex-col h-full shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-200"
+               :class="collapsed ? 'w-16' : 'w-52'">
+        <div class="h-16 flex flex-col justify-center px-4 border-b border-gray-100 dark:border-gray-700 shrink-0" x-show="!collapsed">
             <div class="font-semibold text-gray-800 dark:text-white text-sm truncate">PT. YAY Enak Semua</div>
             <div class="text-xs text-gray-400 dark:text-gray-500 truncate">IT Asset Tracking</div>
         </div>

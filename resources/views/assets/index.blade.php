@@ -215,7 +215,7 @@
                                         <th class="px-4 py-2">
                                             <a href="{{ $sortUrl('status') }}" class="hover:underline">Status {{ $sortArrow('status') }}</a>
                                         </th>
-                                        <th class="px-4 py-2 text-right">Aksi</th>
+                                        <th class="px-4 py-2 text-right sticky right-0 z-10 bg-gray-50 dark:bg-gray-700 border-l border-gray-200 dark:border-gray-600">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -265,7 +265,7 @@
                                                     @endforeach
                                                 </select>
                                             </td>
-                                            <td class="px-4 py-2 text-right space-x-2 whitespace-nowrap">
+                                            <td class="px-4 py-2 text-right space-x-2 whitespace-nowrap sticky right-0 z-10 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700">
                                                 <a href="{{ route('assets.edit', $asset) }}" class="text-brand-500 hover:underline">✏️ Edit</a>
                                                 <a href="{{ route('barcode.print', $asset) }}" target="_blank" class="text-gray-600 dark:text-gray-300 hover:underline">🏷️ Label</a>
                                                 <button type="button" class="text-red-600 hover:underline"
