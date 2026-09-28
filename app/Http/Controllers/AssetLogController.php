@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\AssetLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AssetLogController extends Controller
 {
@@ -15,25 +16,36 @@ class AssetLogController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        if ($asset->status !== 'available') {
+        $ok = DB::transaction(function () use ($asset, $validated) {
+            // lockForUpdate menutup celah dua checkout barengan pada aset yang sama.
+            $locked = Asset::whereKey($asset->id)->lockForUpdate()->first();
+
+            if ($locked->status !== 'available') {
+                return false;
+            }
+
+            AssetLog::create([
+                'asset_id' => $locked->id,
+                'action' => 'check_out',
+                'from_user_id' => null,
+                'to_user_id' => $validated['to_user_id'],
+                'status_before' => $locked->status,
+                'status_after' => 'in_use',
+                'notes' => $validated['notes'] ?? null,
+                'handled_by' => auth()->id(),
+            ]);
+
+            $locked->update([
+                'assigned_to' => $validated['to_user_id'],
+                'status' => 'in_use',
+            ]);
+
+            return true;
+        });
+
+        if (! $ok) {
             return back()->with('error', 'Aset ini tidak dalam status Available, tidak bisa di-checkout.');
         }
-
-        AssetLog::create([
-            'asset_id' => $asset->id,
-            'action' => 'check_out',
-            'from_user_id' => null,
-            'to_user_id' => $validated['to_user_id'],
-            'status_before' => $asset->status,
-            'status_after' => 'in_use',
-            'notes' => $validated['notes'] ?? null,
-            'handled_by' => auth()->id(),
-        ]);
-
-        $asset->update([
-            'assigned_to' => $validated['to_user_id'],
-            'status' => 'in_use',
-        ]);
 
         return redirect()->route('assets.show', $asset)->with('success', 'Aset berhasil di-checkout.');
     }
@@ -45,25 +57,35 @@ class AssetLogController extends Controller
             'new_status' => 'required|in:available,maintenance,broken',
         ]);
 
-        if ($asset->status !== 'in_use') {
+        $ok = DB::transaction(function () use ($asset, $validated) {
+            $locked = Asset::whereKey($asset->id)->lockForUpdate()->first();
+
+            if ($locked->status !== 'in_use') {
+                return false;
+            }
+
+            AssetLog::create([
+                'asset_id' => $locked->id,
+                'action' => 'check_in',
+                'from_user_id' => $locked->assigned_to,
+                'to_user_id' => null,
+                'status_before' => $locked->status,
+                'status_after' => $validated['new_status'],
+                'notes' => $validated['notes'] ?? null,
+                'handled_by' => auth()->id(),
+            ]);
+
+            $locked->update([
+                'assigned_to' => null,
+                'status' => $validated['new_status'],
+            ]);
+
+            return true;
+        });
+
+        if (! $ok) {
             return back()->with('error', 'Aset ini tidak sedang dipinjam, tidak bisa di-checkin.');
         }
-
-        AssetLog::create([
-            'asset_id' => $asset->id,
-            'action' => 'check_in',
-            'from_user_id' => $asset->assigned_to,
-            'to_user_id' => null,
-            'status_before' => $asset->status,
-            'status_after' => $validated['new_status'],
-            'notes' => $validated['notes'] ?? null,
-            'handled_by' => auth()->id(),
-        ]);
-
-        $asset->update([
-            'assigned_to' => null,
-            'status' => $validated['new_status'],
-        ]);
 
         return redirect()->route('assets.show', $asset)->with('success', 'Aset berhasil di-checkin.');
     }

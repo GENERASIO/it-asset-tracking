@@ -11,7 +11,9 @@ use App\Models\Location;
 use App\Models\User;
 use App\Services\AssetCodeGenerator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AssetController extends Controller
@@ -95,7 +97,7 @@ class AssetController extends Controller
             'location_id' => 'required|exists:locations,id',
             'brand' => 'nullable|string|max:255',
             'model' => 'nullable|string|max:255',
-            'serial_number' => 'nullable|string|max:255',
+            'serial_number' => ['nullable', 'string', 'max:255', Rule::unique('assets', 'serial_number')],
             'specification' => 'nullable|string',
             'assigned_to' => 'nullable|exists:users,id',
             'status' => 'required|in:available,in_use,maintenance,broken,retired',
@@ -106,22 +108,29 @@ class AssetController extends Controller
             'photos.*' => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $validated['asset_code'] = AssetCodeGenerator::generate(
-            $validated['category_id'],
-            $validated['location_id']
-        );
-
         $photos = $validated['photos'];
         unset($validated['photos']);
 
-        $asset = Asset::create($validated);
+        $asset = DB::transaction(function () use ($validated) {
+            $validated['asset_code'] = AssetCodeGenerator::generate(
+                $validated['category_id'],
+                $validated['location_id']
+            );
+
+            return Asset::create($validated);
+        });
         $this->storePhotos($asset, $photos);
 
         return redirect()->route('assets.index')->with('success', 'Aset berhasil ditambahkan.');
     }
 
-    public function show(Asset $asset)
+    public function show(Request $request, Asset $asset)
     {
+        $user = $request->user();
+        $isStaff = in_array($user->role, ['super_admin', 'it_staff']);
+
+        abort_unless($isStaff || $asset->assigned_to === $user->id, 403, 'Anda tidak punya akses ke aset ini.');
+
         $asset->load([
             'category', 'location', 'assignedUser', 'photos',
             'logs.fromUser', 'logs.toUser', 'logs.handledBy',
@@ -150,7 +159,7 @@ class AssetController extends Controller
             'location_id' => 'required|exists:locations,id',
             'brand' => 'nullable|string|max:255',
             'model' => 'nullable|string|max:255',
-            'serial_number' => 'nullable|string|max:255',
+            'serial_number' => ['nullable', 'string', 'max:255', Rule::unique('assets', 'serial_number')->ignore($asset->id)],
             'specification' => 'nullable|string',
             'assigned_to' => 'nullable|exists:users,id',
             'status' => 'required|in:available,in_use,maintenance,broken,retired',
@@ -179,6 +188,7 @@ class AssetController extends Controller
         foreach ($asset->photos as $photo) {
             Storage::disk('assets')->delete($photo->path);
         }
+        $asset->photos()->delete();
         $asset->delete();
         return redirect()->route('assets.index')->with('success', 'Aset berhasil dihapus.');
     }
@@ -236,7 +246,15 @@ class AssetController extends Controller
         $request->validate(['status' => 'required|in:available,in_use,maintenance,broken,retired']);
 
         $oldStatus = $asset->status;
-        $asset->update(['status' => $request->status]);
+
+        // Samakan dengan alur check-in resmi: begitu aset tidak lagi berstatus "in_use",
+        // data "dipegang oleh" ikut dikosongkan supaya tidak nyangkut ke orang yang lama.
+        $newAttributes = ['status' => $request->status];
+        if ($request->status !== 'in_use') {
+            $newAttributes['assigned_to'] = null;
+        }
+
+        $asset->update($newAttributes);
 
         \App\Models\AssetLog::create([
             'asset_id' => $asset->id,

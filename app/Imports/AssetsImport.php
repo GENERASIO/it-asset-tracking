@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Location;
 use App\Services\AssetCodeGenerator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
@@ -28,28 +29,30 @@ class AssetsImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
-            $assetCode = trim((string) ($row['kode_aset'] ?? ''));
+            DB::transaction(function () use ($row, $name, $category, $location) {
+                $assetCode = trim((string) ($row['kode_aset'] ?? ''));
 
-            if ($assetCode === '') {
-                $assetCode = AssetCodeGenerator::generate($category->id, $location->id);
-            }
+                if ($assetCode === '') {
+                    $assetCode = AssetCodeGenerator::generate($category->id, $location->id);
+                }
 
-            Asset::updateOrCreate(
-                ['asset_code' => $assetCode],
-                [
-                    'name' => $name,
-                    'category_id' => $category->id,
-                    'brand' => $row['merk'] ?? null,
-                    'model' => $row['model'] ?? null,
-                    'serial_number' => $row['serial_number'] ?? null,
-                    'location_id' => $location->id,
-                    'status' => $row['status'] ?? 'available',
-                    'purchase_date' => $this->parseDate($row['tanggal_pembelian'] ?? null),
-                    'purchase_price' => $row['harga_beli'] ?? null,
-                    'warranty_expired_at' => $this->parseDate($row['garansi_sampai'] ?? null),
-                    'specification' => $row['spesifikasi'] ?? null,
-                ]
-            );
+                Asset::updateOrCreate(
+                    ['asset_code' => $assetCode],
+                    [
+                        'name' => $name,
+                        'category_id' => $category->id,
+                        'brand' => $row['merk'] ?? null,
+                        'model' => $row['model'] ?? null,
+                        'serial_number' => $row['serial_number'] ?? null,
+                        'location_id' => $location->id,
+                        'status' => $row['status'] ?? 'available',
+                        'purchase_date' => $this->parseDate($row['tanggal_pembelian'] ?? null),
+                        'purchase_price' => $row['harga_beli'] ?? null,
+                        'warranty_expired_at' => $this->parseDate($row['garansi_sampai'] ?? null),
+                        'specification' => $row['spesifikasi'] ?? null,
+                    ]
+                );
+            });
         }
     }
 

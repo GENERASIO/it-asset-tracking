@@ -69,6 +69,12 @@
                         @error('employee_id') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
+                    <div class="flex items-center gap-2">
+                        <input id="is_active" type="checkbox" name="is_active" value="1" checked
+                               class="rounded border-gray-300 text-brand-600 shadow-sm">
+                        <label for="is_active" class="text-sm font-medium text-gray-700">User Aktif</label>
+                    </div>
+
                     <div class="flex gap-2 pt-2">
                         <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg transition-all duration-150 hover:scale-105 active:scale-95">
                             Simpan
@@ -88,7 +94,7 @@
                 const btn = this.querySelector('button[type="submit"]');
                 if (btn) {
                     btn.disabled = true;
-                    btn.innerHTML = '<span class="inline-block animate-spin mr-2">⏳</span> Memproses...';
+                    btn.innerHTML = '<svg class="inline-block w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>Memproses...';
                 }
             });
         });

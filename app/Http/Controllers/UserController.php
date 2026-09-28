@@ -50,6 +50,7 @@ class UserController extends Controller
             'role' => $validated['role'],
             'location_id' => $validated['location_id'] ?? null,
             'employee_id' => $validated['employee_id'] ?? null,
+            'is_active' => $request->boolean('is_active', true),
         ]);
 
         $user->forceFill(['email_verified_at' => now()])->save();
@@ -85,6 +86,7 @@ class UserController extends Controller
             'role' => $validated['role'],
             'location_id' => $validated['location_id'] ?? null,
             'employee_id' => $validated['employee_id'] ?? null,
+            'is_active' => $user->id === $request->user()->id ? true : $request->boolean('is_active'),
         ];
 
         if (! empty($validated['password'])) {

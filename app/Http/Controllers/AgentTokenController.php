@@ -12,10 +12,6 @@ class AgentTokenController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->session()->has('newToken')) {
-            $request->session()->reflash();
-        }
-
         $tokens = AgentToken::with('creator')->latest()->get();
 
         $recentCheckins = Asset::whereNotNull('last_seen_at')
@@ -23,7 +19,9 @@ class AgentTokenController extends Controller
             ->take(20)
             ->get();
 
-        return view('agent-tokens.index', compact('tokens', 'recentCheckins'));
+        $newToken = $this->pullActiveTokenReveal($request);
+
+        return view('agent-tokens.index', compact('tokens', 'recentCheckins', 'newToken'));
     }
 
     public function store(Request $request)
@@ -34,9 +32,30 @@ class AgentTokenController extends Controller
 
         [$agentToken, $plainToken] = AgentToken::generate($request->name, $request->user()->id);
 
+        $request->session()->put('newTokenReveal', [
+            'token' => $plainToken,
+            'expires_at' => now()->addMinutes(10),
+        ]);
+
         return redirect()->route('agent-tokens.index')
-            ->with('newToken', $plainToken)
-            ->with('success', 'Token "'.$agentToken->name.'" berhasil dibuat. Salin sekarang, token ini tidak akan ditampilkan lagi.');
+            ->with('success', 'Token "'.$agentToken->name.'" berhasil dibuat. Salin sekarang, token ini hanya ditampilkan selama 10 menit.');
+    }
+
+    /**
+     * Ambil token yang baru saja dibuat kalau masih dalam window reveal (10 menit),
+     * sekaligus bersihkan dari session begitu sudah lewat waktunya.
+     */
+    protected function pullActiveTokenReveal(Request $request): ?string
+    {
+        $reveal = $request->session()->get('newTokenReveal');
+
+        if (! $reveal || now()->greaterThan($reveal['expires_at'])) {
+            $request->session()->forget('newTokenReveal');
+
+            return null;
+        }
+
+        return $reveal['token'];
     }
 
     public function destroy(AgentToken $agentToken)
@@ -48,16 +67,14 @@ class AgentTokenController extends Controller
 
     /**
      * Download paket agent (script + config berisi token) yang baru saja dibuat.
-     * Hanya tersedia selama token masih ada di session (sekali reveal), sama seperti tampilan copy-token.
+     * Hanya tersedia selama masih dalam window reveal 10 menit sejak token dibuat.
      */
     public function downloadPackage(Request $request, string $os)
     {
         abort_unless(in_array($os, ['windows', 'macos']), 404);
 
-        $token = $request->session()->get('newToken');
+        $token = $this->pullActiveTokenReveal($request);
         abort_unless($token, 404, 'Token sudah tidak tersedia untuk didownload. Buat token baru untuk mendapatkan paket agent.');
-
-        $request->session()->reflash();
 
         $apiUrl = url('/api/agent/checkin');
         $sourceDir = base_path("agents/{$os}");

@@ -12,21 +12,27 @@
                 </div>
             @endif
 
-            @if (session('newToken'))
+            @if ($newToken)
                 <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm space-y-3">
-                    <p class="font-medium text-yellow-800">Token baru (salin sekarang, tidak akan ditampilkan lagi):</p>
-                    <code class="block bg-white border border-yellow-300 rounded px-3 py-2 font-mono text-xs break-all select-all">{{ session('newToken') }}</code>
+                    <p class="font-medium text-yellow-800">Token baru (salin sekarang, tampilan ini hilang otomatis dalam 10 menit):</p>
+                    <code class="block bg-white border border-yellow-300 rounded px-3 py-2 font-mono text-xs break-all select-all">{{ $newToken }}</code>
 
                     <div>
                         <p class="text-yellow-800 mb-2">Atau langsung download paket agent yang sudah berisi token ini (tidak perlu edit config manual):</p>
                         <div class="flex flex-wrap gap-2">
                             <a href="{{ route('agent-tokens.download', 'windows') }}"
-                               class="bg-yellow-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-900 transition-all duration-150 hover:scale-105 active:scale-95">
-                                ⬇️ Download Agent Windows (.zip)
+                               class="flex items-center gap-1.5 bg-yellow-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-900 transition-all duration-150 hover:scale-105 active:scale-95">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                </svg>
+                                Download Agent Windows (.zip)
                             </a>
                             <a href="{{ route('agent-tokens.download', 'macos') }}"
-                               class="bg-yellow-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-900 transition-all duration-150 hover:scale-105 active:scale-95">
-                                ⬇️ Download Agent macOS (.zip)
+                               class="flex items-center gap-1.5 bg-yellow-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-900 transition-all duration-150 hover:scale-105 active:scale-95">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                </svg>
+                                Download Agent macOS (.zip)
                             </a>
                         </div>
                     </div>
@@ -142,7 +148,7 @@
                     3. Selesai — laptop otomatis check-in saat login dan setiap hari ke <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">{{ url('/api/agent/checkin') }}</code>, muncul otomatis di daftar Aset.
                 </p>
                 <p class="text-xs text-gray-400 pt-2 border-t dark:border-gray-700">
-                    Tombol download hanya tersedia sesaat setelah token dibuat (sama seperti tampilan token-nya). Kalau sudah tertutup, buat token baru untuk mendapat paket download lagi.
+                    Tombol download hanya tersedia selama 10 menit sejak token dibuat. Kalau sudah lewat, buat token baru untuk mendapat paket download lagi.
                 </p>
             </div>
 

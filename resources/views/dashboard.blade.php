@@ -11,7 +11,12 @@
 
                 @if ($warrantyAlerts->count() > 0)
                     <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg p-4">
-                        <h3 class="font-semibold text-yellow-800 dark:text-yellow-300 mb-2">⚠️ Garansi Akan Habis</h3>
+                        <h3 class="flex items-center gap-2 font-semibold text-yellow-800 dark:text-yellow-300 mb-2">
+                            <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                            </svg>
+                            Garansi Akan Habis
+                        </h3>
                         <div class="space-y-1">
                             @foreach ($warrantyAlerts as $asset)
                                 <div class="flex justify-between items-center text-sm">
@@ -30,7 +35,12 @@
 
                 @if ($overdueMaintenances->count() > 0)
                     <div class="bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg p-4">
-                        <h3 class="font-semibold text-red-800 dark:text-red-300 mb-2">🔧 Maintenance Menggantung</h3>
+                        <h3 class="flex items-center gap-2 font-semibold text-red-800 dark:text-red-300 mb-2">
+                            <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
+                            </svg>
+                            Maintenance Menggantung
+                        </h3>
                         <div class="space-y-1">
                             @foreach ($overdueMaintenances as $log)
                                 <div class="flex justify-between items-center text-sm">
@@ -139,7 +149,12 @@
 
                     {{-- WARRANTY ALERT --}}
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
-                        <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">⚠️ Garansi Segera Habis (30 hari)</h3>
+                        <h3 class="flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                            <svg class="w-5 h-5 shrink-0 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                            </svg>
+                            Garansi Segera Habis (30 hari)
+                        </h3>
                         @forelse ($warrantySoon as $asset)
                             <div class="flex justify-between items-center border-b dark:border-gray-700 py-2 text-sm">
                                 <div>
