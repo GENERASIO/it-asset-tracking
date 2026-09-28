@@ -30,9 +30,14 @@ class AssetController extends Controller
         $query = Asset::with(['category', 'location', 'assignedUser']);
 
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('assets.asset_code', 'like', '%' . $request->search . '%')
-                  ->orWhere('assets.name', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('assets.asset_code', 'like', '%' . $search . '%')
+                  ->orWhere('assets.name', 'like', '%' . $search . '%')
+                  ->orWhere('assets.serial_number', 'like', '%' . $search . '%')
+                  ->orWhereHas('assignedUser', function ($uq) use ($search) {
+                      $uq->where('name', 'like', '%' . $search . '%');
+                  });
             });
         }
 

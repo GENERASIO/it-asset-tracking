@@ -42,7 +42,7 @@
                         <form method="GET" class="flex flex-wrap gap-2">
                             <input type="hidden" name="view" value="{{ $view }}">
                             <input type="text" name="search" value="{{ request('search') }}"
-                                   placeholder="Cari kode / nama aset..."
+                                   placeholder="Cari kode / nama / serial number / pemegang..."
                                    class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
 
                             <select name="category_id" class="border-gray-300 rounded-lg text-sm">
