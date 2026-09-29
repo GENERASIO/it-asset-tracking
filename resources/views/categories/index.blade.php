@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="Kategori Aset">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">Kategori Aset</h2>
     </x-slot>

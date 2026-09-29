@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="Tambah Kategori">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Tambah Kategori</h2>
     </x-slot>

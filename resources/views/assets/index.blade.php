@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="Daftar Aset">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">Daftar Aset IT</h2>
     </x-slot>

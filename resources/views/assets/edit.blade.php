@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="Edit Aset - {{ $asset->asset_code }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Edit Aset</h2>
     </x-slot>
