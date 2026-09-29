@@ -10,6 +10,8 @@ class BarcodeController extends Controller
 {
     public function print(Asset $asset)
     {
+        $asset->load(['category', 'location', 'assignedUser', 'logs' => fn ($q) => $q->limit(3)]);
+
         $url = route('assets.show', $asset, true);
         $barcode = DNS2D::getBarcodePNG($url, 'QRCODE', 4, 4);
 
@@ -20,7 +22,9 @@ class BarcodeController extends Controller
     {
         $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:assets,id']);
 
-        $assets = Asset::whereIn('id', $request->ids)->get();
+        $assets = Asset::whereIn('id', $request->ids)
+            ->with(['category', 'location', 'logs' => fn ($q) => $q->limit(1)])
+            ->get();
 
         $assets->transform(function ($asset) {
             $url = route('assets.show', $asset, true);
