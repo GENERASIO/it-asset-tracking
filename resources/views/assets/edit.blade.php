@@ -34,7 +34,7 @@
                                         <div class="relative group">
                                             <img src="{{ $photo->url }}" class="w-20 h-20 object-cover rounded-lg border">
                                             <form action="{{ route('assets.photos.destroy', [$asset, $photo]) }}" method="POST"
-                                                  onsubmit="return confirm('Hapus foto ini?');"
+                                                  onsubmit="event.preventDefault(); confirmAction('Foto ini akan dihapus permanen.', () => this.submit(), 'Hapus foto ini?');"
                                                   class="absolute -top-1.5 -right-1.5">
                                                 @csrf
                                                 @method('DELETE')

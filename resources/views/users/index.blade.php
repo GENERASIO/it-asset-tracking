@@ -73,7 +73,7 @@
                                         <a href="{{ route('users.edit', $user) }}"
                                            class="text-brand-500 hover:underline">Edit</a>
                                         <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline"
-                                              onsubmit="return confirm('Yakin hapus user ini?');">
+                                              onsubmit="event.preventDefault(); confirmAction('User yang sudah dihapus tidak bisa dikembalikan.', () => this.submit(), 'Hapus user ini?');">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:underline">Hapus</button>
                                         </form>

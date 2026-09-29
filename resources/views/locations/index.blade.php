@@ -41,7 +41,7 @@
                                        class="text-brand-500 hover:underline">Edit</a>
                                     <form action="{{ route('locations.destroy', $location) }}"
                                           method="POST" class="inline"
-                                          onsubmit="return confirm('Yakin hapus lokasi ini?');">
+                                          onsubmit="event.preventDefault(); confirmAction('Lokasi yang sudah dihapus tidak bisa dikembalikan.', () => this.submit(), 'Hapus lokasi ini?');">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:underline">Hapus</button>
                                     </form>

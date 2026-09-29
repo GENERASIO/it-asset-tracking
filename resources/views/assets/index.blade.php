@@ -417,11 +417,11 @@
         }
 
         function confirmDeleteAsset(url) {
-            if (confirm('Yakin hapus aset ini?')) {
+            confirmAction('Aset yang sudah dihapus tidak bisa dikembalikan.', function () {
                 var form = document.getElementById('delete-asset-form');
                 form.action = url;
                 form.submit();
-            }
+            }, 'Hapus aset ini?');
         }
 
         function handleStatusChange(selectEl) {

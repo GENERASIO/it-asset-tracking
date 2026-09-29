@@ -45,6 +45,8 @@
             </div>
         </div>
 
+        <x-confirm-modal />
+
         @vite(['resources/js/dark-mode.js'])
     </body>
 </html>

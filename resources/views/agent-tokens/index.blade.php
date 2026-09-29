@@ -82,7 +82,7 @@
                                     <td class="px-4 py-2 text-right">
                                         @unless ($token->revoked_at)
                                             <form method="POST" action="{{ route('agent-tokens.destroy', $token) }}"
-                                                  onsubmit="return confirm('Cabut token ini? Agent yang memakainya akan berhenti bisa check-in.');">
+                                                  onsubmit="event.preventDefault(); confirmAction('Agent yang memakainya akan berhenti bisa check-in.', () => this.submit(), 'Cabut token ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:underline">Cabut</button>

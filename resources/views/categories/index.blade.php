@@ -39,7 +39,7 @@
                                        class="text-brand-500 hover:underline">Edit</a>
                                     <form action="{{ route('categories.destroy', $category) }}"
                                           method="POST" class="inline"
-                                          onsubmit="return confirm('Yakin hapus kategori ini?');">
+                                          onsubmit="event.preventDefault(); confirmAction('Kategori yang sudah dihapus tidak bisa dikembalikan.', () => this.submit(), 'Hapus kategori ini?');">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:underline">Hapus</button>
                                     </form>
