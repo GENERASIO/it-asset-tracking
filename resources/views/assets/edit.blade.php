@@ -33,16 +33,11 @@
                                     @foreach ($asset->photos as $photo)
                                         <div class="relative group">
                                             <img src="{{ $photo->url }}" class="w-20 h-20 object-cover rounded-lg border">
-                                            <form action="{{ route('assets.photos.destroy', [$asset, $photo]) }}" method="POST"
-                                                  onsubmit="event.preventDefault(); confirmAction('Foto ini akan dihapus permanen.', () => this.submit(), 'Hapus foto ini?');"
-                                                  class="absolute -top-1.5 -right-1.5">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="w-5 h-5 rounded-full bg-red-600 text-white text-xs flex items-center justify-center leading-none">
-                                                    ×
-                                                </button>
-                                            </form>
+                                            <button type="button"
+                                                    onclick="confirmDeletePhoto('{{ route('assets.photos.destroy', [$asset, $photo]) }}')"
+                                                    class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-600 text-white text-xs flex items-center justify-center leading-none">
+                                                ×
+                                            </button>
                                         </div>
                                     @endforeach
                                 </div>
@@ -175,6 +170,13 @@
                         </a>
                     </div>
                 </form>
+
+                <!-- Form terpisah (bukan nested di dalam form utama - HTML tidak izinkan form
+                     bersarang, dan browser bakal menutup form utama lebih awal kalau dipaksakan). -->
+                <form id="delete-photo-form" action="" method="POST" class="hidden">
+                    @csrf
+                    @method('DELETE')
+                </form>
             </div>
         </div>
     </div>
@@ -194,25 +196,13 @@
             });
         });
 
-        // Diagnostik sementara: kalau tombol "Perbarui Aset" diklik tapi form gagal
-        // tervalidasi oleh browser (field kosong/tidak valid), langsung tunjukkan
-        // field mana yang bermasalah lewat alert - supaya kelihatan tanpa perlu buka DevTools.
-        (function () {
-            const mainForm = document.querySelector('form[action*="/assets/"]');
-            if (!mainForm) return;
-
-            mainForm.querySelector('button[type="submit"]').addEventListener('click', function () {
-                setTimeout(() => {
-                    if (!mainForm.checkValidity()) {
-                        const invalidField = mainForm.querySelector(':invalid');
-                        const label = invalidField
-                            ? (invalidField.closest('div')?.querySelector('label')?.textContent.trim() || invalidField.name)
-                            : 'tidak diketahui';
-                        alert('Form belum bisa disimpan. Field yang bermasalah: ' + label + '\n\n(' + (invalidField?.validationMessage || '') + ')');
-                    }
-                }, 50);
-            });
-        })();
+        function confirmDeletePhoto(url) {
+            confirmAction('Foto ini akan dihapus permanen.', function () {
+                const form = document.getElementById('delete-photo-form');
+                form.action = url;
+                form.submit();
+            }, 'Hapus foto ini?');
+        }
     </script>
     @vite(['resources/js/photo-compress.js'])
 </x-app-layout>
