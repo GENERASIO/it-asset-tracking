@@ -18,6 +18,35 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class AssetController extends Controller
 {
+    public function searchSuggestions(Request $request)
+    {
+        $search = trim((string) $request->query('q'));
+
+        if ($search === '') {
+            return response()->json([]);
+        }
+
+        $assets = Asset::query()
+            ->where(function ($q) use ($search) {
+                $q->where('asset_code', 'like', '%' . $search . '%')
+                  ->orWhere('name', 'like', '%' . $search . '%')
+                  ->orWhere('serial_number', 'like', '%' . $search . '%')
+                  ->orWhereHas('assignedUser', function ($uq) use ($search) {
+                      $uq->where('name', 'like', '%' . $search . '%');
+                  });
+            })
+            ->limit(8)
+            ->get(['id', 'asset_code', 'name', 'status'])
+            ->map(fn ($asset) => [
+                'id' => $asset->id,
+                'asset_code' => $asset->asset_code,
+                'name' => $asset->name,
+                'status' => $asset->status,
+            ]);
+
+        return response()->json($assets);
+    }
+
     public function index(Request $request)
     {
         $requestedView = $request->query('view');

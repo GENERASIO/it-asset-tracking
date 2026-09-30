@@ -41,27 +41,31 @@
                     <div class="flex flex-wrap items-center gap-2">
                         <form method="GET" class="flex flex-wrap gap-2">
                             <input type="hidden" name="view" value="{{ $view }}">
-                            <input type="text" name="search" value="{{ request('search') }}"
-                                   placeholder="Cari kode / nama / serial number / pemegang..."
-                                   class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
 
-                            <select name="category_id" class="border-gray-300 rounded-lg text-sm">
-                                <option value="">Semua Kategori</option>
-                                @foreach ($categories as $cat)
-                                    <option value="{{ $cat->id }}" @selected(request('category_id') == $cat->id)>
-                                        {{ $cat->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <div class="relative" x-data="assetSearchSuggest(@js(route('assets.search-suggestions')), @js(request('search', '')))" @click.outside="open = false">
+                                <input type="text" name="search" x-model="query" @input.debounce.300ms="fetchSuggestions()"
+                                       @focus="if (results.length) open = true" @keydown.escape="open = false"
+                                       autocomplete="off"
+                                       placeholder="Cari kode / nama / serial number / pemegang..."
+                                       class="w-72 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
 
-                            <select name="status" class="border-gray-300 rounded-lg text-sm">
-                                <option value="">Semua Status</option>
-                                @foreach ($statusColumns as $key => $meta)
-                                    <option value="{{ $key }}" @selected(request('status') == $key)>
-                                        {{ $meta['label'] }}
-                                    </option>
-                                @endforeach
-                            </select>
+                                <div x-show="open && results.length" style="display: none;"
+                                     class="absolute z-20 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-64 overflow-auto">
+                                    <template x-for="item in results" :key="item.id">
+                                        <button type="button" @click="select(item)"
+                                                class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2">
+                                            <span class="font-mono font-semibold text-gray-800 dark:text-white" x-text="item.asset_code"></span>
+                                            <span class="text-gray-500 dark:text-gray-400 truncate" x-text="item.name"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <x-searchable-select name="category_id" placeholder="Semua Kategori"
+                                :options="$categories->pluck('name', 'id')" :selected="request('category_id')" />
+
+                            <x-searchable-select name="status" placeholder="Semua Status"
+                                :options="collect($statusColumns)->map(fn ($m) => $m['label'])" :selected="request('status')" />
 
                             <button type="submit" class="bg-gray-200 px-3 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Filter</button>
                         </form>
@@ -405,6 +409,32 @@
     </form>
 
     <script>
+        function assetSearchSuggest(suggestUrl, initialQuery) {
+            return {
+                query: initialQuery || '',
+                results: [],
+                open: false,
+                fetchSuggestions() {
+                    if (!this.query || this.query.trim().length < 2) {
+                        this.results = [];
+                        this.open = false;
+                        return;
+                    }
+                    fetch(suggestUrl + '?q=' + encodeURIComponent(this.query))
+                        .then((res) => res.json())
+                        .then((data) => {
+                            this.results = data;
+                            this.open = data.length > 0;
+                        });
+                },
+                select(item) {
+                    this.query = item.asset_code;
+                    this.open = false;
+                    this.$el.closest('form').submit();
+                },
+            };
+        }
+
         function handleAssetCardClick(event, url) {
             if (event.target.closest('.asset-checkbox, .asset-delete-btn')) return;
             window.location = url;

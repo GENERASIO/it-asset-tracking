@@ -40,6 +40,7 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::patch('/assets/{asset}/update-status', [AssetController::class, 'updateStatus'])->name('assets.update-status');
     Route::get('/assets-export', [AssetController::class, 'export'])->name('assets.export');
     Route::post('/assets-import', [AssetController::class, 'import'])->name('assets.import');
+    Route::get('/assets-search-suggestions', [AssetController::class, 'searchSuggestions'])->name('assets.search-suggestions');
     Route::post('/assets/{asset}/checkout', [AssetLogController::class, 'checkout'])->name('assets.checkout');
     Route::post('/assets/{asset}/checkin', [AssetLogController::class, 'checkin'])->name('assets.checkin');
     Route::post('/assets/{asset}/maintenance-logs', [MaintenanceLogController::class, 'store'])->name('maintenance-logs.store');
