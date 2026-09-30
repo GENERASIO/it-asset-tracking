@@ -194,6 +194,25 @@
             });
         });
 
+        // Diagnostik sementara: kalau tombol "Perbarui Aset" diklik tapi form gagal
+        // tervalidasi oleh browser (field kosong/tidak valid), langsung tunjukkan
+        // field mana yang bermasalah lewat alert - supaya kelihatan tanpa perlu buka DevTools.
+        (function () {
+            const mainForm = document.querySelector('form[action*="/assets/"]');
+            if (!mainForm) return;
+
+            mainForm.querySelector('button[type="submit"]').addEventListener('click', function () {
+                setTimeout(() => {
+                    if (!mainForm.checkValidity()) {
+                        const invalidField = mainForm.querySelector(':invalid');
+                        const label = invalidField
+                            ? (invalidField.closest('div')?.querySelector('label')?.textContent.trim() || invalidField.name)
+                            : 'tidak diketahui';
+                        alert('Form belum bisa disimpan. Field yang bermasalah: ' + label + '\n\n(' + (invalidField?.validationMessage || '') + ')');
+                    }
+                }, 50);
+            });
+        })();
     </script>
     @vite(['resources/js/photo-compress.js'])
 </x-app-layout>
