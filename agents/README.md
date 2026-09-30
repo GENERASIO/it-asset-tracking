@@ -13,6 +13,20 @@ Agent kecil yang, sekali dipasang di laptop Windows/macOS, otomatis mendaftarkan
 
 ## Windows
 
+Cara utama (untuk end user, tidak perlu buka PowerShell sama sekali):
+
+1. Download paket dari halaman **Kelola Agent Token** (sudah berisi `ITAssetAgentSetup.exe` + `config.json` dengan token yang benar).
+2. Extract zip-nya, lalu double-click `ITAssetAgentSetup.exe`.
+3. Klik **Yes** di prompt izin admin (UAC) yang muncul, dan **"Run anyway"** kalau Windows menampilkan peringatan SmartScreen (installer belum di-sign dengan sertifikat berbayar).
+
+Installer ini otomatis: menyalin file ke `%ProgramData%\ITAssetAgent`, mendaftarkan Scheduled Task yang jalan sebagai **SYSTEM** (jadi tidak butuh hak admin lagi setelah instalasi awal ini, dan tidak akan kena blokir kebijakan "running scripts is disabled" karena bukan menjalankan `.ps1` mentah), lalu langsung check-in sekali.
+
+Bisa di-uninstall lewat **Control Panel → Programs → Uninstall a program → IT Asset Agent** seperti aplikasi Windows pada umumnya.
+
+Source installer ada di `agents/windows/installer/AgentSetup.iss` (build pakai [Inno Setup 6](https://jrsoftware.org/isinfo.php), hasil compile-nya di-commit sebagai `agents/windows/ITAssetAgentSetup.exe` karena server produksi Linux tidak bisa compile installer Windows).
+
+Cara lama (manual, untuk debug/laptop yang tidak ikut kebijakan restriktif):
+
 ```powershell
 cd agents\windows
 copy config.example.json config.json
@@ -20,7 +34,7 @@ notepad config.json   # isi ApiUrl dan ApiToken
 ./install.ps1
 ```
 
-Untuk mencabut: jalankan `agents\windows\uninstall.ps1` di laptop yang bersangkutan.
+Untuk mencabut cara lama: jalankan `agents\windows\uninstall.ps1` di laptop yang bersangkutan.
 
 ## macOS
 

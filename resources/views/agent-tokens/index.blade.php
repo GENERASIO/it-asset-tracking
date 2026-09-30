@@ -142,7 +142,7 @@
                     1. Klik <strong>Buat Token</strong> di atas, lalu langsung download paket agent (sudah berisi token, tinggal pakai) dari tombol yang muncul.
                 </p>
                 <p>
-                    2. Extract zip-nya di laptop tujuan, lalu jalankan <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">install.ps1</code> (klik kanan → Run with PowerShell) untuk Windows, atau <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">install.sh</code> untuk macOS.
+                    2. Extract zip-nya di laptop tujuan. Untuk <strong>Windows</strong>: double-click <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">ITAssetAgentSetup.exe</code>, klik <strong>Yes</strong> di prompt izin admin yang muncul (dan "Run anyway" kalau Windows menampilkan peringatan SmartScreen). Untuk <strong>macOS</strong>: jalankan <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">install.sh</code>.
                 </p>
                 <p>
                     3. Selesai — laptop otomatis check-in saat login dan setiap hari ke <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">{{ url('/api/agent/checkin') }}</code>, muncul otomatis di daftar Aset.

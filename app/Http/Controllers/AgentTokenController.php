@@ -90,9 +90,7 @@ class AgentTokenController extends Controller
                 'ApiToken' => $token,
             ], JSON_PRETTY_PRINT));
 
-            foreach (['checkin.ps1', 'install.ps1', 'uninstall.ps1'] as $file) {
-                $zip->addFile($sourceDir.'/'.$file, $file);
-            }
+            $zip->addFile($sourceDir.'/ITAssetAgentSetup.exe', 'ITAssetAgentSetup.exe');
         } else {
             $zip->addFromString('config.sh', "#!/bin/bash\nAPI_URL=\"{$apiUrl}\"\nAPI_TOKEN=\"{$token}\"\n");
 
