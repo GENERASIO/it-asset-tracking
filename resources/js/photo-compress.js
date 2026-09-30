@@ -1,35 +1,51 @@
 function compressImage(file) {
     return new Promise((resolve) => {
+        // Kalau ada langkah yang gagal (mis. HEIC dari iPhone yang tidak bisa didecode
+        // browser buat kompresi), jangan macet - lanjut pakai file aslinya saja supaya
+        // upload tetap jalan (validasi server yang akan kasih tahu kalau formatnya
+        // memang tidak didukung).
+        const fallbackToOriginal = () => resolve(file);
+
         const reader = new FileReader();
+        reader.onerror = fallbackToOriginal;
         reader.onload = function (event) {
             const img = new Image();
+            img.onerror = fallbackToOriginal;
             img.onload = function () {
-                const canvas = document.createElement('canvas');
-                const maxDimension = 1600;
-                let width = img.width;
-                let height = img.height;
+                try {
+                    const canvas = document.createElement('canvas');
+                    const maxDimension = 1600;
+                    let width = img.width;
+                    let height = img.height;
 
-                if (width > height && width > maxDimension) {
-                    height = Math.round(height * (maxDimension / width));
-                    width = maxDimension;
-                } else if (height > maxDimension) {
-                    width = Math.round(width * (maxDimension / height));
-                    height = maxDimension;
+                    if (width > height && width > maxDimension) {
+                        height = Math.round(height * (maxDimension / width));
+                        width = maxDimension;
+                    } else if (height > maxDimension) {
+                        width = Math.round(width * (maxDimension / height));
+                        height = maxDimension;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob(function (blob) {
+                        if (!blob) {
+                            fallbackToOriginal();
+                            return;
+                        }
+                        const compressedFile = new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now(),
+                        });
+                        console.log('Ukuran asli:', (file.size / 1024).toFixed(0) + 'KB', '→ setelah kompresi:', (compressedFile.size / 1024).toFixed(0) + 'KB');
+                        resolve(compressedFile);
+                    }, 'image/jpeg', 0.75);
+                } catch (err) {
+                    fallbackToOriginal();
                 }
-
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-
-                canvas.toBlob(function (blob) {
-                    const compressedFile = new File([blob], file.name, {
-                        type: 'image/jpeg',
-                        lastModified: Date.now(),
-                    });
-                    console.log('Ukuran asli:', (file.size / 1024).toFixed(0) + 'KB', '→ setelah kompresi:', (compressedFile.size / 1024).toFixed(0) + 'KB');
-                    resolve(compressedFile);
-                }, 'image/jpeg', 0.75);
             };
             img.src = event.target.result;
         };
