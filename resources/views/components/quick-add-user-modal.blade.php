@@ -21,20 +21,6 @@
                     <input type="text" x-model="form.name" class="mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300">Email</label>
-                    <input type="email" x-model="form.email" class="mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm text-sm">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300">Password</label>
-                        <input type="password" x-model="form.password" class="mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300">Konfirmasi</label>
-                        <input type="password" x-model="form.password_confirmation" class="mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm text-sm">
-                    </div>
-                </div>
-                <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300">Role</label>
                     <select x-model="form.role" class="mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm text-sm">
                         <option value="user">User</option>
@@ -75,7 +61,7 @@
             open: false,
             loading: false,
             error: null,
-            form: { name: '', email: '', password: '', password_confirmation: '', role: 'user', location_id: '', employee_id: '' },
+            form: { name: '', role: 'user', location_id: '', employee_id: '' },
             submit() {
                 this.loading = true;
                 this.error = null;
@@ -104,7 +90,7 @@
                     select.value = data.user.id;
 
                     this.open = false;
-                    this.form = { name: '', email: '', password: '', password_confirmation: '', role: 'user', location_id: '', employee_id: '' };
+                    this.form = { name: '', role: 'user', location_id: '', employee_id: '' };
                 })
                 .catch((err) => {
                     this.error = err.message;

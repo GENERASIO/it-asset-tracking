@@ -6,6 +6,7 @@ use App\Models\Location;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -34,19 +35,28 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        // Quick-add dari form "Dipegang Oleh" (dikirim via fetch/JSON) cuma mencatat
+        // pemegang aset, bukan akun login - jadi email & password di sana opsional.
+        // Form "Kelola User -> Tambah User" (submit halaman biasa) tetap wajib isi
+        // keduanya karena itu benar-benar akun yang akan dipakai login.
+        $isQuickAdd = $request->wantsJson();
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed',
+            'email' => ($isQuickAdd ? 'nullable' : 'required').'|email|unique:users,email',
+            'password' => ($isQuickAdd ? 'nullable' : 'required').'|min:8|confirmed',
             'role' => 'required|in:super_admin,it_staff,user',
             'location_id' => 'nullable|exists:locations,id',
             'employee_id' => 'nullable|string|max:255|unique:users,employee_id',
         ]);
 
+        $email = $validated['email'] ?? $this->generatePlaceholderEmail($validated['name']);
+        $password = $validated['password'] ?? Str::random(32);
+
         $user = User::create([
             'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'email' => $email,
+            'password' => Hash::make($password),
             'role' => $validated['role'],
             'location_id' => $validated['location_id'] ?? null,
             'employee_id' => $validated['employee_id'] ?? null,
@@ -96,6 +106,17 @@ class UserController extends Controller
         $user->update($data);
 
         return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
+    }
+
+    protected function generatePlaceholderEmail(string $name): string
+    {
+        $slug = Str::slug($name) ?: 'user';
+
+        do {
+            $email = $slug.'+'.Str::random(6).'@pengguna-aset.local';
+        } while (User::where('email', $email)->exists());
+
+        return $email;
     }
 
     public function destroy(Request $request, User $user)
