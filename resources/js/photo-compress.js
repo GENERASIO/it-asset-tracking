@@ -56,31 +56,71 @@ function compressImage(file) {
 /**
  * Pasang kompresi otomatis + preview thumbnail pada input file foto aset.
  * Dipakai bersama oleh form Tambah dan Edit Aset supaya logikanya tidak dobel.
+ *
+ * Batas jumlah foto diambil dari atribut data-max-photos di elemen input
+ * (di-set per halaman lewat Blade, misal 5 untuk Tambah, atau sisa slot untuk Edit).
+ *
+ * File yang dipilih ditampung di array terpisah (bukan langsung pakai e.target.files)
+ * karena input dengan atribut capture="environment" di banyak browser Android/iOS
+ * memaksa kamera cuma bisa ambil 1 foto per klik - foto sebelumnya akan hilang
+ * (ketiban) kalau tidak ditampung manual begini.
  */
 window.setupPhotoCompression = function (inputSelector, previewListSelector) {
     const photoInput = document.querySelector(inputSelector);
     if (!photoInput) return;
 
-    photoInput.addEventListener('change', async function (e) {
-        const files = Array.from(e.target.files);
-        if (!files.length) return;
+    const maxPhotos = parseInt(photoInput.dataset.maxPhotos, 10) || 5;
+    let selectedFiles = [];
 
-        const compressedFiles = await Promise.all(files.map(compressImage));
-
+    function syncInputFiles() {
         const dataTransfer = new DataTransfer();
-        compressedFiles.forEach((f) => dataTransfer.items.add(f));
+        selectedFiles.forEach((f) => dataTransfer.items.add(f));
         photoInput.files = dataTransfer.files;
+    }
 
+    function renderPreview() {
         const list = document.querySelector(previewListSelector);
-        if (list) {
-            list.innerHTML = '';
-            compressedFiles.forEach((f) => {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(f);
-                img.className = 'h-20 w-20 object-cover rounded-lg border';
-                list.appendChild(img);
+        if (!list) return;
+
+        list.innerHTML = '';
+        selectedFiles.forEach((f, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'relative group';
+
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(f);
+            img.className = 'h-20 w-20 object-cover rounded-lg border';
+            wrapper.appendChild(img);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-600 text-white text-xs flex items-center justify-center leading-none';
+            removeBtn.textContent = '×';
+            removeBtn.addEventListener('click', function () {
+                selectedFiles.splice(index, 1);
+                syncInputFiles();
+                renderPreview();
             });
-        }
+            wrapper.appendChild(removeBtn);
+
+            list.appendChild(wrapper);
+        });
+    }
+
+    photoInput.addEventListener('change', async function (e) {
+        const newFiles = Array.from(e.target.files);
+        if (!newFiles.length) return;
+
+        const compressed = await Promise.all(newFiles.map(compressImage));
+
+        compressed.forEach((f) => {
+            if (selectedFiles.length < maxPhotos) {
+                selectedFiles.push(f);
+            }
+        });
+
+        syncInputFiles();
+        renderPreview();
     });
 };
 

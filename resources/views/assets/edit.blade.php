@@ -50,6 +50,7 @@
 
                             @if ($asset->photos->count() < 5)
                                 <input type="file" name="photos[]" accept="image/*" capture="environment" multiple
+                                       data-max-photos="{{ 5 - $asset->photos->count() }}"
                                        class="mt-1 w-full border-gray-300 rounded-lg shadow-sm text-sm">
                                 <div id="photo-preview-list" class="flex flex-wrap gap-2 mt-2"></div>
                                 <p class="text-xs text-gray-400 mt-1">Tambah foto baru (sisa slot: {{ 5 - $asset->photos->count() }}).</p>

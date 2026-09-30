@@ -21,6 +21,7 @@
                         <div class="sm:col-span-2">
                             <label class="block text-sm font-medium text-gray-700">Foto Aset (min 1, maks 5)</label>
                             <input type="file" name="photos[]" accept="image/*" capture="environment" multiple required
+                                   data-max-photos="5"
                                    class="mt-1 w-full border-gray-300 rounded-lg shadow-sm text-sm">
                             <div id="photo-preview-list" class="flex flex-wrap gap-2 mt-2"></div>
                             @error('photos') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
