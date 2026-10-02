@@ -12,7 +12,7 @@ class BarcodeController extends Controller
     {
         $asset->load(['category', 'location', 'assignedUser', 'logs' => fn ($q) => $q->limit(3)]);
 
-        $url = route('assets.show', $asset, true);
+        $url = route('assets.public-info', $asset, true);
         $barcode = DNS2D::getBarcodePNG($url, 'QRCODE', 4, 4);
 
         return view('barcode.print', compact('asset', 'barcode'));
@@ -27,7 +27,7 @@ class BarcodeController extends Controller
             ->get();
 
         $assets->transform(function ($asset) {
-            $url = route('assets.show', $asset, true);
+            $url = route('assets.public-info', $asset, true);
             $asset->qrcode = DNS2D::getBarcodePNG($url, 'QRCODE', 4, 4);
             return $asset;
         });

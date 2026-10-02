@@ -17,6 +17,9 @@ Route::get('/', function () {
     return redirect()->route(auth()->check() ? 'dashboard' : 'login');
 });
 
+// Halaman publik (tanpa login) yang dibuka waktu scan QR di label aset - info dasar saja.
+Route::get('/scan/{asset}', [AssetController::class, 'publicInfo'])->name('assets.public-info');
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 

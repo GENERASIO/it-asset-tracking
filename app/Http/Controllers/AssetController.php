@@ -18,6 +18,18 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class AssetController extends Controller
 {
+    /**
+     * Halaman publik (tanpa login) yang dibuka waktu scan QR di label aset.
+     * Sengaja cuma tampilkan info dasar - tanpa harga beli, pemegang aset,
+     * atau riwayat mutasi, karena halaman ini bisa diakses siapa saja.
+     */
+    public function publicInfo(Asset $asset)
+    {
+        $asset->load(['category', 'location']);
+
+        return view('assets.public-info', compact('asset'));
+    }
+
     public function searchSuggestions(Request $request)
     {
         $search = trim((string) $request->query('q'));

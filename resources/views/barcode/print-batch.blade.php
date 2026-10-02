@@ -153,7 +153,7 @@
 
     <div class="history-card no-print">
         <h2>Ringkasan &amp; Riwayat Aset</h2>
-        <p>Scan QR pada label untuk membuka halaman detail lengkap beserta seluruh riwayat mutasi aset ini.</p>
+        <p>Scan QR pada label untuk membuka info dasar aset ini (tanpa perlu login). Klik "Riwayat lengkap" di bawah untuk lihat detail & histori mutasi penuh (perlu login).</p>
         <table class="history-table">
             <thead>
                 <tr>
