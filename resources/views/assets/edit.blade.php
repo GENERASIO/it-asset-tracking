@@ -165,7 +165,7 @@
                         <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg transition-all duration-150 hover:scale-105 active:scale-95">
                             Perbarui Aset
                         </button>
-                        <a href="{{ route('assets.index') }}" class="px-4 py-2 text-center text-gray-600">
+                        <a href="{{ route('assets.index') }}" id="edit-form-cancel-link" class="px-4 py-2 text-center text-gray-600">
                             Batal
                         </a>
                     </div>

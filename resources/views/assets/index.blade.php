@@ -489,6 +489,10 @@
                             const injectedForm = container.querySelector('form');
                             injectedForm.addEventListener('submit', (event) => this.submitEdit(event, injectedForm));
 
+                            // Link "Batal" bawaan form (navigasi ke halaman daftar aset) dilepas -
+                            // drawer sudah punya tombol Batal sendiri yang cukup tutup mode edit.
+                            injectedForm.querySelector('#edit-form-cancel-link')?.remove();
+
                             if (window.setupPhotoCompression) {
                                 window.setupPhotoCompression(
                                     '#quickview-edit-container input[name="photos[]"]',
