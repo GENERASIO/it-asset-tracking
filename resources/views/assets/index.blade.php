@@ -26,7 +26,7 @@
         ));
     @endphp
 
-    <div class="py-8" x-data="{ quickView: null }">
+    <div class="py-8" x-data="assetsPage()">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if (session('success'))
@@ -263,7 +263,7 @@
                                                 'showUrl' => route('assets.show', $asset),
                                                 'editUrl' => route('assets.edit', $asset),
                                             ]) }}"
-                                            @click="if (!$event.target.closest('a, button, .asset-checkbox, .status-select')) { quickView = JSON.parse($el.dataset.asset) }"
+                                            @click="if (!$event.target.closest('a, button, .asset-checkbox, .status-select')) { openQuickView(JSON.parse($el.dataset.asset)) }"
                                             class="cursor-pointer border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-300">
                                             <td class="px-4 py-2">
                                                 <input type="checkbox" name="ids[]" value="{{ $asset->id }}" class="asset-checkbox">
@@ -322,7 +322,7 @@
 
         <!-- Quick View Drawer -->
         <div x-show="quickView" style="display: none;" class="fixed inset-0 z-50">
-            <div class="absolute inset-0 bg-black/30" @click="quickView = null"></div>
+            <div class="absolute inset-0 bg-black/30" @click="closeQuickView()"></div>
 
             <div x-show="quickView"
                  x-transition:enter="transition ease-out duration-200"
@@ -337,15 +337,15 @@
                         <!-- Header -->
                         <div class="bg-gradient-to-br from-indigo-950 via-purple-900 to-violet-800 px-5 py-4 flex items-center justify-between shrink-0">
                             <p class="font-mono font-bold text-white text-lg truncate" x-text="quickView.code"></p>
-                            <button type="button" @click="quickView = null" class="text-white/80 hover:text-white transition">
+                            <button type="button" @click="closeQuickView()" class="text-white/80 hover:text-white transition">
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
 
-                        <!-- Body -->
-                        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+                        <!-- Body: mode lihat -->
+                        <div x-show="!editing" class="flex-1 overflow-y-auto p-5 space-y-4">
                             <template x-if="quickView.photo">
                                 <img :src="quickView.photo" class="w-full h-40 object-cover rounded-lg border dark:border-gray-700">
                             </template>
@@ -388,14 +388,32 @@
                             </div>
                         </div>
 
-                        <!-- Footer -->
-                        <div class="border-t border-gray-100 dark:border-gray-700 p-4 flex gap-2 shrink-0">
+                        <!-- Body: mode edit (form disuntik via fetch, tanpa pindah halaman) -->
+                        <div x-show="editing" class="flex-1 overflow-y-auto p-5">
+                            <template x-if="editLoading">
+                                <p class="text-sm text-gray-400">Memuat form edit...</p>
+                            </template>
+                            <template x-if="editError">
+                                <div class="mb-3 p-2 bg-red-50 text-red-600 text-xs rounded" x-text="editError"></div>
+                            </template>
+                            <div id="quickview-edit-container" class="quickview-edit-form"></div>
+                        </div>
+
+                        <!-- Footer: mode lihat -->
+                        <div x-show="!editing" class="border-t border-gray-100 dark:border-gray-700 p-4 flex gap-2 shrink-0">
                             <a :href="quickView.showUrl" class="flex-1 text-center bg-gray-100 dark:bg-gray-700 dark:text-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">
                                 Lihat Detail Lengkap
                             </a>
-                            <a :href="quickView.editUrl" class="flex-1 text-center bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">
+                            <button type="button" @click="startEdit()" class="flex-1 text-center bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">
                                 Edit
-                            </a>
+                            </button>
+                        </div>
+
+                        <!-- Footer: mode edit -->
+                        <div x-show="editing" class="border-t border-gray-100 dark:border-gray-700 p-4 flex gap-2 shrink-0">
+                            <button type="button" @click="cancelEdit()" class="flex-1 text-center bg-gray-100 dark:bg-gray-700 dark:text-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">
+                                Batal
+                            </button>
                         </div>
                     </div>
                 </template>
@@ -408,7 +426,129 @@
         @method('DELETE')
     </form>
 
+    <!-- Dipakai tombol hapus foto di form edit yang disuntik ke Quick View drawer. -->
+    <form id="delete-photo-form" action="" method="POST" class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
+
     <script>
+        function confirmDeletePhoto(url) {
+            confirmAction('Foto ini akan dihapus permanen.', function () {
+                const form = document.getElementById('delete-photo-form');
+                form.action = url;
+                form.submit();
+            }, 'Hapus foto ini?');
+        }
+
+        function assetsPage() {
+            return {
+                quickView: null,
+                editing: false,
+                editLoading: false,
+                editError: null,
+
+                openQuickView(data) {
+                    this.quickView = data;
+                    this.editing = false;
+                    this.editError = null;
+                },
+
+                closeQuickView() {
+                    this.quickView = null;
+                    this.editing = false;
+                },
+
+                startEdit() {
+                    this.editing = true;
+                    this.editLoading = true;
+                    this.editError = null;
+
+                    const container = document.getElementById('quickview-edit-container');
+                    container.innerHTML = '';
+
+                    fetch(this.quickView.editUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                        .then((res) => res.text())
+                        .then((html) => {
+                            const doc = new DOMParser().parseFromString(html, 'text/html');
+                            // Bukan sekadar "form pertama di halaman" - sidebar navigasi juga
+                            // punya <form> sendiri (logout) yang muncul lebih dulu di DOM.
+                            const form = doc.querySelector('form[enctype="multipart/form-data"]');
+                            if (!form) throw new Error('Form edit tidak ditemukan di halaman.');
+
+                            // Pakai createContextualFragment (bukan innerHTML) supaya <script> di
+                            // dalam form (tombol "+ Tambah Kategori/Lokasi/User Baru") ikut jalan.
+                            const range = document.createRange();
+                            range.selectNode(container);
+                            container.appendChild(range.createContextualFragment(form.outerHTML));
+
+                            if (window.Alpine) {
+                                window.Alpine.initTree(container);
+                            }
+
+                            const injectedForm = container.querySelector('form');
+                            injectedForm.addEventListener('submit', (event) => this.submitEdit(event, injectedForm));
+
+                            if (window.setupPhotoCompression) {
+                                window.setupPhotoCompression(
+                                    '#quickview-edit-container input[name="photos[]"]',
+                                    '#quickview-edit-container #photo-preview-list'
+                                );
+                            }
+                        })
+                        .catch(() => {
+                            this.editError = 'Gagal memuat form edit. Coba lagi.';
+                        })
+                        .finally(() => {
+                            this.editLoading = false;
+                        });
+                },
+
+                cancelEdit() {
+                    this.editing = false;
+                    this.editError = null;
+                },
+
+                submitEdit(event, form) {
+                    event.preventDefault();
+                    this.editError = null;
+
+                    const btn = form.querySelector('button[type="submit"]');
+                    const originalHtml = btn ? btn.innerHTML : '';
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = 'Menyimpan...';
+                    }
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: { 'Accept': 'application/json' },
+                    })
+                        .then(async (res) => {
+                            if (res.status === 422) {
+                                const data = await res.json();
+                                this.editError = data.errors ? Object.values(data.errors)[0][0] : 'Data belum valid.';
+                                return;
+                            }
+                            if (!res.ok) {
+                                throw new Error('Gagal menyimpan perubahan.');
+                            }
+                            window.location.reload();
+                        })
+                        .catch((err) => {
+                            this.editError = err.message || 'Gagal menyimpan perubahan.';
+                        })
+                        .finally(() => {
+                            if (btn && this.editing) {
+                                btn.disabled = false;
+                                btn.innerHTML = originalHtml;
+                            }
+                        });
+                },
+            };
+        }
+
         function assetSearchSuggest(suggestUrl, initialQuery) {
             return {
                 query: initialQuery || '',
@@ -501,4 +641,5 @@
     @if ($view === 'board')
         @vite(['resources/js/asset-board.js'])
     @endif
+    @vite(['resources/js/photo-compress.js'])
 </x-app-layout>

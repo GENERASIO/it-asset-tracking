@@ -221,6 +221,10 @@ class AssetController extends Controller
         $asset->update($validated);
         $this->storePhotos($asset, $photos);
 
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Aset berhasil diperbarui.']);
+        }
+
         return redirect()->route('assets.index')->with('success', 'Aset berhasil diperbarui.');
     }
 
