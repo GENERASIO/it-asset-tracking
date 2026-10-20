@@ -71,6 +71,24 @@ class AgentCheckinLocationTest extends TestCase
         $this->assertEquals(106.8, (float) $asset->longitude);
     }
 
+    public function test_checkin_mengembalikan_hash_script_terbaru(): void
+    {
+        $this->checkin()->assertOk()->assertJson([
+            'script_sha256' => hash_file('sha256', base_path('agents/windows/checkin.ps1')),
+        ]);
+    }
+
+    public function test_script_agent_bisa_diunduh_dengan_token(): void
+    {
+        $path = base_path('agents/windows/checkin.ps1');
+
+        $this->withToken($this->token)->get('/api/agent/script')
+            ->assertOk()
+            ->assertHeader('X-Script-Sha256', hash_file('sha256', $path));
+
+        $this->flushHeaders()->get('/api/agent/script')->assertUnauthorized();
+    }
+
     public function test_koordinat_tidak_valid_ditolak(): void
     {
         $this->checkin(['latitude' => 120, 'longitude' => 106.8])->assertUnprocessable();

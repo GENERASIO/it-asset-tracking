@@ -53,6 +53,38 @@ function Get-GeoLocation([int]$TimeoutSeconds = 20) {
     }
 }
 
+# Update otomatis: kalau hash checkin.ps1 di server beda dengan file ini, unduh versi
+# server lalu timpa file ini. Versi baru dipakai mulai check-in berikutnya. File hanya
+# ditimpa kalau hash hasil unduhan cocok dengan yang dilaporkan server.
+function Update-AgentScript($ExpectedHash, $Config, $Headers) {
+    if (-not $ExpectedHash) { return }
+
+    $selfPath = $PSCommandPath
+
+    $currentHash = (Get-FileHash -Path $selfPath -Algorithm SHA256).Hash
+    if ($currentHash -ieq $ExpectedHash) { return }
+
+    $tempPath = Join-Path $InstallDir 'checkin.ps1.download'
+    try {
+        $scriptUrl = $Config.ApiUrl -replace '/checkin/?$', '/script'
+        Invoke-WebRequest -Uri $scriptUrl -Headers $Headers -OutFile $tempPath -UseBasicParsing
+
+        $downloadedHash = (Get-FileHash -Path $tempPath -Algorithm SHA256).Hash
+        if ($downloadedHash -ine $ExpectedHash) {
+            throw "hash unduhan ($downloadedHash) tidak cocok dengan server ($ExpectedHash)"
+        }
+
+        Move-Item -Path $tempPath -Destination $selfPath -Force
+        Write-Log "UPDATE - checkin.ps1 diperbarui ke versi $($ExpectedHash.Substring(0, 12)), berlaku mulai check-in berikutnya."
+    }
+    catch {
+        Write-Log "UPDATE GAGAL - $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path $tempPath) { Remove-Item $tempPath -Force -ErrorAction SilentlyContinue }
+    }
+}
+
 try {
     if (-not (Test-Path $ConfigPath)) {
         throw "config.json tidak ditemukan di $InstallDir. Salin dari config.example.json dan isi ApiUrl/ApiToken."
@@ -91,6 +123,8 @@ try {
 
     $geoInfo = if ($geo) { "lokasi=$($geo.latitude),$($geo.longitude) (+/-$($geo.location_accuracy_m)m)" } else { 'lokasi=-' }
     Write-Log "OK - asset_code=$($response.asset_code) created=$($response.created) $geoInfo"
+
+    Update-AgentScript -ExpectedHash $response.script_sha256 -Config $config -Headers $headers
 }
 catch {
     Write-Log "GAGAL - $($_.Exception.Message)"

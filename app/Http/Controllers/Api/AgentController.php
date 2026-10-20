@@ -87,6 +87,24 @@ class AgentController extends Controller
             'status' => 'ok',
             'created' => $created,
             'asset_code' => $asset->asset_code,
+            // Agent membandingkan ini dengan hash checkin.ps1 miliknya sendiri; kalau beda,
+            // agent mengunduh versi terbaru dari endpoint script() di bawah (update otomatis).
+            'script_sha256' => hash_file('sha256', self::scriptPath()),
         ], $created ? 201 : 200);
+    }
+
+    public function script()
+    {
+        $path = self::scriptPath();
+
+        return response()->file($path, [
+            'Content-Type' => 'text/plain; charset=utf-8',
+            'X-Script-Sha256' => hash_file('sha256', $path),
+        ]);
+    }
+
+    private static function scriptPath(): string
+    {
+        return base_path('agents/windows/checkin.ps1');
     }
 }
