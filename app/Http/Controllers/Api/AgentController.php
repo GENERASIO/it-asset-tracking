@@ -89,13 +89,15 @@ class AgentController extends Controller
             'asset_code' => $asset->asset_code,
             // Agent membandingkan ini dengan hash checkin.ps1 miliknya sendiri; kalau beda,
             // agent mengunduh versi terbaru dari endpoint script() di bawah (update otomatis).
-            'script_sha256' => hash_file('sha256', self::scriptPath()),
+            // null kalau file script tidak ada di server - check-in tetap jalan, hanya update dilewati.
+            'script_sha256' => is_file(self::scriptPath()) ? hash_file('sha256', self::scriptPath()) : null,
         ], $created ? 201 : 200);
     }
 
     public function script()
     {
         $path = self::scriptPath();
+        abort_unless(is_file($path), 404, 'Script agent tidak tersedia di server.');
 
         return response()->file($path, [
             'Content-Type' => 'text/plain; charset=utf-8',
