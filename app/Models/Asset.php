@@ -13,7 +13,7 @@ class Asset extends Model
         'asset_code', 'name', 'category_id', 'brand', 'model', 'serial_number',
         'specification', 'location_id', 'assigned_to', 'status',
         'purchase_date', 'purchase_price', 'purchase_price_estimated', 'warranty_expired_at', 'photo',
-        'hostname', 'os_name', 'os_version', 'ram_gb', 'storage_gb', 'mac_address', 'last_seen_at',
+        'hostname', 'os_name', 'os_version', 'cpu', 'ram_gb', 'storage_gb', 'mac_address', 'last_seen_at',
         'latitude', 'longitude', 'location_accuracy_m', 'geo_captured_at',
         'inventory_synced_at', 'crack_indicators',
     ];

@@ -20,6 +20,7 @@ class AgentController extends Controller
             'hostname' => ['required', 'string', 'max:191'],
             'os_name' => ['required', 'string', 'max:100'],
             'os_version' => ['nullable', 'string', 'max:100'],
+            'cpu' => ['nullable', 'string', 'max:191'],
             'brand' => ['nullable', 'string', 'max:191'],
             'model' => ['nullable', 'string', 'max:191'],
             'ram_gb' => ['nullable', 'integer', 'min:0', 'max:4096'],
@@ -70,6 +71,10 @@ class AgentController extends Controller
             $asset->hostname = $data['hostname'];
             $asset->os_name = $data['os_name'];
             $asset->os_version = $data['os_version'] ?? null;
+            // Agent lama tidak mengirim cpu, jadi nilai yang sudah ada tidak ditimpa kosong.
+            if (! empty($data['cpu'])) {
+                $asset->cpu = trim(preg_replace('/\s+/', ' ', $data['cpu']));
+            }
             $asset->ram_gb = $data['ram_gb'] ?? null;
             $asset->storage_gb = $data['storage_gb'] ?? null;
             $asset->mac_address = $data['mac_address'] ?? null;

@@ -189,6 +189,18 @@
                                     <span class="text-gray-500">Sistem Operasi</span>
                                     <p class="font-medium text-gray-900 dark:text-white">{{ $asset->os_label ?? '-' }}</p>
                                 </div>
+                                <div class="sm:col-span-2">
+                                    <span class="text-gray-500">Prosesor</span>
+                                    <p class="font-medium text-gray-900 dark:text-white">
+                                        {{ $asset->cpu ?? '-' }}
+                                        @if ($asset->cpu)
+                                            @php $age = \App\Support\DeviceAge::classify($asset->cpu); @endphp
+                                            <span class="ml-1 text-xs px-2 py-0.5 rounded-full align-middle {{ ['new' => 'bg-green-100 text-green-700', 'mid' => 'bg-blue-100 text-blue-700', 'old' => 'bg-red-100 text-red-700', 'unknown' => 'bg-gray-100 text-gray-600'][$age] }}">
+                                                {{ \App\Support\DeviceAge::LABELS[$age] }}
+                                            </span>
+                                        @endif
+                                    </p>
+                                </div>
                                 <div>
                                     <span class="text-gray-500">RAM</span>
                                     <p class="font-medium text-gray-900 dark:text-white">{{ $asset->ram_gb ? $asset->ram_gb.' GB' : '-' }}</p>

@@ -219,12 +219,14 @@ try {
     $os = Get-CimInstance Win32_OperatingSystem
     $disk = Get-CimInstance Win32_DiskDrive | Measure-Object -Property Size -Sum
     $nic = Get-CimInstance Win32_NetworkAdapterConfiguration | Where-Object { $_.IPEnabled } | Select-Object -First 1
+    $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1
 
     $payload = @{
         serial_number = $bios.SerialNumber
         hostname      = $env:COMPUTERNAME
         os_name       = 'Windows'
         os_version    = $os.Caption
+        cpu           = ([string]$cpu.Name).Trim()
         brand         = $computerSystem.Manufacturer
         model         = $computerSystem.Model
         ram_gb        = [math]::Round($computerSystem.TotalPhysicalMemory / 1GB)

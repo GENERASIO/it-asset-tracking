@@ -89,6 +89,54 @@ class ReportAnalysisTest extends TestCase
         $this->assertSame(13000000, $response->viewData('valueByLocation')->sum('value'));
     }
 
+    public function test_prosesor_dari_agent_dipakai_untuk_umur(): void
+    {
+        // A4 spesifikasinya cuma "Catatan: Ex" (umur tidak diketahui). Setelah agent melaporkan
+        // prosesornya, umurnya ikut terbaca.
+        [, $token] = \App\Models\AgentToken::generate('Test', $this->staff->id);
+        $a4 = Asset::where('asset_code', 'A4')->first();
+        $a4->update(['serial_number' => 'SN-A4']);
+
+        $this->withToken($token)->postJson('/api/agent/checkin', [
+            'serial_number' => 'SN-A4', 'hostname' => 'LAPTOP-A4', 'os_name' => 'Windows',
+            'cpu' => '13th Gen Intel(R) Core(TM) i5-1335U',
+        ])->assertOk();
+
+        $this->assertSame('13th Gen Intel(R) Core(TM) i5-1335U', $a4->fresh()->cpu);
+
+        $ages = $this->actingAs($this->staff)->get(route('reports.index'))->viewData('ageGroups')->keyBy('key');
+        $this->assertSame(2, $ages['new']['count']);
+        $this->assertSame(0, $ages['unknown']['count']);
+
+        $this->flushHeaders()->actingAs($this->staff)->get(route('assets.show', $a4))
+            ->assertSee('13th Gen Intel(R) Core(TM) i5-1335U')
+            ->assertSee('Baru (2023+)');
+
+        // Check-in agent lama (tanpa cpu) tidak menghapus nilai yang sudah ada.
+        $this->withToken($token)->postJson('/api/agent/checkin', [
+            'serial_number' => 'SN-A4', 'hostname' => 'LAPTOP-A4', 'os_name' => 'Windows',
+        ])->assertOk();
+        $this->assertSame('13th Gen Intel(R) Core(TM) i5-1335U', $a4->fresh()->cpu);
+    }
+
+    public function test_klasifikasi_nama_prosesor_dari_agent(): void
+    {
+        $cases = [
+            '13th Gen Intel(R) Core(TM) i3-1315U' => 'new',
+            'Intel(R) Core(TM) i3-10110U CPU @ 2.10GHz' => 'old',
+            '11th Gen Intel(R) Core(TM) i3-1115G4 @ 3.00GHz' => 'mid',
+            'AMD Ryzen 5 7535HS with Radeon Graphics' => 'new',
+            'Intel(R) Celeron(R) N4000 CPU @ 1.10GHz' => 'old',
+            'Intel(R) Core(TM) Ultra 5 125H' => 'new',
+            'Apple M1' => 'mid',
+            'Apple M3 Pro' => 'new',
+        ];
+
+        foreach ($cases as $cpu => $expected) {
+            $this->assertSame($expected, \App\Support\DeviceAge::classify($cpu), $cpu);
+        }
+    }
+
     public function test_export_pdf_berisi_analisis(): void
     {
         $this->actingAs($this->staff)->get(route('reports.export-pdf'))

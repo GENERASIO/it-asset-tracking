@@ -99,7 +99,7 @@ class ReportController extends Controller
 
         // Umur perangkat (dari generasi prosesor).
         $ageGroups = collect(DeviceAge::LABELS)->map(function ($label, $key) use ($assets) {
-            $group = $assets->filter(fn ($a) => DeviceAge::classify($a->specification) === $key);
+            $group = $assets->filter(fn ($a) => DeviceAge::forAsset($a) === $key);
 
             return ['key' => $key, 'label' => $label, 'count' => $group->count(), 'value' => (int) $group->sum('purchase_price')];
         })->values();
@@ -124,7 +124,7 @@ class ReportController extends Controller
             ['label' => 'Lokasi diketahui', 'filled' => $assets->filter(fn ($a) => $a->location && $a->location->name !== 'Tidak Diketahui')->count()],
             ['label' => 'Ada pemegang', 'filled' => $assets->whereNotNull('assigned_to')->count()],
             ['label' => 'Serial number', 'filled' => $assets->filter(fn ($a) => filled($a->serial_number))->count()],
-            ['label' => 'Spesifikasi prosesor', 'filled' => $assets->filter(fn ($a) => DeviceAge::classify($a->specification) !== 'unknown')->count()],
+            ['label' => 'Prosesor diketahui', 'filled' => $assets->filter(fn ($a) => DeviceAge::forAsset($a) !== 'unknown')->count()],
             ['label' => 'Harga beli asli', 'filled' => $assets->filter(fn ($a) => $a->purchase_price && ! $a->purchase_price_estimated)->count()],
             ['label' => 'Tanggal beli', 'filled' => $assets->whereNotNull('purchase_date')->count()],
             ['label' => 'Tanggal garansi', 'filled' => $assets->whereNotNull('warranty_expired_at')->count()],

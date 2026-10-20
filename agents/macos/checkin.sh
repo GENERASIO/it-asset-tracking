@@ -27,6 +27,11 @@ source "$CONFIG_FILE"
 SERIAL=$(system_profiler SPHardwareDataType | awk -F': ' '/Serial Number/ {print $2; exit}')
 MODEL=$(system_profiler SPHardwareDataType | awk -F': ' '/Model Name/ {print $2; exit}')
 OS_VERSION=$(sw_vers -productVersion)
+# Intel Mac: "Intel(R) Core(TM) i5-8257U ...", Apple Silicon: "Apple M2" (dari baris Chip).
+CPU=$(sysctl -n machdep.cpu.brand_string 2>/dev/null || true)
+if [ -z "$CPU" ]; then
+    CPU=$(system_profiler SPHardwareDataType | awk -F': ' '/Chip/ {print $2; exit}')
+fi
 HOSTNAME=$(scutil --get ComputerName 2>/dev/null || hostname -s)
 RAM_GB=$(( $(sysctl -n hw.memsize) / 1024 / 1024 / 1024 ))
 STORAGE_GB=$(df -g / | tail -1 | awk '{print $2}')
@@ -71,6 +76,7 @@ JSON=$(cat <<EOF
   "hostname": "$(json_escape "$HOSTNAME")",
   "os_name": "macOS",
   "os_version": "$(json_escape "$OS_VERSION")",
+  "cpu": "$(json_escape "$CPU")",
   "brand": "Apple",
   "model": "$(json_escape "$MODEL")",
   "ram_gb": $RAM_GB,

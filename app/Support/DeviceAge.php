@@ -15,9 +15,22 @@ class DeviceAge
         'unknown' => 'Tidak diketahui',
     ];
 
+    /**
+     * Umur sebuah aset: dari nama prosesor yang dilaporkan agent kalau ada, kalau tidak
+     * dari teks spesifikasi (data lama hasil import / isian manual).
+     */
+    public static function forAsset($asset): string
+    {
+        $fromCpu = self::classify($asset->cpu ?? null);
+
+        return $fromCpu !== 'unknown' ? $fromCpu : self::classify($asset->specification ?? null);
+    }
+
     public static function classify(?string $specification): string
     {
+        // Windows melaporkan "Intel(R) Core(TM) Ultra 5 125H" - tanda merek dibuang dulu.
         $spec = strtoupper((string) $specification);
+        $spec = trim(preg_replace('/\s+/', ' ', str_replace(['(R)', '(TM)', '®', '™'], ' ', $spec)));
 
         if ($spec === '') {
             return 'unknown';
@@ -25,6 +38,11 @@ class DeviceAge
 
         if (str_contains($spec, 'CORE ULTRA')) {
             return 'new';
+        }
+
+        // Mac Apple Silicon: M1 (2020-2021) masih layak tapi paling tua, M2 ke atas 2022+.
+        if (preg_match('/\bAPPLE M(\d)/', $spec, $m)) {
+            return (int) $m[1] >= 2 ? 'new' : 'mid';
         }
 
         if (preg_match('/\b(CELERON|PENTIUM|ATOM)\b/', $spec)) {
