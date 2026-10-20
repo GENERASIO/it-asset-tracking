@@ -50,7 +50,7 @@ class EstimatedPriceTest extends TestCase
             ->assertOk()->assertSee('Rp 7.900.000')->assertSee('estimasi');
 
         $this->actingAs($this->staff)->get(route('reports.index'))
-            ->assertOk()->assertSee('Termasuk 1 aset dengan harga estimasi');
+            ->assertOk()->assertSee('1 aset harga estimasi');
     }
 
     public function test_simpan_tanpa_ubah_harga_tetap_estimasi(): void
