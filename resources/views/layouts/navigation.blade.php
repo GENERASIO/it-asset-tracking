@@ -53,7 +53,7 @@
                     </x-responsive-nav-link>
                 @endif
 
-                @if (Auth::user()->role === 'super_admin')
+                @if (in_array(Auth::user()->role, ['super_admin', 'it_staff']))
                     <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                         {{ __('Kategori') }}
                     </x-responsive-nav-link>
@@ -265,7 +265,7 @@
                 </x-sidebar-nav-link>
             @endif
 
-            @if (Auth::user()->role === 'super_admin')
+            @if (in_array(Auth::user()->role, ['super_admin', 'it_staff']))
                 <x-sidebar-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                     <x-slot name="icon">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -307,7 +307,7 @@
                 </x-sidebar-nav-link>
             @endif
 
-            @if (Auth::user()->role === 'super_admin')
+            @if (in_array(Auth::user()->role, ['super_admin', 'it_staff']))
                 <x-sidebar-nav-link :href="route('agent-tokens.index')" :active="request()->routeIs('agent-tokens.*')">
                     <x-slot name="icon">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
