@@ -12,6 +12,47 @@ function Write-Log($message) {
     Add-Content -Path $LogPath -Value $line
 }
 
+# Mengambil posisi dari Windows Location API (GPS / Wi-Fi / IP, tergantung yang tersedia).
+# Mengembalikan $null kalau Location Services mati, izin ditolak, atau timeout - check-in
+# tetap jalan tanpa koordinat.
+function Get-GeoLocation([int]$TimeoutSeconds = 20) {
+    $watcher = $null
+    try {
+        Add-Type -AssemblyName System.Device
+        $watcher = New-Object System.Device.Location.GeoCoordinateWatcher([System.Device.Location.GeoPositionAccuracy]::High)
+        $watcher.Start()
+
+        $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+        while ($watcher.Status -ne 'Ready' -and $watcher.Permission -ne 'Denied' -and (Get-Date) -lt $deadline) {
+            Start-Sleep -Milliseconds 500
+        }
+
+        if ($watcher.Permission -eq 'Denied') {
+            Write-Log "Lokasi tidak diambil - izin lokasi ditolak (cek Settings > Privacy > Location)."
+            return $null
+        }
+
+        $loc = $watcher.Position.Location
+        if ($loc.IsUnknown) {
+            Write-Log "Lokasi tidak diambil - status=$($watcher.Status), posisi belum tersedia dalam $TimeoutSeconds detik."
+            return $null
+        }
+
+        return @{
+            latitude            = [math]::Round($loc.Latitude, 7)
+            longitude           = [math]::Round($loc.Longitude, 7)
+            location_accuracy_m = [int][math]::Round($loc.HorizontalAccuracy)
+        }
+    }
+    catch {
+        Write-Log "Lokasi tidak diambil - $($_.Exception.Message)"
+        return $null
+    }
+    finally {
+        if ($watcher) { $watcher.Stop(); $watcher.Dispose() }
+    }
+}
+
 try {
     if (-not (Test-Path $ConfigPath)) {
         throw "config.json tidak ditemukan di $InstallDir. Salin dari config.example.json dan isi ApiUrl/ApiToken."
@@ -38,12 +79,18 @@ try {
         username      = $env:USERNAME
     }
 
+    $geo = Get-GeoLocation
+    if ($geo) {
+        $payload += $geo
+    }
+
     $body = $payload | ConvertTo-Json
     $headers = @{ Authorization = "Bearer $($config.ApiToken)" }
 
     $response = Invoke-RestMethod -Uri $config.ApiUrl -Method Post -Body $body -ContentType 'application/json' -Headers $headers
 
-    Write-Log "OK - asset_code=$($response.asset_code) created=$($response.created)"
+    $geoInfo = if ($geo) { "lokasi=$($geo.latitude),$($geo.longitude) (+/-$($geo.location_accuracy_m)m)" } else { 'lokasi=-' }
+    Write-Log "OK - asset_code=$($response.asset_code) created=$($response.created) $geoInfo"
 }
 catch {
     Write-Log "GAGAL - $($_.Exception.Message)"

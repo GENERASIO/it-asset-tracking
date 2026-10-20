@@ -25,6 +25,9 @@ class AgentController extends Controller
             'storage_gb' => ['nullable', 'integer', 'min:0', 'max:1048576'],
             'mac_address' => ['nullable', 'string', 'max:64'],
             'username' => ['nullable', 'string', 'max:191'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90', 'required_with:longitude'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180', 'required_with:latitude'],
+            'location_accuracy_m' => ['nullable', 'integer', 'min:0', 'max:1000000'],
         ]);
 
         [$asset, $created] = DB::transaction(function () use ($data) {
@@ -65,6 +68,16 @@ class AgentController extends Controller
             $asset->storage_gb = $data['storage_gb'] ?? null;
             $asset->mac_address = $data['mac_address'] ?? null;
             $asset->last_seen_at = now();
+
+            // Lokasi GPS hanya ditimpa kalau agent berhasil mendapatkannya, supaya posisi
+            // terakhir yang diketahui tidak hilang saat Location Services sedang mati.
+            if (isset($data['latitude'], $data['longitude'])) {
+                $asset->latitude = $data['latitude'];
+                $asset->longitude = $data['longitude'];
+                $asset->location_accuracy_m = $data['location_accuracy_m'] ?? null;
+                $asset->geo_captured_at = now();
+            }
+
             $asset->save();
 
             return [$asset, $created];

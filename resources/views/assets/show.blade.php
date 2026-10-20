@@ -185,6 +185,33 @@
                                     <p class="font-medium text-gray-900 dark:text-white font-mono">{{ $asset->mac_address ?? '-' }}</p>
                                 </div>
                             </div>
+
+                            @if ($asset->latitude !== null && $asset->longitude !== null)
+                                @php
+                                    $lat = (float) $asset->latitude;
+                                    $lng = (float) $asset->longitude;
+                                    $d = 0.005;
+                                    $osmEmbed = sprintf(
+                                        'https://www.openstreetmap.org/export/embed.html?bbox=%F,%F,%F,%F&layer=mapnik&marker=%F,%F',
+                                        $lng - $d, $lat - $d, $lng + $d, $lat + $d, $lat, $lng
+                                    );
+                                    $gmapsUrl = sprintf('https://www.google.com/maps?q=%F,%F', $lat, $lng);
+                                @endphp
+                                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2 text-sm">
+                                        <span class="text-gray-500">Lokasi Terakhir (GPS)</span>
+                                        <a href="{{ $gmapsUrl }}" target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 hover:underline">Buka di Google Maps</a>
+                                    </div>
+                                    <p class="font-mono text-sm text-gray-900 dark:text-white">
+                                        {{ number_format($lat, 6) }}, {{ number_format($lng, 6) }}
+                                        @if ($asset->location_accuracy_m)
+                                            <span class="text-gray-500 font-sans">(akurasi ±{{ $asset->location_accuracy_m }} m)</span>
+                                        @endif
+                                    </p>
+                                    <p class="text-xs text-gray-500 mb-2">Diambil {{ $asset->geo_captured_at?->diffForHumans() ?? '-' }}</p>
+                                    <iframe src="{{ $osmEmbed }}" class="w-full h-64 rounded-lg border border-gray-200 dark:border-gray-700" loading="lazy" title="Peta lokasi {{ $asset->asset_code }}"></iframe>
+                                </div>
+                            @endif
                         </div>
                     @endif
 

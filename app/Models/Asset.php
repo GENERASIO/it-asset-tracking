@@ -14,6 +14,7 @@ class Asset extends Model
         'specification', 'location_id', 'assigned_to', 'status',
         'purchase_date', 'purchase_price', 'warranty_expired_at', 'photo',
         'hostname', 'os_name', 'os_version', 'ram_gb', 'storage_gb', 'mac_address', 'last_seen_at',
+        'latitude', 'longitude', 'location_accuracy_m', 'geo_captured_at',
     ];
 
     protected $casts = [
@@ -21,6 +22,9 @@ class Asset extends Model
         'warranty_expired_at' => 'date',
         'purchase_price' => 'decimal:2',
         'last_seen_at' => 'datetime',
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
+        'geo_captured_at' => 'datetime',
     ];
 
     public function category()
