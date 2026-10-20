@@ -32,8 +32,10 @@ SetupLogging=yes
 
 [Files]
 Source: "..\checkin.ps1"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\enable-location.ps1"; DestDir: "{app}"; Flags: ignoreversion
 
 [Run]
+Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\enable-location.ps1"""; StatusMsg: "Mengaktifkan layanan lokasi..."; Flags: runhidden
 Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\checkin.ps1"""; StatusMsg: "Menjalankan check-in..."; Flags: runhidden
 
 [Code]

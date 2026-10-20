@@ -52,11 +52,13 @@ Untuk mencabut: jalankan `agents/macos/uninstall.sh` di Mac yang bersangkutan.
 
 Setiap check-in, agent mencoba mengirim lokasi laptop. Hasilnya tampil sebagai peta di halaman **detail aset** (perlu login), bukan di halaman publik scan QR. Kalau lokasi gagal diambil, check-in tetap jalan dan lokasi terakhir yang diketahui tidak dihapus. Alasannya dicatat di `checkin.log`.
 
-- **Windows**: memakai Windows Location API. Location Services di laptop harus aktif (Settings → Privacy → Location).
+- **Windows**: memakai Windows Location API. Installer dan updater (dijalankan IT dengan hak admin) menyalakan Location Services otomatis saat pemasangan lewat `enable-location.ps1` — melepas kebijakan yang mematikan lokasi, mengizinkan aplikasi desktop mengakses lokasi, dan menghidupkan layanan Geolocation (`lfsvc`). Langkahnya dicatat di `%ProgramData%\ITAssetAgent\setup.log`. Ini provisioning terbuka oleh IT di perangkat milik perusahaan; **pastikan karyawan sudah diberi tahu lebih dulu** (lihat catatan UU PDP di bawah). Kalau perlu dimatikan untuk satu laptop, nonaktifkan manual di Settings → Privacy → Location.
 - **macOS**: script bash tidak boleh mengakses lokasi, jadi dipakai app helper kecil `ITAssetLocation.app` (source di `macos/location-helper/`). Saat pertama jalan muncul pop-up izin lokasi sekali; user harus klik **Allow**. Kalau ditolak, bisa diizinkan lagi di System Settings → Privacy & Security → Location Services → IT Asset Location.
   - Build di Mac (butuh `xcode-select --install`): `bash agents/macos/location-helper/build.sh`, lalu commit `agents/macos/ITAssetLocation.zip` yang dihasilkan. Selama zip ini belum ada, agent macOS jalan tanpa lokasi.
 
-Akurasi biasanya puluhan sampai ratusan meter (dihitung dari Wi-Fi sekitar, bukan satelit). Karena agent juga jalan saat laptop dibawa pulang, pastikan karyawan sudah diberi tahu sesuai kebijakan perusahaan (UU PDP).
+**Lokasi hanya dicatat di Wi-Fi kantor.** Agent cuma mengirim lokasi saat laptop tersambung ke salah satu SSID kantor (default: `SUSHI`, `FreeWifi-SUSHI`, `yaygroup_lt1`, `Yaygroup LT2`, `yaygroup`, `TrainingCenter`, `TrainingCenter_Guest`). Di luar itu — Wi-Fi rumah, hotspot, atau tanpa Wi-Fi — lokasi dilewati, jadi laptop yang dibawa pulang tidak terlacak. Daftar SSID bisa diubah per laptop lewat `LocationSsids` di `config.json` (Windows) atau variabel `LOCATION_SSIDS` (macOS); kalau kosong dipakai daftar default di script.
+
+Akurasi biasanya puluhan sampai ratusan meter (dihitung dari Wi-Fi sekitar, bukan satelit). Tetap pastikan karyawan sudah diberi tahu sesuai kebijakan perusahaan (UU PDP).
 
 ## Update Otomatis
 

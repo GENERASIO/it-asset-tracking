@@ -20,6 +20,18 @@ New-Item -ItemType Directory -Force -Path $TargetDir | Out-Null
 Copy-Item -Path (Join-Path $SourceDir 'checkin.ps1') -Destination $TargetDir -Force
 Copy-Item -Path (Join-Path $SourceDir 'config.json') -Destination $TargetDir -Force
 
+# Nyalakan Windows Location Services (butuh admin; dilewati dengan peringatan kalau tidak).
+$enableLocation = Join-Path $SourceDir 'enable-location.ps1'
+if (Test-Path $enableLocation) {
+    Copy-Item -Path $enableLocation -Destination $TargetDir -Force
+    $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
+    if ($isAdmin) {
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $TargetDir 'enable-location.ps1')
+    } else {
+        Write-Host "Lewati: aktivasi Location Services butuh Administrator. Jalankan ulang sebagai admin, atau nyalakan manual di Settings > Privacy > Location." -ForegroundColor Yellow
+    }
+}
+
 $action = New-ScheduledTaskAction -Execute 'powershell.exe' `
     -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$TargetDir\checkin.ps1`""
 

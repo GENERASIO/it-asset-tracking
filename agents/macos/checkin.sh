@@ -46,7 +46,22 @@ LOCATION_APP="$INSTALL_DIR/ITAssetLocation.app"
 GEO_JSON=""
 GEO_INFO="lokasi=-"
 
-if [ -d "$LOCATION_APP" ]; then
+# Lokasi HANYA dicatat saat tersambung Wi-Fi kantor, supaya Mac yang dibawa pulang tidak terlacak.
+DEFAULT_SSIDS="SUSHI|FreeWifi-SUSHI|yaygroup_lt1|Yaygroup LT2|yaygroup|TrainingCenter|TrainingCenter_Guest"
+ALLOWED_SSIDS="${LOCATION_SSIDS:-$DEFAULT_SSIDS}"
+CURRENT_SSID=$(networksetup -getairportnetwork en0 2>/dev/null | sed -n 's/^Current Wi-Fi Network: //p')
+
+ssid_allowed=false
+if [ -n "$CURRENT_SSID" ]; then
+    IFS='|' read -ra _ssid_list <<< "$ALLOWED_SSIDS"
+    for s in "${_ssid_list[@]}"; do
+        [ "$s" = "$CURRENT_SSID" ] && ssid_allowed=true && break
+    done
+fi
+
+if [ "$ssid_allowed" != true ]; then
+    log "Lokasi dilewati - bukan Wi-Fi kantor (SSID: ${CURRENT_SSID:-tidak tersambung})."
+elif [ -d "$LOCATION_APP" ]; then
     LOCATION_FILE="$INSTALL_DIR/location.txt"
     rm -f "$LOCATION_FILE"
 

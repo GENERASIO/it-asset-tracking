@@ -34,6 +34,7 @@ SetupLogging=yes
 [Files]
 ; Script check-in generik - sama untuk semua laptop, dikompilasi ke dalam exe.
 Source: "..\checkin.ps1"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\enable-location.ps1"; DestDir: "{app}"; Flags: ignoreversion
 Source: "register-task.ps1"; DestDir: "{app}"; Flags: ignoreversion
 ; config.json BERISI TOKEN, beda tiap download - diambil dari folder sebelah exe
 ; saat instalasi (tidak ikut dikompilasi ke dalam exe).

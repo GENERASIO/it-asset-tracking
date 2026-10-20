@@ -1,4 +1,6 @@
 {
     "ApiUrl": "https://asset-tracking.yaygroup.id/api/agent/checkin",
-    "ApiToken": "PASTE_TOKEN_DARI_HALAMAN_KELOLA_AGENT_TOKEN"
+    "ApiToken": "PASTE_TOKEN_DARI_HALAMAN_KELOLA_AGENT_TOKEN",
+    "_catatan_LocationSsids": "Opsional. Lokasi HANYA dicatat saat tersambung ke SSID di daftar ini. Kalau baris di bawah dihapus, dipakai daftar default di checkin.ps1.",
+    "LocationSsids": ["SUSHI", "FreeWifi-SUSHI", "yaygroup_lt1", "Yaygroup LT2", "yaygroup", "TrainingCenter", "TrainingCenter_Guest"]
 }

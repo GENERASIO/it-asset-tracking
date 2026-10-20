@@ -9,6 +9,12 @@ $TargetDir = Join-Path $env:ProgramData 'ITAssetAgent'
 $TaskName = 'ITAssetAgentCheckin'
 $ScriptPath = Join-Path $TargetDir 'checkin.ps1'
 
+# Nyalakan Windows Location Services (terang-terangan oleh IT, dicatat di setup.log).
+$enableLocation = Join-Path $PSScriptRoot 'enable-location.ps1'
+if (Test-Path $enableLocation) {
+    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $enableLocation
+}
+
 $action = New-ScheduledTaskAction -Execute 'powershell.exe' `
     -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$ScriptPath`""
 

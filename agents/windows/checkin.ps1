@@ -12,6 +12,23 @@ function Write-Log($message) {
     Add-Content -Path $LogPath -Value $line
 }
 
+# Daftar SSID Wi-Fi kantor. Lokasi HANYA dicatat saat laptop tersambung ke salah satu SSID ini,
+# supaya laptop yang dibawa pulang (Wi-Fi rumah/hotspot) tidak ikut terlacak. Bisa ditimpa lewat
+# config.json ("LocationSsids": ["...", "..."]).
+$DefaultLocationSsids = @(
+    'SUSHI', 'FreeWifi-SUSHI', 'yaygroup_lt1', 'Yaygroup LT2', 'yaygroup', 'TrainingCenter', 'TrainingCenter_Guest'
+)
+
+# Nama Wi-Fi (SSID) yang sedang tersambung, atau $null kalau tidak ada / bukan Wi-Fi.
+function Get-CurrentSsid {
+    try {
+        $line = (netsh wlan show interfaces 2>$null | Select-String -Pattern '^\s*SSID\s*:\s*(.+)$' | Select-Object -First 1)
+        if ($line) { return $line.Matches[0].Groups[1].Value.Trim() }
+    }
+    catch { }
+    return $null
+}
+
 # Mengambil posisi dari Windows Location API (GPS / Wi-Fi / IP, tergantung yang tersedia).
 # Mengembalikan $null kalau Location Services mati, izin ditolak, atau timeout - check-in
 # tetap jalan tanpa koordinat.
@@ -235,9 +252,20 @@ try {
         username      = $env:USERNAME
     }
 
-    $geo = Get-GeoLocation
-    if ($geo) {
-        $payload += $geo
+    # Lokasi hanya dicatat kalau tersambung ke Wi-Fi kantor (lihat $DefaultLocationSsids).
+    $allowedSsids = if ($config.LocationSsids) { @($config.LocationSsids) } else { $DefaultLocationSsids }
+    $currentSsid = Get-CurrentSsid
+    $geo = $null
+
+    if ($currentSsid -and ($allowedSsids -contains $currentSsid)) {
+        $geo = Get-GeoLocation
+        if ($geo) { $payload += $geo }
+    }
+    elseif ($currentSsid) {
+        Write-Log "Lokasi dilewati - bukan Wi-Fi kantor (SSID: $currentSsid)."
+    }
+    else {
+        Write-Log "Lokasi dilewati - tidak tersambung Wi-Fi."
     }
 
     # Key hanya dikirim kalau pengambilannya berhasil; kalau tidak dikirim, server
