@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\Category;
 use App\Models\Location;
+use App\Services\AgentInventorySync;
 use App\Services\AssetCodeGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +29,11 @@ class AgentController extends Controller
             'latitude' => ['nullable', 'numeric', 'between:-90,90', 'required_with:longitude'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180', 'required_with:latitude'],
             'location_accuracy_m' => ['nullable', 'integer', 'min:0', 'max:1000000'],
+            // Isi tiap item divalidasi longgar di AgentInventorySync (dipotong/dilewati, bukan
+            // ditolak), supaya satu nama aplikasi yang aneh tidak menggagalkan check-in.
+            'software' => ['nullable', 'array', 'max:5000'],
+            'licenses' => ['nullable', 'array', 'max:50'],
+            'crack_indicators' => ['nullable', 'array', 'max:50'],
         ]);
 
         [$asset, $created] = DB::transaction(function () use ($data) {
@@ -79,6 +85,10 @@ class AgentController extends Controller
             }
 
             $asset->save();
+
+            // Agent lama tidak mengirim key software/licenses, jadi data inventaris yang
+            // sudah ada tidak ikut terhapus.
+            app(AgentInventorySync::class)->sync($asset, $data);
 
             return [$asset, $created];
         });

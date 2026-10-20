@@ -47,6 +47,10 @@
                     <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
                         {{ __('Laporan') }}
                     </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('software-licenses.index')" :active="request()->routeIs('software-licenses.*')">
+                        {{ __('Lisensi Software') }}
+                    </x-responsive-nav-link>
                 @endif
 
                 @if (Auth::user()->role === 'super_admin')
@@ -281,6 +285,15 @@
                         </svg>
                     </x-slot>
                     {{ __('Laporan') }}
+                </x-sidebar-nav-link>
+
+                <x-sidebar-nav-link :href="route('software-licenses.index')" :active="request()->routeIs('software-licenses.*')">
+                    <x-slot name="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                        </svg>
+                    </x-slot>
+                    {{ __('Lisensi Software') }}
                 </x-sidebar-nav-link>
             @endif
         </nav>

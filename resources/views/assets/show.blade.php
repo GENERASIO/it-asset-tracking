@@ -215,6 +215,10 @@
                         </div>
                     @endif
 
+                    @if ($isStaff && $asset->inventory_synced_at)
+                        @include('assets.partials.software-inventory')
+                    @endif
+
                     @if ($isStaff)
                         <div class="border border-gray-100 dark:border-gray-700 rounded-lg p-4">
                             <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Check-in / Check-out</h3>

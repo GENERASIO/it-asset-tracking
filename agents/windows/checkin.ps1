@@ -85,6 +85,128 @@ function Update-AgentScript($ExpectedHash, $Config, $Headers) {
     }
 }
 
+# Daftar aplikasi terpasang dari registry "Apps & features" (64-bit, 32-bit, dan per-user
+# untuk user yang sedang login). Update/hotfix Windows dan komponen sistem dilewati.
+# Mengembalikan $null kalau gagal, supaya server tidak menghapus data yang sudah ada.
+function Get-InstalledSoftware {
+    try {
+        $paths = @(
+            'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
+            'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'
+        )
+        Get-ChildItem Registry::HKEY_USERS -ErrorAction SilentlyContinue |
+            Where-Object { $_.PSChildName -match '^S-1-5-21-[\d-]+$' } |
+            ForEach-Object { $paths += "Registry::HKEY_USERS\$($_.PSChildName)\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" }
+
+        $apps = Get-ItemProperty -Path $paths -ErrorAction SilentlyContinue |
+            Where-Object {
+                $_.DisplayName -and $_.SystemComponent -ne 1 -and -not $_.ParentKeyName -and
+                $_.ReleaseType -notin @('Update', 'Hotfix', 'Security Update')
+            } |
+            Sort-Object DisplayName -Unique |
+            ForEach-Object {
+                @{
+                    name         = ([string]$_.DisplayName).Trim()
+                    version      = [string]$_.DisplayVersion
+                    publisher    = [string]$_.Publisher
+                    installed_on = [string]$_.InstallDate
+                }
+            }
+
+        return , @($apps)
+    }
+    catch {
+        Write-Log "Daftar aplikasi tidak diambil - $($_.Exception.Message)"
+        return $null
+    }
+}
+
+# Status lisensi Office & Windows dari layanan lisensi Windows (SPP), plus Microsoft 365
+# (langganan) dari konfigurasi Click-to-Run. Product key lengkap TIDAK dikirim, hanya 5
+# karakter terakhir yang memang ditampilkan Windows.
+function Get-LicenseInfo {
+    try {
+        $officeAppId = '0ff1ce15-a989-479d-af46-f275c6370663'
+        $windowsAppId = '55c92734-d682-4d71-983e-d6ec3f16059f'
+        $licenses = @()
+
+        $products = @(Get-CimInstance SoftwareLicensingProduct -Filter 'PartialProductKey IS NOT NULL' -ErrorAction Stop)
+        # Office 2010 memakai layanan lisensi sendiri.
+        $products += @(Get-CimInstance OfficeSoftwareProtectionProduct -Filter 'PartialProductKey IS NOT NULL' -ErrorAction SilentlyContinue)
+
+        foreach ($p in $products) {
+            $product = if ($p.ApplicationID -eq $windowsAppId) { 'windows' } elseif ($p.ApplicationID -eq $officeAppId -or $p.Name -like 'Office*') { 'office' } else { $null }
+            if (-not $product) { continue }
+
+            $kmsHost = if ($p.KeyManagementServiceMachine) { $p.KeyManagementServiceMachine } else { $p.DiscoveredKeyManagementServiceMachineName }
+            if ($kmsHost -and $p.KeyManagementServicePort) { $kmsHost = "${kmsHost}:$($p.KeyManagementServicePort)" }
+
+            $licenses += @{
+                product       = $product
+                name          = [string]$p.Name
+                description   = [string]$p.Description
+                channel       = [string]$p.ProductKeyChannel
+                status_code   = [int]$p.LicenseStatus
+                grace_minutes = [int]$p.GracePeriodRemaining
+                partial_key   = [string]$p.PartialProductKey
+                kms_host      = [string]$kmsHost
+            }
+        }
+
+        $c2r = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Configuration' -ErrorAction SilentlyContinue
+        if ($c2r -and $c2r.ProductReleaseIds) {
+            foreach ($releaseId in ([string]$c2r.ProductReleaseIds -split ',')) {
+                $releaseId = $releaseId.Trim()
+                if ($releaseId -like 'O365*') {
+                    $licenses += @{ product = 'office'; name = "Microsoft 365 Apps ($releaseId)"; channel = 'Subscription'; status = 'subscription' }
+                }
+                elseif ($releaseId -and -not ($licenses | Where-Object { $_.product -eq 'office' })) {
+                    # Office terpasang tapi tidak ada lisensi sama sekali di SPP = belum diaktivasi.
+                    $licenses += @{ product = 'office'; name = $releaseId; channel = 'Click-to-Run'; status_code = 0 }
+                }
+            }
+        }
+
+        return , @($licenses)
+    }
+    catch {
+        Write-Log "Status lisensi tidak diambil - $($_.Exception.Message)"
+        return $null
+    }
+}
+
+# Jejak tool aktivasi ilegal yang umum (KMSpico, KMSAuto, AAct, KMS_VL_ALL, dll).
+function Get-CrackIndicators {
+    $found = @()
+    try {
+        $paths = @(
+            "$env:ProgramFiles\KMSpico", "${env:ProgramFiles(x86)}\KMSpico",
+            "$env:ProgramData\KMSAutoS", "$env:SystemRoot\KMSAutoS",
+            "$env:SystemRoot\AAct_Tools", "$env:ProgramData\AAct_Tools",
+            "$env:SystemRoot\System32\SECOH-QAD.exe", "$env:SystemRoot\System32\SECOH-QAD.dll",
+            "$env:SystemRoot\System32\SppExtComObjHook.dll"
+        )
+        foreach ($path in $paths) {
+            if (Test-Path -LiteralPath $path) { $found += "file: $path" }
+        }
+
+        Get-ScheduledTask -ErrorAction SilentlyContinue |
+            Where-Object { $_.TaskName -match 'AutoPico|KMSAuto|AutoKMS|KMS_VL_ALL|AAct|Activation-Renewal|Activation-Run_Once' } |
+            ForEach-Object { $found += "task: $($_.TaskPath)$($_.TaskName)" }
+
+        Get-Service -Name 'KMSELDI', 'Service_KMS' -ErrorAction SilentlyContinue |
+            ForEach-Object { $found += "service: $($_.Name)" }
+
+        $ifeo = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\SppExtComObj.exe'
+        if ((Get-ItemProperty $ifeo -ErrorAction SilentlyContinue).VerifierDlls) { $found += 'registry: SppExtComObj.exe VerifierDlls' }
+    }
+    catch {
+        Write-Log "Pengecekan jejak aktivasi ilegal tidak lengkap - $($_.Exception.Message)"
+    }
+
+    return , @($found)
+}
+
 try {
     if (-not (Test-Path $ConfigPath)) {
         throw "config.json tidak ditemukan di $InstallDir. Salin dari config.example.json dan isi ApiUrl/ApiToken."
@@ -116,13 +238,26 @@ try {
         $payload += $geo
     }
 
-    $body = $payload | ConvertTo-Json
+    # Key hanya dikirim kalau pengambilannya berhasil; kalau tidak dikirim, server
+    # membiarkan data inventaris sebelumnya.
+    $software = Get-InstalledSoftware
+    if ($null -ne $software) { $payload.software = $software }
+
+    $licenses = Get-LicenseInfo
+    if ($null -ne $licenses) { $payload.licenses = $licenses }
+
+    $payload.crack_indicators = Get-CrackIndicators
+
+    $body = $payload | ConvertTo-Json -Depth 5 -Compress
     $headers = @{ Authorization = "Bearer $($config.ApiToken)" }
 
-    $response = Invoke-RestMethod -Uri $config.ApiUrl -Method Post -Body $body -ContentType 'application/json' -Headers $headers
+    # Dikirim sebagai byte UTF-8: PowerShell 5.1 secara default mengirim string body dengan
+    # encoding lain, yang merusak karakter seperti (R)/(TM) di nama aplikasi.
+    $response = Invoke-RestMethod -Uri $config.ApiUrl -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($body)) -ContentType 'application/json; charset=utf-8' -Headers $headers
 
     $geoInfo = if ($geo) { "lokasi=$($geo.latitude),$($geo.longitude) (+/-$($geo.location_accuracy_m)m)" } else { 'lokasi=-' }
-    Write-Log "OK - asset_code=$($response.asset_code) created=$($response.created) $geoInfo"
+    $invInfo = "aplikasi=$(if ($null -ne $software) { $software.Count } else { '-' }) lisensi=$(if ($null -ne $licenses) { $licenses.Count } else { '-' })"
+    Write-Log "OK - asset_code=$($response.asset_code) created=$($response.created) $geoInfo $invInfo"
 
     Update-AgentScript -ExpectedHash $response.script_sha256 -Config $config -Headers $headers
 }

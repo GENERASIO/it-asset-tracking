@@ -15,6 +15,7 @@ class Asset extends Model
         'purchase_date', 'purchase_price', 'warranty_expired_at', 'photo',
         'hostname', 'os_name', 'os_version', 'ram_gb', 'storage_gb', 'mac_address', 'last_seen_at',
         'latitude', 'longitude', 'location_accuracy_m', 'geo_captured_at',
+        'inventory_synced_at', 'crack_indicators',
     ];
 
     protected $casts = [
@@ -25,7 +26,19 @@ class Asset extends Model
         'latitude' => 'decimal:7',
         'longitude' => 'decimal:7',
         'geo_captured_at' => 'datetime',
+        'inventory_synced_at' => 'datetime',
+        'crack_indicators' => 'array',
     ];
+
+    public function software()
+    {
+        return $this->hasMany(AssetSoftware::class)->orderBy('name');
+    }
+
+    public function licenses()
+    {
+        return $this->hasMany(AssetLicense::class)->orderBy('product')->orderBy('name');
+    }
 
     public function category()
     {

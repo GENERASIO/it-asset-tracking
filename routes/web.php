@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AgentTokenController;
+use App\Http\Controllers\SoftwareLicenseController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\AssetController;
@@ -53,6 +54,11 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::post('/barcode/print-batch', [BarcodeController::class, 'printBatch'])->name('barcode.print-batch');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export-pdf');
+    Route::get('/software-licenses', [SoftwareLicenseController::class, 'index'])->name('software-licenses.index');
+    Route::post('/software-licenses', [SoftwareLicenseController::class, 'store'])->name('software-licenses.store');
+    Route::get('/software-licenses/{entitlement}/edit', [SoftwareLicenseController::class, 'edit'])->name('software-licenses.edit');
+    Route::put('/software-licenses/{entitlement}', [SoftwareLicenseController::class, 'update'])->name('software-licenses.update');
+    Route::delete('/software-licenses/{entitlement}', [SoftwareLicenseController::class, 'destroy'])->name('software-licenses.destroy');
 });
 
 Route::middleware(['auth'])->group(function () {
