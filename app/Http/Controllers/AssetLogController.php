@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\AssetLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class AssetLogController extends Controller
 {
@@ -13,6 +14,7 @@ class AssetLogController extends Controller
     {
         $validated = $request->validate([
             'to_user_id' => 'required|exists:users,id',
+            'condition' => ['required', Rule::in(AssetLog::CONDITIONS)],
             'notes' => 'nullable|string',
         ]);
 
@@ -31,6 +33,7 @@ class AssetLogController extends Controller
                 'to_user_id' => $validated['to_user_id'],
                 'status_before' => $locked->status,
                 'status_after' => 'in_use',
+                'condition' => $validated['condition'],
                 'notes' => $validated['notes'] ?? null,
                 'handled_by' => auth()->id(),
             ]);
@@ -47,7 +50,10 @@ class AssetLogController extends Controller
             return back()->with('error', 'Aset ini tidak dalam status Available, tidak bisa di-checkout.');
         }
 
-        return redirect()->route('assets.show', $asset)->with('success', 'Aset berhasil di-checkout.');
+        // offer_bast memunculkan tombol "Buat BAST" di flash message halaman detail aset.
+        return redirect()->route('assets.show', $asset)
+            ->with('success', 'Aset berhasil di-checkout.')
+            ->with('offer_bast', true);
     }
 
     public function checkin(Request $request, Asset $asset)

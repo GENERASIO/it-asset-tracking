@@ -7,14 +7,28 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-4">
 
             @if (session('success'))
-                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-sm">
-                    {{ session('success') }}
+                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-sm flex flex-wrap items-center justify-between gap-2">
+                    <span>{{ session('success') }}</span>
+                    @if (session('offer_bast'))
+                        <a href="{{ route('bast.create', ['ids' => [$asset->id]]) }}"
+                           class="bg-green-700 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-green-800">
+                            Buat BAST
+                        </a>
+                    @endif
                 </div>
             @endif
 
             @if (session('error'))
                 <div class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">
                     {{ session('error') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                    @foreach ($errors->all() as $error)
+                        <p>{{ $error }}</p>
+                    @endforeach
                 </div>
             @endif
 
@@ -237,6 +251,16 @@
                                         </select>
                                     </div>
                                     <div>
+                                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Kondisi Barang</label>
+                                        <select name="condition" required
+                                                class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm text-sm">
+                                            <option value="">-- Pilih Kondisi --</option>
+                                            @foreach (\App\Models\AssetLog::CONDITIONS as $condition)
+                                                <option value="{{ $condition }}" @selected(old('condition') === $condition)>{{ $condition }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
                                         <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Catatan (opsional)</label>
                                         <textarea name="notes" rows="2"
                                                   class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm text-sm"></textarea>
@@ -275,6 +299,8 @@
                                 </p>
                             @endif
                         </div>
+
+                        @include('assets.partials.bast-list')
                     @endif
                 </div>
 
@@ -286,6 +312,9 @@
                             <div class="border-b dark:border-gray-700 py-2 text-sm">
                                 <span class="font-medium text-gray-900 dark:text-white">{{ ucfirst(str_replace('_',' ',$log->action)) }}</span>
                                 — {{ $log->fromUser->name ?? 'Gudang' }} → {{ $log->toUser->name ?? 'Gudang' }}
+                                @if ($log->condition)
+                                    <span class="text-xs text-gray-500">(kondisi: {{ $log->condition }})</span>
+                                @endif
                                 <span class="text-gray-400 block text-xs">{{ $log->created_at->format('d M Y H:i') }}</span>
                                 @if ($log->notes)
                                     <p class="text-gray-500 text-xs mt-1">{{ $log->notes }}</p>

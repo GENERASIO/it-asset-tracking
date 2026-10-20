@@ -60,6 +60,11 @@ class Asset extends Model
         return $this->hasMany(AssetLog::class)->latest();
     }
 
+    public function bastDocuments()
+    {
+        return $this->belongsToMany(BastDocument::class, 'bast_items')->distinct()->latest('handover_date');
+    }
+
     public function maintenanceLogs()
     {
         return $this->hasMany(MaintenanceLog::class)->latest();

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AgentTokenController;
+use App\Http\Controllers\BastController;
 use App\Http\Controllers\SoftwareLicenseController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocationController;
@@ -59,6 +60,14 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::get('/software-licenses/{entitlement}/edit', [SoftwareLicenseController::class, 'edit'])->name('software-licenses.edit');
     Route::put('/software-licenses/{entitlement}', [SoftwareLicenseController::class, 'update'])->name('software-licenses.update');
     Route::delete('/software-licenses/{entitlement}', [SoftwareLicenseController::class, 'destroy'])->name('software-licenses.destroy');
+    Route::get('/bast', [BastController::class, 'index'])->name('bast.index');
+    Route::get('/bast/create', [BastController::class, 'create'])->name('bast.create');
+    Route::post('/bast', [BastController::class, 'store'])->name('bast.store');
+    Route::get('/bast/{bast}', [BastController::class, 'show'])->name('bast.show');
+    Route::get('/bast/{bast}/pdf', [BastController::class, 'pdf'])->name('bast.pdf');
+    Route::post('/bast/{bast}/signed', [BastController::class, 'uploadSigned'])->name('bast.signed.upload');
+    Route::get('/bast/{bast}/signed', [BastController::class, 'signedFile'])->name('bast.signed.show');
+    Route::delete('/bast/{bast}', [BastController::class, 'destroy'])->name('bast.destroy');
 });
 
 Route::middleware(['auth'])->group(function () {

@@ -9,8 +9,11 @@ class AssetLog extends Model
     protected $fillable = [
         'asset_id', 'action', 'from_user_id', 'to_user_id',
         'from_location_id', 'to_location_id',
-        'status_before', 'status_after', 'notes', 'handled_by',
+        'status_before', 'status_after', 'condition', 'notes', 'handled_by',
     ];
+
+    // Kondisi barang saat check-out, dipakai juga sebagai isian awal "Kondisi barang" di BAST.
+    public const CONDITIONS = ['Baru', 'Bekas'];
 
     public function asset()
     {
