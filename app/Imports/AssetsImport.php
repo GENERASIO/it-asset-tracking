@@ -47,7 +47,7 @@ class AssetsImport implements ToCollection, WithHeadingRow
                         'location_id' => $location->id,
                         'status' => $row['status'] ?? 'available',
                         'purchase_date' => $this->parseDate($row['tanggal_pembelian'] ?? null),
-                        'purchase_price' => $row['harga_beli'] ?? null,
+                        'purchase_price' => $this->parsePrice($row['harga_beli'] ?? null),
                         'warranty_expired_at' => $this->parseDate($row['garansi_sampai'] ?? null),
                         'specification' => $row['spesifikasi'] ?? null,
                     ]
@@ -76,6 +76,23 @@ class AssetsImport implements ToCollection, WithHeadingRow
         }
 
         return Location::where('name', $value)->orWhere('code', $value)->first();
+    }
+
+    /**
+     * Harga dari Excel: angka biasa (10000000) atau teks berformat ("Rp 10.000.000").
+     * Nilai di bawah Rp 1.000 (mis. "6,8" maksudnya 6,8 juta) dikosongkan, bukan disimpan salah.
+     */
+    protected function parsePrice($value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $price = is_numeric($value)
+            ? (int) round((float) $value)
+            : (int) preg_replace('/\D/', '', (string) $value);
+
+        return $price >= 1000 ? $price : null;
     }
 
     protected function parseDate($value): ?string

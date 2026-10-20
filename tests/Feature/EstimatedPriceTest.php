@@ -60,6 +60,39 @@ class EstimatedPriceTest extends TestCase
         $this->assertTrue($this->asset->fresh()->purchase_price_estimated);
     }
 
+    public function test_input_harga_berformat_rupiah_disimpan_sebagai_angka(): void
+    {
+        $this->actingAs($this->staff)
+            ->put(route('assets.update', $this->asset), $this->updatePayload(['purchase_price' => 'Rp 10.000.000']))
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame(10000000, $this->asset->fresh()->purchase_price);
+
+        $this->actingAs($this->staff)->get(route('assets.edit', $this->asset))
+            ->assertOk()
+            ->assertSee('value="Rp 10.000.000"', false);
+    }
+
+    public function test_harga_dalam_satuan_juta_ditolak(): void
+    {
+        $this->actingAs($this->staff)
+            ->put(route('assets.update', $this->asset), $this->updatePayload(['purchase_price' => '6,8']))
+            ->assertSessionHasErrors('purchase_price');
+
+        $this->assertSame(7900000, $this->asset->fresh()->purchase_price);
+    }
+
+    public function test_harga_boleh_dikosongkan(): void
+    {
+        $this->actingAs($this->staff)
+            ->put(route('assets.update', $this->asset), $this->updatePayload(['purchase_price' => '']))
+            ->assertSessionHasNoErrors();
+
+        $asset = $this->asset->fresh();
+        $this->assertNull($asset->purchase_price);
+        $this->assertFalse($asset->purchase_price_estimated);
+    }
+
     public function test_harga_diubah_manual_jadi_harga_asli(): void
     {
         $this->actingAs($this->staff)->put(route('assets.update', $this->asset), $this->updatePayload(['purchase_price' => '8250000']));

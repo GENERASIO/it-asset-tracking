@@ -130,8 +130,30 @@ class AssetController extends Controller
         return view('assets.create', compact('categories', 'locations', 'users'));
     }
 
+    // Harga beli disimpan dalam Rupiah penuh (bilangan bulat). Minimal Rp 1.000 supaya input
+    // dalam satuan juta (mis. "6,8" untuk 6,8 juta) tidak lolos lagi.
+    private const PRICE_RULE = 'nullable|integer|min:1000|max:999999999999';
+
+    private const PRICE_MESSAGES = [
+        'purchase_price.min' => 'Harga beli terlalu kecil. Isi dalam Rupiah penuh, mis. 6800000 untuk Rp 6.800.000.',
+        'purchase_price.integer' => 'Harga beli hanya boleh berisi angka.',
+    ];
+
+    /** "Rp 10.000.000" (dari input berformat) -> "10000000"; kosong -> null. */
+    private function normalizeRupiah(Request $request): void
+    {
+        if (! $request->has('purchase_price')) {
+            return;
+        }
+
+        $digits = preg_replace('/\D/', '', (string) $request->input('purchase_price'));
+        $request->merge(['purchase_price' => $digits === '' ? null : $digits]);
+    }
+
     public function store(Request $request)
     {
+        $this->normalizeRupiah($request);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -143,11 +165,11 @@ class AssetController extends Controller
             'assigned_to' => 'nullable|exists:users,id',
             'status' => 'required|in:available,in_use,maintenance,broken,retired',
             'purchase_date' => 'nullable|date',
-            'purchase_price' => 'nullable|numeric',
+            'purchase_price' => self::PRICE_RULE,
             'warranty_expired_at' => 'nullable|date',
             'photos' => 'required|array|min:1|max:5',
             'photos.*' => 'image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+        ], self::PRICE_MESSAGES);
 
         $photos = $validated['photos'];
         unset($validated['photos']);
@@ -194,6 +216,8 @@ class AssetController extends Controller
     {
         $existingCount = $asset->photos()->count();
 
+        $this->normalizeRupiah($request);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -205,7 +229,7 @@ class AssetController extends Controller
             'assigned_to' => 'nullable|exists:users,id',
             'status' => 'required|in:available,in_use,maintenance,broken,retired',
             'purchase_date' => 'nullable|date',
-            'purchase_price' => 'nullable|numeric',
+            'purchase_price' => self::PRICE_RULE,
             'warranty_expired_at' => 'nullable|date',
             'photos' => ['nullable', 'array', function ($attribute, $value, $fail) use ($existingCount) {
                 if ($existingCount + count($value) > 5) {
@@ -213,14 +237,14 @@ class AssetController extends Controller
                 }
             }],
             'photos.*' => 'image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+        ], self::PRICE_MESSAGES);
 
         $photos = $validated['photos'] ?? [];
         unset($validated['photos']);
 
         // Harga yang diubah manual dianggap harga asli, jadi tanda "estimasi" dilepas.
         if ($asset->purchase_price_estimated
-            && (string) ($validated['purchase_price'] ?? '') !== '' && (float) $validated['purchase_price'] !== (float) $asset->purchase_price) {
+            && ($validated['purchase_price'] ?? null) !== null && (int) $validated['purchase_price'] !== (int) $asset->purchase_price) {
             $validated['purchase_price_estimated'] = false;
         }
         if (($validated['purchase_price'] ?? null) === null) {

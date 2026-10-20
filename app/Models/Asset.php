@@ -21,7 +21,7 @@ class Asset extends Model
     protected $casts = [
         'purchase_date' => 'date',
         'warranty_expired_at' => 'date',
-        'purchase_price' => 'decimal:2',
+        'purchase_price' => 'integer',
         'purchase_price_estimated' => 'boolean',
         'last_seen_at' => 'datetime',
         'latitude' => 'decimal:7',
