@@ -41,140 +41,134 @@
                 </div>
             @endif
 
+            @php
+                $btnSecondary = 'inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3.5 py-2 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 whitespace-nowrap transition-colors duration-150 cursor-pointer';
+                $btnPrimary = 'inline-flex items-center gap-1.5 bg-brand-500 text-white px-3.5 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap transition-colors duration-150 active:scale-95 disabled:opacity-40 disabled:pointer-events-none';
+            @endphp
+
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
 
-                <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                {{-- Baris 1: pencarian & filter --}}
+                <form method="GET" class="flex flex-wrap items-center gap-2">
+                    <input type="hidden" name="view" value="{{ $view }}">
+
+                    <div class="relative flex-1 min-w-[16rem]" x-data="assetSearchSuggest(@js(route('assets.search-suggestions')), @js(request('search', '')))" @click.outside="open = false">
+                        <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                        <input type="text" name="search" x-model="query" @input.debounce.300ms="fetchSuggestions()"
+                               @focus="if (results.length) open = true" @keydown.escape="open = false"
+                               autocomplete="off"
+                               placeholder="Cari kode, nama, serial, pemegang, atau lokasi..."
+                               class="w-full pl-9 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+
+                        <div x-show="open && results.length" style="display: none;"
+                             class="absolute z-20 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-64 overflow-auto">
+                            <template x-for="item in results" :key="item.id">
+                                <button type="button" @click="select(item)"
+                                        class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2">
+                                    <span class="font-mono font-semibold text-gray-800 dark:text-white" x-text="item.asset_code"></span>
+                                    <span class="text-gray-500 dark:text-gray-400 truncate" x-text="item.name"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <x-searchable-select name="category_id" placeholder="Semua Kategori"
+                        :options="$categories->pluck('name', 'id')" :selected="request('category_id')" />
+
+                    <x-searchable-select name="location_id" placeholder="Semua Lokasi"
+                        :options="$locations->pluck('name', 'id')" :selected="request('location_id')" />
+
+                    <x-searchable-select name="status" placeholder="Semua Status"
+                        :options="collect($statusColumns)->map(fn ($m) => $m['label'])" :selected="request('status')" />
+
+                    <button type="submit" class="{{ $btnPrimary }}">Filter</button>
+
+                    @if ($hasFilters)
+                        <a href="{{ route('assets.index', ['view' => $view]) }}" class="px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Reset</a>
+                    @endif
+                </form>
+
+                {{-- Baris 2: ringkasan, tampilan, export/import, tambah --}}
+                <div class="mt-4 pb-4 border-b border-gray-100 dark:border-gray-700 flex flex-wrap items-center justify-between gap-3">
+                    <div class="text-sm text-gray-600 dark:text-gray-300 flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span><span class="font-semibold text-gray-900 dark:text-white">{{ number_format($summary['count'], 0, ',', '.') }}</span> aset{{ $hasFilters ? ' sesuai filter' : '' }}</span>
+                        <span class="text-gray-300 dark:text-gray-600">|</span>
+                        <span>Total nilai <span class="font-semibold text-gray-900 dark:text-white whitespace-nowrap">Rp {{ number_format($summary['value'], 0, ',', '.') }}</span></span>
+                        @if ($summary['estimated'])
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">{{ $summary['estimated'] }} harga estimasi</span>
+                        @endif
+                        @if ($summary['no_price'])
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">{{ $summary['no_price'] }} tanpa harga</span>
+                        @endif
+                    </div>
+
                     <div class="flex flex-wrap items-center gap-2">
-                        <form method="GET" class="flex flex-wrap gap-2">
-                            <input type="hidden" name="view" value="{{ $view }}">
-
-                            <div class="relative" x-data="assetSearchSuggest(@js(route('assets.search-suggestions')), @js(request('search', '')))" @click.outside="open = false">
-                                <input type="text" name="search" x-model="query" @input.debounce.300ms="fetchSuggestions()"
-                                       @focus="if (results.length) open = true" @keydown.escape="open = false"
-                                       autocomplete="off"
-                                       placeholder="Cari kode / nama / serial / pemegang / lokasi..."
-                                       class="w-72 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
-
-                                <div x-show="open && results.length" style="display: none;"
-                                     class="absolute z-20 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-64 overflow-auto">
-                                    <template x-for="item in results" :key="item.id">
-                                        <button type="button" @click="select(item)"
-                                                class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2">
-                                            <span class="font-mono font-semibold text-gray-800 dark:text-white" x-text="item.asset_code"></span>
-                                            <span class="text-gray-500 dark:text-gray-400 truncate" x-text="item.name"></span>
-                                        </button>
-                                    </template>
-                                </div>
-                            </div>
-
-                            <x-searchable-select name="category_id" placeholder="Semua Kategori"
-                                :options="$categories->pluck('name', 'id')" :selected="request('category_id')" />
-
-                            <x-searchable-select name="location_id" placeholder="Semua Lokasi"
-                                :options="$locations->pluck('name', 'id')" :selected="request('location_id')" />
-
-                            <x-searchable-select name="status" placeholder="Semua Status"
-                                :options="collect($statusColumns)->map(fn ($m) => $m['label'])" :selected="request('status')" />
-
-                            <x-searchable-select name="price" placeholder="Semua Harga"
-                                :options="['actual' => 'Harga asli', 'estimated' => 'Harga estimasi', 'empty' => 'Belum ada harga']" :selected="request('price')" />
-
-                            <div class="flex items-center gap-1">
-                                <x-rupiah-input name="price_min" :value="request('price_min')" placeholder="Harga dari"
-                                                class="w-36 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm" />
-                                <span class="text-gray-400">–</span>
-                                <x-rupiah-input name="price_max" :value="request('price_max')" placeholder="sampai"
-                                                class="w-36 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm" />
-                            </div>
-
-                            <button type="submit" class="bg-gray-200 dark:bg-gray-600 dark:text-white px-3 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Filter</button>
-
-                            @if ($hasFilters)
-                                <a href="{{ route('assets.index', ['view' => $view]) }}"
-                                   class="px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Reset</a>
-                            @endif
-                        </form>
-
                         <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                             <a href="{{ $viewUrl('board') }}"
-                               class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-all duration-150 {{ $view === 'board' ? 'bg-brand-500 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                               class="flex items-center gap-1.5 px-3 py-1 rounded-md text-sm whitespace-nowrap transition-colors duration-150 {{ $view === 'board' ? 'bg-white dark:bg-gray-800 text-brand-600 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white' }}">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
                                 </svg>
                                 Board
                             </a>
                             <a href="{{ $viewUrl('table') }}"
-                               class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-all duration-150 {{ $view === 'table' ? 'bg-brand-500 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                               class="flex items-center gap-1.5 px-3 py-1 rounded-md text-sm whitespace-nowrap transition-colors duration-150 {{ $view === 'table' ? 'bg-white dark:bg-gray-800 text-brand-600 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white' }}">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
                                 </svg>
                                 Tabel
                             </a>
                         </div>
-                    </div>
 
-                    <div class="flex flex-wrap items-center gap-2">
-                        <a href="{{ route('assets.export', $filterParams) }}" title="{{ $hasFilters ? 'Export aset sesuai filter yang sedang aktif' : 'Export semua aset' }}"
-                           class="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
+                        <a href="{{ route('assets.export', $filterParams) }}" class="{{ $btnSecondary }}"
+                           title="{{ $hasFilters ? 'Export aset sesuai filter yang sedang aktif' : 'Export semua aset' }}">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                             </svg>
                             Export Excel
                         </a>
 
-                        <form action="{{ route('assets.import') }}" method="POST" enctype="multipart/form-data"
-                              class="flex items-center gap-2">
+                        {{-- Pilih file langsung meng-upload, jadi tidak ada lagi tampilan "Choose file / No file chosen". --}}
+                        <form action="{{ route('assets.import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
-                            <input type="file" name="file" accept=".xlsx,.xls,.csv" required
-                                   class="border-gray-300 rounded-lg text-sm">
-                            <button type="submit"
-                                    class="flex items-center gap-1.5 bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
+                            <label class="{{ $btnSecondary }}" title="Import aset dari file Excel (.xlsx / .xls / .csv)">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m-6 3l3-3m0 0l3 3m-3-3V15" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                                 </svg>
-                                Import
-                            </button>
+                                Import Excel
+                                <input type="file" name="file" accept=".xlsx,.xls,.csv" class="hidden"
+                                       onchange="if (this.files.length) this.form.submit()">
+                            </label>
                         </form>
+
+                        <a href="{{ route('assets.create') }}" class="{{ $btnPrimary }}">+ Tambah Aset</a>
                     </div>
                 </div>
 
                 <form id="bulk-print-form" action="{{ route('barcode.print-batch') }}" method="POST" target="_blank">
                     @csrf
 
-                    <div class="flex flex-wrap justify-end items-center gap-2 mb-4">
-                        {{-- Ringkasan hasil filter --}}
-                        <div class="mr-auto text-sm text-gray-600 dark:text-gray-300 flex flex-wrap items-center gap-x-3 gap-y-1">
-                            <span><span class="font-semibold text-gray-900 dark:text-white">{{ number_format($summary['count'], 0, ',', '.') }}</span> aset{{ $hasFilters ? ' sesuai filter' : '' }}</span>
-                            <span class="text-gray-300 dark:text-gray-600">|</span>
-                            <span>Total nilai <span class="font-semibold text-gray-900 dark:text-white whitespace-nowrap">Rp {{ number_format($summary['value'], 0, ',', '.') }}</span></span>
-                            @if ($summary['estimated'])
-                                <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">{{ $summary['estimated'] }} harga estimasi</span>
-                            @endif
-                            @if ($summary['no_price'])
-                                <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">{{ $summary['no_price'] }} tanpa harga</span>
-                            @endif
-                        </div>
+                    {{-- Baris 3: aksi untuk aset yang dicentang --}}
+                    <div class="py-3 flex flex-wrap items-center gap-2">
+                        <span class="text-sm text-gray-500 dark:text-gray-400 mr-1">
+                            <span id="selected-asset-count" class="font-semibold text-gray-900 dark:text-white">0</span> aset dipilih
+                        </span>
 
-                        <button type="submit" id="bulk-print-btn" disabled title="Pilih minimal 1 aset dulu"
-                                class="flex items-center gap-1.5 bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:pointer-events-none disabled:hover:scale-100">
+                        <button type="submit" id="bulk-print-btn" disabled title="Pilih minimal 1 aset dulu" class="{{ $btnPrimary }}">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
                             </svg>
-                            Cetak Label Terpilih
+                            Cetak Label
                         </button>
 
-                        <button type="button" id="bulk-bast-btn" disabled title="Pilih minimal 1 aset dulu" onclick="openBastForSelected()"
-                                class="flex items-center gap-1.5 bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:pointer-events-none disabled:hover:scale-100">
+                        <button type="button" id="bulk-bast-btn" disabled title="Pilih minimal 1 aset dulu" onclick="openBastForSelected()" class="{{ $btnPrimary }}">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                             </svg>
-                            Buat BAST Terpilih
+                            Buat BAST
                         </button>
-
-                        <a href="{{ route('assets.create') }}"
-                           class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
-                            + Tambah Aset
-                        </a>
                     </div>
 
                     @if ($view === 'board')
@@ -657,6 +651,10 @@
 
         function updateBulkPrintButtonState() {
             var checkedCount = document.querySelectorAll('.asset-checkbox:checked').length;
+            // Board & tabel bisa punya checkbox untuk aset yang sama, jadi yang dihitung id unik.
+            var uniqueIds = new Set(Array.from(document.querySelectorAll('.asset-checkbox:checked')).map(function (c) { return c.value; }));
+            var counter = document.getElementById('selected-asset-count');
+            if (counter) counter.textContent = uniqueIds.size;
             ['bulk-print-btn', 'bulk-bast-btn'].forEach(function (id) {
                 var btn = document.getElementById(id);
                 if (!btn) return;

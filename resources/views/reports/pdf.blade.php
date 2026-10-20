@@ -47,7 +47,77 @@
         <p><strong>Total Nilai Aset:</strong> Rp {{ number_format($totalAssetValue ?? 0, 0, ',', '.') }}@if ($estimatedPriceCount) (termasuk {{ $estimatedPriceCount }} aset dengan harga estimasi)@endif</p>
         <p><strong>Jumlah Kategori:</strong> {{ $totalCategories }}</p>
         <p><strong>Jumlah Lokasi:</strong> {{ $totalLocations }}</p>
+        <p><strong>Perkiraan Nilai Buku:</strong> Rp {{ number_format($bookValue, 0, ',', '.') }}
+            (dari {{ $bookValueCoverage }} aset bertanggal beli, susut garis lurus 4 tahun)</p>
+        <p><strong>Stok Cadangan (Available):</strong> {{ $spareCount }} unit</p>
+        <p><strong>Skor Kelengkapan Data:</strong> {{ $dataScore }}%</p>
     </div>
+
+    <h2>Umur Perangkat (perkiraan dari generasi prosesor)</h2>
+    <table>
+        <thead>
+            <tr><th>Umur</th><th class="number">Jumlah Aset</th><th class="number">Nilai Beli</th></tr>
+        </thead>
+        <tbody>
+            @foreach ($ageGroups as $group)
+                <tr>
+                    <td>{{ $group['label'] }}</td>
+                    <td class="number">{{ $group['count'] }}</td>
+                    <td class="number">Rp {{ number_format($group['value'], 0, ',', '.') }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <h2>Nilai Aset per Lokasi (10 terbesar)</h2>
+    <table>
+        <thead>
+            <tr><th>Lokasi</th><th class="number">Jumlah Aset</th><th class="number">Nilai</th></tr>
+        </thead>
+        <tbody>
+            @foreach ($valueByLocation->take(10) as $row)
+                <tr>
+                    <td>{{ $row['name'] }}</td>
+                    <td class="number">{{ $row['count'] }}</td>
+                    <td class="number">Rp {{ number_format($row['value'], 0, ',', '.') }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <h2>Kelengkapan Data</h2>
+    <table>
+        <thead>
+            <tr><th>Data</th><th class="number">Terisi</th><th class="number">Persen</th></tr>
+        </thead>
+        <tbody>
+            @foreach ($completeness as $row)
+                <tr>
+                    <td>{{ $row['label'] }}</td>
+                    <td class="number">{{ $row['filled'] }} / {{ $totalAssets }}</td>
+                    <td class="number">{{ $row['percent'] }}%</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    @if ($maintenanceByModel->isNotEmpty())
+        <h2>Biaya Maintenance per Model</h2>
+        <table>
+            <thead>
+                <tr><th>Model</th><th class="number">Perbaikan</th><th class="number">Biaya</th></tr>
+            </thead>
+            <tbody>
+                @foreach ($maintenanceByModel as $row)
+                    <tr>
+                        <td>{{ $row['model'] }}</td>
+                        <td class="number">{{ $row['count'] }} ({{ $row['assets'] }} unit)</td>
+                        <td class="number">Rp {{ number_format($row['cost'], 0, ',', '.') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 
     <h2>Aset per Kategori</h2>
     <table>

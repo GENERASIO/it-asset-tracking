@@ -151,6 +151,155 @@
                 </div>
             </form>
 
+            @php
+                $rp = fn ($n) => 'Rp '.number_format($n, 0, ',', '.');
+                $ageColors = ['new' => '#22c55e', 'mid' => '#3b82f6', 'old' => '#ef4444', 'unknown' => '#9ca3af'];
+                $sparePercent = $totalAssets ? round($spareCount / $totalAssets * 100, 1) : 0;
+                $scoreColor = $dataScore >= 80 ? 'bg-green-500' : ($dataScore >= 50 ? 'bg-yellow-500' : 'bg-red-500');
+                $maxLocationValue = max($valueByLocation->max('value') ?? 0, 1);
+            @endphp
+
+            {{-- Indikator utama --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="{{ $card }}">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Perkiraan Nilai Buku</p>
+                    <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white tabular-nums whitespace-nowrap">{{ $rp($bookValue) }}</p>
+                    <p class="mt-auto pt-2 text-xs text-gray-500 dark:text-gray-400">
+                        @if ($bookValueCoverage)
+                            Dari {{ $bookValueCoverage }} aset bertanggal beli (nilai beli {{ $rp($bookValuePurchase) }}), susut garis lurus 4 tahun.
+                        @else
+                            Belum bisa dihitung — tanggal beli belum diisi.
+                        @endif
+                        @if ($bookValueCoverage < $totalAssets)
+                            <span class="text-yellow-700 dark:text-yellow-400">{{ $totalAssets - $bookValueCoverage }} aset belum punya tanggal beli.</span>
+                        @endif
+                    </p>
+                </div>
+
+                <div class="{{ $card }}">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Skor Kelengkapan Data</p>
+                    <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white tabular-nums">{{ $dataScore }}%</p>
+                    <div class="mt-2 h-2 rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                        <div class="h-full rounded-full {{ $scoreColor }}" style="width: {{ $dataScore }}%"></div>
+                    </div>
+                    <p class="mt-auto pt-2 text-xs text-gray-500 dark:text-gray-400">Rata-rata kelengkapan 7 data penting (rincian di bawah).</p>
+                </div>
+
+                <div class="{{ $card }}">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Stok Cadangan (Available)</p>
+                    <p class="mt-2 text-2xl font-bold tabular-nums {{ $sparePercent < 3 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">
+                        {{ $spareCount }} <span class="text-base font-semibold text-gray-500 dark:text-gray-400">unit ({{ $sparePercent }}%)</span>
+                    </p>
+                    <p class="mt-auto pt-2 text-xs text-gray-500 dark:text-gray-400">
+                        Disarankan 3–5% dari total aset
+                        ({{ (int) ceil($totalAssets * 0.03) }}–{{ (int) ceil($totalAssets * 0.05) }} unit) sebagai pengganti saat ada yang rusak.
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {{-- Umur perangkat --}}
+                <div class="{{ $card }}">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300">Umur Perangkat</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Diperkirakan dari generasi prosesor. Yang "Tua" sebaiknya masuk rencana peremajaan.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                        <div class="relative" style="height: 200px;">
+                            <canvas id="chartAge"></canvas>
+                        </div>
+                        <table class="w-full text-sm">
+                            <tbody>
+                                @foreach ($ageGroups as $group)
+                                    <tr class="border-b last:border-b-0 border-gray-100 dark:border-gray-700">
+                                        <td class="py-2">
+                                            <span class="inline-block w-2.5 h-2.5 rounded-full mr-1.5" style="background: {{ $ageColors[$group['key']] }}"></span>
+                                            <span class="text-gray-700 dark:text-gray-300">{{ $group['label'] }}</span>
+                                        </td>
+                                        <td class="py-2 text-right font-semibold text-gray-900 dark:text-white tabular-nums">{{ $group['count'] }}</td>
+                                        <td class="py-2 pl-3 text-right text-xs text-gray-500 dark:text-gray-400 tabular-nums whitespace-nowrap">{{ $rp($group['value']) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Nilai per lokasi --}}
+                <div class="{{ $card }}">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300">Nilai Aset per Lokasi</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">10 lokasi dengan nilai aset terbesar.</p>
+                    <div class="space-y-2.5">
+                        @forelse ($valueByLocation->take(10) as $row)
+                            <div>
+                                <div class="flex items-baseline justify-between gap-3 text-sm">
+                                    <span class="text-gray-700 dark:text-gray-300 truncate">{{ $row['name'] }} <span class="text-xs text-gray-400">· {{ $row['count'] }} aset</span></span>
+                                    <span class="font-semibold text-gray-900 dark:text-white tabular-nums whitespace-nowrap">{{ $rp($row['value']) }}</span>
+                                </div>
+                                <div class="mt-1 h-1.5 rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                                    <div class="h-full rounded-full bg-brand-500" style="width: {{ round($row['value'] / $maxLocationValue * 100, 1) }}%"></div>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-sm text-gray-400">Tidak ada data.</p>
+                        @endforelse
+                    </div>
+                    @if ($valueByLocation->count() > 10)
+                        <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                            + {{ $valueByLocation->count() - 10 }} lokasi lain senilai {{ $rp($valueByLocation->slice(10)->sum('value')) }}
+                        </p>
+                    @endif
+                </div>
+
+                {{-- Kelengkapan data --}}
+                <div class="{{ $card }}">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300">Kelengkapan Data</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Makin lengkap, makin bisa dipercaya laporan di halaman ini.</p>
+                    <div class="space-y-2.5">
+                        @foreach ($completeness as $row)
+                            @php $barColor = $row['percent'] >= 80 ? 'bg-green-500' : ($row['percent'] >= 50 ? 'bg-yellow-500' : 'bg-red-500'); @endphp
+                            <div>
+                                <div class="flex items-baseline justify-between text-sm">
+                                    <span class="text-gray-700 dark:text-gray-300">{{ $row['label'] }}</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 tabular-nums">{{ $row['filled'] }} / {{ $totalAssets }} · <span class="font-semibold text-gray-900 dark:text-white">{{ $row['percent'] }}%</span></span>
+                                </div>
+                                <div class="mt-1 h-1.5 rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                                    <div class="h-full rounded-full {{ $barColor }}" style="width: {{ $row['percent'] }}%"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Biaya maintenance per model --}}
+                <div class="{{ $card }}">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300">Biaya Maintenance per Model</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Model yang sering rusak / mahal perawatannya sebaiknya tidak dibeli lagi.</p>
+                    @if ($maintenanceByModel->isEmpty())
+                        <div class="flex-1 flex items-center justify-center text-center text-sm text-gray-400 py-8">
+                            Belum ada catatan maintenance.<br>Catat perbaikan di halaman detail aset (tab Aktivitas) supaya bagian ini terisi.
+                        </div>
+                    @else
+                        <table class="w-full text-sm">
+                            <thead class="text-xs text-gray-500 dark:text-gray-400">
+                                <tr>
+                                    <th class="text-left font-medium pb-2">Model</th>
+                                    <th class="text-right font-medium pb-2">Perbaikan</th>
+                                    <th class="text-right font-medium pb-2">Biaya</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($maintenanceByModel as $row)
+                                    <tr class="border-t border-gray-100 dark:border-gray-700">
+                                        <td class="py-2 text-gray-700 dark:text-gray-300">{{ $row['model'] }}</td>
+                                        <td class="py-2 text-right tabular-nums text-gray-900 dark:text-white">{{ $row['count'] }}× <span class="text-xs text-gray-400">({{ $row['assets'] }} unit)</span></td>
+                                        <td class="py-2 text-right tabular-nums font-semibold text-gray-900 dark:text-white whitespace-nowrap">{{ $rp($row['cost']) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="{{ $card }}">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aset per Kategori</h3>
@@ -198,6 +347,22 @@
 
         const trendLabels = @json($monthlyPurchases->pluck('label'));
         const trendData = @json($monthlyPurchases->pluck('total'));
+
+        new Chart(document.getElementById('chartAge'), {
+            type: 'doughnut',
+            data: {
+                labels: @json($ageGroups->pluck('label')),
+                datasets: [{
+                    data: @json($ageGroups->pluck('count')),
+                    backgroundColor: @json($ageGroups->map(fn ($g) => $ageColors[$g['key']])),
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+            },
+        });
 
         new Chart(document.getElementById('chartCategory'), {
             type: 'doughnut',
