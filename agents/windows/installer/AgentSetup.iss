@@ -2,7 +2,7 @@
 ;
 ; Dikompilasi sekali (generic, tanpa token) jadi ITAssetAgentSetup.exe. Token per-laptop
 ; dikirim terpisah lewat file config.json yang disalin BERSEBELAHAN dengan exe ini di
-; dalam paket zip yang didownload dari halaman Kelola Agent Token (lihat flag "external"
+; dalam paket zip yang didownload dari menu Agent di website IT Asset Tracking (lihat flag "external"
 ; di [Files] di bawah - config.json TIDAK dikompilasi ke dalam exe, tapi dibaca dari
 ; folder yang sama saat instalasi berjalan).
 ;
@@ -57,7 +57,7 @@ begin
   if not FileExists(GetSrcExeDir('') + 'config.json') then
   begin
     MsgBox('config.json tidak ditemukan di folder yang sama dengan installer ini.' + #13#10 +
-           'Pastikan Anda mengekstrak SEMUA isi zip yang didownload dari halaman Kelola Agent Token, ' +
+           'Pastikan Anda mengekstrak SEMUA isi zip yang didownload dari menu Agent di website IT Asset Tracking, ' +
            'lalu jalankan Setup.exe dari dalam folder hasil ekstrak tersebut.',
            mbError, MB_OK);
     Result := False;

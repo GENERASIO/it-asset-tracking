@@ -28,10 +28,6 @@
                     </form>
 
                     <div class="flex flex-wrap gap-2">
-                        <a href="{{ route('agent-tokens.index') }}"
-                           class="bg-gray-100 dark:bg-gray-700 dark:text-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
-                            Kelola Agent Token
-                        </a>
                         <a href="{{ route('users.create') }}"
                            class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
                             + Tambah User
@@ -57,7 +53,7 @@
                                     <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $user->name }}</td>
                                     <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $user->email }}</td>
                                     <td class="px-4 py-2">
-                                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200">
+                                        <span class="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200">
                                             {{ ucfirst(str_replace('_', ' ', $user->role)) }}
                                         </span>
                                     </td>

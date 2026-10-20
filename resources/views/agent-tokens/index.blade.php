@@ -1,6 +1,6 @@
-<x-app-layout title="Kelola Agent Token">
+<x-app-layout title="Agent">
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">Kelola Agent Token</h2>
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">Agent</h2>
     </x-slot>
 
     <div class="py-8">

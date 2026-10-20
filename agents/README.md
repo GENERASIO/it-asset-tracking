@@ -4,7 +4,7 @@ Agent kecil yang, sekali dipasang di laptop Windows/macOS, otomatis mendaftarkan
 
 ## Cara Kerja
 
-1. Admin (`super_admin`) membuat token di halaman **Kelola User → Kelola Agent Token**.
+1. Admin (`super_admin`) membuat token di menu **Agent** di sidebar (khusus Super Admin).
 2. Token tersebut dimasukkan ke file konfigurasi agent (`config.json` untuk Windows, `config.sh` untuk macOS).
 3. Script instalasi mendaftarkan tugas terjadwal (Scheduled Task di Windows, LaunchAgent di macOS) yang menjalankan check-in saat login dan sekali sehari.
 4. Setiap check-in mengirim data hardware ke `POST /api/agent/checkin`. Server mencocokkan aset berdasarkan **serial number**:
@@ -15,7 +15,7 @@ Agent kecil yang, sekali dipasang di laptop Windows/macOS, otomatis mendaftarkan
 
 Cara utama (untuk end user, tidak perlu buka PowerShell sama sekali):
 
-1. Download paket dari halaman **Kelola Agent Token** (sudah berisi `ITAssetAgentSetup.exe` + `config.json` dengan token yang benar).
+1. Download paket dari menu **Agent** (sudah berisi `ITAssetAgentSetup.exe` + `config.json` dengan token yang benar).
 2. Extract zip-nya, lalu double-click `ITAssetAgentSetup.exe`.
 3. Klik **Yes** di prompt izin admin (UAC) yang muncul, dan **"Run anyway"** kalau Windows menampilkan peringatan SmartScreen (installer belum di-sign dengan sertifikat berbayar).
 

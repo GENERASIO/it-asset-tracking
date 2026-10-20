@@ -42,7 +42,7 @@ begin
   if not FileExists(ExpandConstant('{commonappdata}\ITAssetAgent\config.json')) then
   begin
     MsgBox('IT Asset Agent belum terpasang di laptop ini.' + #13#10 +
-           'Pakai installer lengkap (ITAssetAgentSetup.exe dari halaman Kelola Agent Token), bukan updater ini.',
+           'Pakai installer lengkap (ITAssetAgentSetup.exe dari menu Agent di website IT Asset Tracking), bukan updater ini.',
            mbError, MB_OK);
     Result := False;
   end else
