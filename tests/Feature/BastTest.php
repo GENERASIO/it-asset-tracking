@@ -86,7 +86,8 @@ class BastTest extends TestCase
         $this->actingAs($this->staff)
             ->get(route('bast.create', ['ids' => [$this->asset->id]]))
             ->assertOk()
-            ->assertSee('value="Andi Wibowo"', false)
+            // Staff yang login ada di daftar Pihak Pertama, jadi langsung terpilih.
+            ->assertSee('<option value="Andi Wibowo" selected', false)
             ->assertSee('value="Rifki Deo Winnada"', false)
             ->assertSee('value="LENOVO IdeaPad Gaming 3 15ARH7"', false)
             ->assertSee('value="MP2EB2QS"', false)
@@ -116,6 +117,24 @@ class BastTest extends TestCase
         // Tampil juga di detail aset.
         $this->actingAs($this->staff)->get(route('assets.show', $this->asset))
             ->assertSee('19 Oktober 2026 — ke Outlet Kemang');
+    }
+
+    public function test_pihak_pertama_harus_dari_daftar_dan_jabatannya_diingat(): void
+    {
+        $this->actingAs($this->staff)
+            ->post(route('bast.store'), $this->bastPayload(['first_party_name' => 'Orang Lain']))
+            ->assertSessionHasErrors('first_party_name');
+
+        $this->actingAs($this->staff)
+            ->post(route('bast.store'), $this->bastPayload(['first_party_name' => 'Indra Paksi Putra', 'first_party_position' => 'IT Supervisor']))
+            ->assertRedirect();
+
+        $this->actingAs($this->staff)
+            ->get(route('bast.create', ['ids' => [$this->asset->id]]))
+            ->assertOk()
+            ->assertSee('Aris Munandar')
+            ->assertSee('Rifki Deo')
+            ->assertSee('IT Supervisor');
     }
 
     public function test_jabatan_wajib_diisi(): void

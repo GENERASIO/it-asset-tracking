@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class BastController extends Controller
 {
@@ -68,12 +69,26 @@ class BastController extends Controller
             'condition' => $asset->logs->first()?->condition ?? '',
         ]);
 
+        $firstParties = config('bast.first_parties', []);
+
+        // Jabatan terakhir tiap Pihak Pertama di BAST sebelumnya, untuk isian otomatis.
+        $lastPositions = BastDocument::whereIn('first_party_name', $firstParties)
+            ->latest('id')
+            ->get(['first_party_name', 'first_party_position'])
+            ->unique('first_party_name')
+            ->pluck('first_party_position', 'first_party_name');
+
+        $defaultFirstParty = in_array($request->user()->name, $firstParties, true) ? $request->user()->name : '';
+
         return view('bast.create', [
             'items' => $items,
+            'firstParties' => $firstParties,
+            'lastPositions' => $lastPositions,
             'defaults' => [
                 'handover_date' => now('Asia/Jakarta')->toDateString(),
                 'city' => 'Jakarta',
-                'first_party_name' => $request->user()->name,
+                'first_party_name' => $defaultFirstParty,
+                'first_party_position' => $lastPositions[$defaultFirstParty] ?? '',
                 'second_party_name' => $holders->count() === 1 ? (string) $holders->first() : '',
             ],
         ]);
@@ -84,7 +99,7 @@ class BastController extends Controller
         $data = $request->validate([
             'handover_date' => ['required', 'date'],
             'city' => ['required', 'string', 'max:100'],
-            'first_party_name' => ['required', 'string', 'max:255'],
+            'first_party_name' => ['required', 'string', Rule::in(config('bast.first_parties', []))],
             'first_party_position' => ['required', 'string', 'max:255'],
             'second_party_name' => ['required', 'string', 'max:255'],
             'second_party_position' => ['required', 'string', 'max:255'],
@@ -95,7 +110,10 @@ class BastController extends Controller
             'items.*.serial_number' => ['nullable', 'string', 'max:255'],
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:10000'],
             'items.*.condition' => ['required', 'string', 'max:50'],
-        ], [], [
+        ], [
+            'first_party_name.in' => 'Pihak Pertama harus dipilih dari daftar.',
+        ], [
+            'first_party_name' => 'nama Pihak Pertama',
             'first_party_position' => 'jabatan Pihak Pertama',
             'second_party_position' => 'jabatan Pihak Kedua',
             'items.*.item_type' => 'jenis barang',

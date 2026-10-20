@@ -28,17 +28,28 @@
                     </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-3">
+                        <div class="space-y-3"
+                             x-data="{
+                                 positions: {{ Js::from($lastPositions) }},
+                                 name: {{ Js::from(old('first_party_name', $defaults['first_party_name'])) }},
+                                 position: {{ Js::from(old('first_party_position', $defaults['first_party_position'])) }},
+                                 pick() { if (this.positions[this.name]) this.position = this.positions[this.name]; }
+                             }">
                             <h3 class="font-semibold text-gray-700 dark:text-gray-300">Pihak Pertama (yang menyerahkan)</h3>
                             <div>
                                 <label class="{{ $label }}">Nama</label>
-                                <input type="text" name="first_party_name" required class="{{ $input }}"
-                                       value="{{ old('first_party_name', $defaults['first_party_name']) }}">
+                                <select name="first_party_name" required class="{{ $input }}" x-model="name" @change="pick()">
+                                    <option value="">-- Pilih --</option>
+                                    @foreach ($firstParties as $person)
+                                        <option value="{{ $person }}" @selected(old('first_party_name', $defaults['first_party_name']) === $person)>{{ $person }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div>
                                 <label class="{{ $label }}">Jabatan</label>
                                 <input type="text" name="first_party_position" required class="{{ $input }}" placeholder="mis. IT Staff"
-                                       value="{{ old('first_party_position') }}">
+                                       x-model="position" value="{{ old('first_party_position', $defaults['first_party_position']) }}">
+                                <p class="text-xs text-gray-500 mt-1">Terisi otomatis dari BAST terakhir orang ini, tetap bisa diubah.</p>
                             </div>
                         </div>
 
