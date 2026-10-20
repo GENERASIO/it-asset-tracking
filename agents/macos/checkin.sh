@@ -33,6 +33,38 @@ STORAGE_GB=$(df -g / | tail -1 | awk '{print $2}')
 MAC_ADDRESS=$(ifconfig en0 2>/dev/null | awk '/ether/{print $2; exit}')
 USERNAME=$(whoami)
 
+# Lokasi diambil oleh ITAssetLocation.app (lihat location-helper/main.swift), karena macOS
+# tidak mengizinkan script bash mengakses lokasi. Dibuka lewat `open` supaya izin lokasi
+# tercatat atas nama app itu. Kalau app tidak ada, izin ditolak, atau timeout, check-in
+# tetap jalan tanpa koordinat.
+LOCATION_APP="$INSTALL_DIR/ITAssetLocation.app"
+GEO_JSON=""
+GEO_INFO="lokasi=-"
+
+if [ -d "$LOCATION_APP" ]; then
+    LOCATION_FILE="$INSTALL_DIR/location.txt"
+    rm -f "$LOCATION_FILE"
+
+    if open -W -n -g -a "$LOCATION_APP" --args "$LOCATION_FILE" 2>/dev/null && [ -f "$LOCATION_FILE" ]; then
+        read -r GEO_STATUS GEO_LAT GEO_LNG GEO_ACC < "$LOCATION_FILE" || true
+
+        NUM='^-?[0-9]+(\.[0-9]+)?$'
+        if [ "${GEO_STATUS:-}" = "OK" ] && [[ "${GEO_LAT:-}" =~ $NUM ]] && [[ "${GEO_LNG:-}" =~ $NUM ]] && [[ "${GEO_ACC:-}" =~ $NUM ]]; then
+            GEO_JSON=",
+  \"latitude\": $GEO_LAT,
+  \"longitude\": $GEO_LNG,
+  \"location_accuracy_m\": $GEO_ACC"
+            GEO_INFO="lokasi=$GEO_LAT,$GEO_LNG (+/-${GEO_ACC}m)"
+        else
+            log "Lokasi tidak diambil - $(cat "$LOCATION_FILE")"
+        fi
+    else
+        log "Lokasi tidak diambil - ITAssetLocation.app gagal dijalankan atau tidak menulis hasil."
+    fi
+
+    rm -f "$LOCATION_FILE"
+fi
+
 JSON=$(cat <<EOF
 {
   "serial_number": "$(json_escape "$SERIAL")",
@@ -44,7 +76,7 @@ JSON=$(cat <<EOF
   "ram_gb": $RAM_GB,
   "storage_gb": $STORAGE_GB,
   "mac_address": "$(json_escape "$MAC_ADDRESS")",
-  "username": "$(json_escape "$USERNAME")"
+  "username": "$(json_escape "$USERNAME")"$GEO_JSON
 }
 EOF
 )
@@ -89,7 +121,7 @@ update_agent_script() {
 }
 
 if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
-    log "OK - $BODY"
+    log "OK - $BODY $GEO_INFO"
 
     EXPECTED_HASH=$(printf '%s' "$BODY" | sed -n 's/.*"script_sha256":"\([0-9a-f]\{64\}\)".*/\1/p')
     if [ -n "$EXPECTED_HASH" ]; then

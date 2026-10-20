@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>id.yaygroup.itassetagent.location</string>
+    <key>CFBundleName</key>
+    <string>IT Asset Location</string>
+    <key>CFBundleDisplayName</key>
+    <string>IT Asset Location</string>
+    <key>CFBundleExecutable</key>
+    <string>ITAssetLocation</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>11.0</string>
+    <!-- Tidak tampil di Dock / menu bar - app ini hanya jalan beberapa detik lalu keluar. -->
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSLocationUsageDescription</key>
+    <string>IT Asset Agent mencatat lokasi laptop kantor ini ke sistem IT Asset Tracking PT. YAY Enak Semua, untuk membantu melacak aset yang hilang atau berpindah.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>IT Asset Agent mencatat lokasi laptop kantor ini ke sistem IT Asset Tracking PT. YAY Enak Semua, untuk membantu melacak aset yang hilang atau berpindah.</string>
+</dict>
+</plist>

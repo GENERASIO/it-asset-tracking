@@ -22,6 +22,14 @@ cp "$SOURCE_DIR/checkin.sh" "$TARGET_DIR/checkin.sh"
 cp "$SOURCE_DIR/config.sh" "$TARGET_DIR/config.sh"
 chmod +x "$TARGET_DIR/checkin.sh"
 
+# Helper lokasi (lihat location-helper/). Atribut quarantine dari browser dihapus supaya
+# Gatekeeper tidak memblokir app yang hanya ditandatangani ad-hoc ini.
+if [ -f "$SOURCE_DIR/ITAssetLocation.zip" ]; then
+    rm -rf "$TARGET_DIR/ITAssetLocation.app"
+    ditto -x -k "$SOURCE_DIR/ITAssetLocation.zip" "$TARGET_DIR"
+    xattr -dr com.apple.quarantine "$TARGET_DIR/ITAssetLocation.app" 2>/dev/null || true
+fi
+
 cat > "$PLIST_PATH" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -48,5 +56,8 @@ launchctl load "$PLIST_PATH"
 echo "Berhasil dipasang. Agent akan check-in saat login dan setiap 24 jam."
 
 # Jalankan sekali sekarang supaya asetnya langsung muncul.
+if [ -d "$TARGET_DIR/ITAssetLocation.app" ]; then
+    echo "Kalau muncul pop-up izin lokasi dari \"IT Asset Location\", klik Allow / Izinkan."
+fi
 bash "$TARGET_DIR/checkin.sh"
 echo "Check-in pertama sudah dijalankan. Cek log di $TARGET_DIR/checkin.log"

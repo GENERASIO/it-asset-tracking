@@ -97,6 +97,11 @@ class AgentTokenController extends Controller
             foreach (['checkin.sh', 'install.sh', 'uninstall.sh'] as $file) {
                 $zip->addFile($sourceDir.'/'.$file, $file);
             }
+
+            // Helper lokasi hasil build di Mac (location-helper/build.sh); dilewati kalau belum ada.
+            if (is_file($sourceDir.'/ITAssetLocation.zip')) {
+                $zip->addFile($sourceDir.'/ITAssetLocation.zip', 'ITAssetLocation.zip');
+            }
         }
 
         $zip->close();

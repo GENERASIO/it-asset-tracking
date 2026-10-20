@@ -48,6 +48,22 @@ chmod +x install.sh uninstall.sh
 
 Untuk mencabut: jalankan `agents/macos/uninstall.sh` di Mac yang bersangkutan.
 
+## Lokasi Laptop (GPS)
+
+Setiap check-in, agent mencoba mengirim lokasi laptop. Hasilnya tampil sebagai peta di halaman **detail aset** (perlu login), bukan di halaman publik scan QR. Kalau lokasi gagal diambil, check-in tetap jalan dan lokasi terakhir yang diketahui tidak dihapus. Alasannya dicatat di `checkin.log`.
+
+- **Windows**: memakai Windows Location API. Location Services di laptop harus aktif (Settings → Privacy → Location).
+- **macOS**: script bash tidak boleh mengakses lokasi, jadi dipakai app helper kecil `ITAssetLocation.app` (source di `macos/location-helper/`). Saat pertama jalan muncul pop-up izin lokasi sekali; user harus klik **Allow**. Kalau ditolak, bisa diizinkan lagi di System Settings → Privacy & Security → Location Services → IT Asset Location.
+  - Build di Mac (butuh `xcode-select --install`): `bash agents/macos/location-helper/build.sh`, lalu commit `agents/macos/ITAssetLocation.zip` yang dihasilkan. Selama zip ini belum ada, agent macOS jalan tanpa lokasi.
+
+Akurasi biasanya puluhan sampai ratusan meter (dihitung dari Wi-Fi sekitar, bukan satelit). Karena agent juga jalan saat laptop dibawa pulang, pastikan karyawan sudah diberi tahu sesuai kebijakan perusahaan (UU PDP).
+
+## Update Otomatis
+
+Respons check-in menyertakan hash SHA-256 script check-in versi server (`checkin.ps1` / `checkin.sh`). Kalau berbeda dengan milik agent, agent mengunduh versi baru dari `GET /api/agent/script?os=windows|macos`, mencocokkan hash, lalu mengganti dirinya; versi baru berlaku mulai check-in berikutnya. Jadi perubahan script cukup di-deploy ke server.
+
+Yang **tidak** ikut update otomatis: installer Windows, `config.json`/`config.sh`, Scheduled Task/LaunchAgent, dan `ITAssetLocation.app` — perubahan pada bagian ini tetap butuh install ulang.
+
 ## Catatan Keamanan
 
 - Token bersifat rahasia dan hanya ditampilkan sekali saat dibuat — kalau hilang, cabut token lama dan buat yang baru.
