@@ -15,6 +15,12 @@
         .summary-box { background-color: #f9f9f9; border: 1px solid #ddd; padding: 10px 14px; margin-bottom: 10px; }
         .summary-box p { margin: 4px 0; }
         .footer { margin-top: 30px; font-size: 10px; color: #888; }
+        table.insights td { vertical-align: top; }
+        .level-danger, .level-warning, .level-info, .level-good { font-size: 9px; font-weight: bold; text-align: center; }
+        .level-danger { color: #b91c1c; background-color: #fee2e2; }
+        .level-warning { color: #92400e; background-color: #fef3c7; }
+        .level-info { color: #1d4ed8; background-color: #dbeafe; }
+        .level-good { color: #15803d; background-color: #dcfce7; }
     </style>
 </head>
 <body>
@@ -52,6 +58,29 @@
         <p><strong>Stok Cadangan (Available):</strong> {{ $spareCount }} unit</p>
         <p><strong>Skor Kelengkapan Data:</strong> {{ $dataScore }}%</p>
     </div>
+
+    @if (! empty($insights))
+        <h2>Kesimpulan &amp; Rekomendasi</h2>
+        <table class="insights">
+            <tbody>
+                @foreach ($insights as $insight)
+                    <tr>
+                        <td style="width: 70px;" class="level-{{ $insight['level'] }}">
+                            {{ ['danger' => 'PENTING', 'warning' => 'PERHATIAN', 'info' => 'INFO', 'good' => 'BAIK'][$insight['level']] }}
+                        </td>
+                        <td>
+                            <strong>{{ $insight['title'] }}</strong><br>
+                            {{ $insight['detail'] }}<br>
+                            <em>Saran:</em> {{ $insight['action'] }}
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+        <p style="font-size: 10px; color: #888;">
+            Nilai buku = perkiraan nilai aset saat ini setelah penyusutan garis lurus 4 tahun (komputer termasuk harta Kelompok 1).
+        </p>
+    @endif
 
     <h2>Umur Perangkat (perkiraan dari generasi prosesor)</h2>
     <table>

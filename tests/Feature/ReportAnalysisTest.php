@@ -60,6 +60,22 @@ class ReportAnalysisTest extends TestCase
             ->assertSee('1 <span class="text-base font-semibold text-gray-500 dark:text-gray-400">unit (25%)</span>', false);
     }
 
+    public function test_kesimpulan_dan_rekomendasi(): void
+    {
+        $response = $this->actingAs($this->staff)->get(route('reports.index'))->assertOk();
+
+        $titles = collect($response->viewData('insights'))->pluck('title');
+
+        // A2 (i3-10110U) & A3 (i3-5005U) tua; harga pengganti dari rata-rata perangkat baru (A1 Rp 8 jt).
+        $this->assertContains('2 perangkat (50%) sudah tua (prosesor 2020 ke bawah)', $titles);
+        $this->assertContains('Nilai buku baru terhitung untuk 1 dari 4 aset', $titles);
+        // Ada 1 unit Available dari 4 aset, sudah memenuhi 3% -> tidak ada peringatan cadangan.
+        $this->assertNotContains('Tidak ada perangkat cadangan', $titles);
+
+        $response->assertSee('Kesimpulan &amp; Rekomendasi', false)
+            ->assertSee('Anggarkan peremajaan bertahap sekitar Rp 16.000.000 (2 unit × Rp 8.000.000)');
+    }
+
     public function test_umur_dan_nilai_mengikuti_filter_lokasi(): void
     {
         $outlet = Location::where('code', 'SUSH')->first();

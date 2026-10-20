@@ -159,10 +159,45 @@
                 $maxLocationValue = max($valueByLocation->max('value') ?? 0, 1);
             @endphp
 
+            {{-- Kesimpulan & rekomendasi (otomatis dari data) --}}
+            @php
+                $insightStyles = [
+                    'danger' => ['dot' => 'bg-red-500', 'badge' => 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300', 'label' => 'Penting'],
+                    'warning' => ['dot' => 'bg-yellow-500', 'badge' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300', 'label' => 'Perhatian'],
+                    'info' => ['dot' => 'bg-blue-500', 'badge' => 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300', 'label' => 'Info'],
+                    'good' => ['dot' => 'bg-green-500', 'badge' => 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300', 'label' => 'Baik'],
+                ];
+            @endphp
+            <div class="{{ $card }}">
+                <div class="flex flex-wrap items-baseline justify-between gap-2">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300">Kesimpulan &amp; Rekomendasi</h3>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Disusun otomatis dari data aset sesuai filter, ikut di Export PDF</span>
+                </div>
+                <ol class="mt-3 divide-y divide-gray-100 dark:divide-gray-700">
+                    @forelse ($insights as $insight)
+                        @php $style = $insightStyles[$insight['level']]; @endphp
+                        <li class="py-3 flex gap-3">
+                            <span class="mt-1.5 w-2.5 h-2.5 rounded-full shrink-0 {{ $style['dot'] }}"></span>
+                            <div class="min-w-0">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ $insight['title'] }}
+                                    <span class="ml-1 align-middle text-[11px] px-1.5 py-0.5 rounded {{ $style['badge'] }}">{{ $style['label'] }}</span>
+                                </p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{{ $insight['detail'] }}</p>
+                                <p class="text-sm text-gray-800 dark:text-gray-200 mt-1"><span class="font-medium">Saran:</span> {{ $insight['action'] }}</p>
+                            </div>
+                        </li>
+                    @empty
+                        <li class="py-3 text-sm text-gray-400">Belum ada data untuk dianalisis.</li>
+                    @endforelse
+                </ol>
+            </div>
+
             {{-- Indikator utama --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="{{ $card }}">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Perkiraan Nilai Buku</p>
+                    <p class="text-xs text-gray-400">Nilai aset sekarang setelah penyusutan (habis dalam 4 tahun)</p>
                     <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white tabular-nums whitespace-nowrap">{{ $rp($bookValue) }}</p>
                     <p class="mt-auto pt-2 text-xs text-gray-500 dark:text-gray-400">
                         @if ($bookValueCoverage)

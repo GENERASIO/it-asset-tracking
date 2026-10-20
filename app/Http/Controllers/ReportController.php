@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Location;
 use App\Models\MaintenanceLog;
 use App\Support\DeviceAge;
+use App\Support\ReportInsights;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -145,7 +146,7 @@ class ReportController extends Controller
             ->take(10)
             ->values();
 
-        return [
+        $analysis = [
             'ageGroups' => $ageGroups,
             'valueByLocation' => $valueByLocation,
             'bookValue' => $bookValue,
@@ -156,6 +157,8 @@ class ReportController extends Controller
             'maintenanceByModel' => $maintenanceByModel,
             'spareCount' => $assets->where('status', 'available')->count(),
         ];
+
+        return $analysis + ['insights' => ReportInsights::build($assets, $analysis)];
     }
 
     protected function applyAssetFilters($query, array $filters)
