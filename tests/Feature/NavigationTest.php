@@ -25,6 +25,24 @@ class NavigationTest extends TestCase
             ->assertDontSee('href="'.$agentUrl.'"', false);
     }
 
+    public function test_laporan_ada_di_urutan_paling_bawah_sidebar(): void
+    {
+        $href = fn ($route) => 'href="'.route($route).'"';
+
+        $this->actingAs(User::factory()->create(['role' => 'super_admin']))
+            ->get(route('software-licenses.index'))
+            ->assertSeeInOrder([
+                $href('assets.index'), $href('users.index'), $href('software-licenses.index'),
+                $href('agent-tokens.index'), $href('reports.index'), '</nav>',
+            ], false);
+
+        $this->actingAs(User::factory()->create(['role' => 'it_staff']))
+            ->get(route('software-licenses.index'))
+            ->assertSeeInOrder([
+                $href('assets.index'), $href('software-licenses.index'), $href('reports.index'), '</nav>',
+            ], false);
+    }
+
     public function test_halaman_kelola_user_tidak_lagi_punya_tombol_agent(): void
     {
         $this->actingAs(User::factory()->create(['role' => 'super_admin']))

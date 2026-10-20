@@ -44,10 +44,6 @@
                         {{ __('Aset') }}
                     </x-responsive-nav-link>
 
-                    <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
-                        {{ __('Laporan') }}
-                    </x-responsive-nav-link>
-
                     <x-responsive-nav-link :href="route('software-licenses.index')" :active="request()->routeIs('software-licenses.*')">
                         {{ __('Lisensi Software') }}
                     </x-responsive-nav-link>
@@ -68,6 +64,12 @@
 
                     <x-responsive-nav-link :href="route('agent-tokens.index')" :active="request()->routeIs('agent-tokens.*')">
                         {{ __('Agent') }}
+                    </x-responsive-nav-link>
+                @endif
+
+                @if (in_array(Auth::user()->role, ['super_admin', 'it_staff']))
+                    <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                        {{ __('Laporan') }}
                     </x-responsive-nav-link>
                 @endif
             </div>
@@ -282,15 +284,6 @@
             @endif
 
             @if (in_array(Auth::user()->role, ['super_admin', 'it_staff']))
-                <x-sidebar-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
-                    <x-slot name="icon">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-                        </svg>
-                    </x-slot>
-                    {{ __('Laporan') }}
-                </x-sidebar-nav-link>
-
                 <x-sidebar-nav-link :href="route('software-licenses.index')" :active="request()->routeIs('software-licenses.*')">
                     <x-slot name="icon">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -309,6 +302,17 @@
                         </svg>
                     </x-slot>
                     {{ __('Agent') }}
+                </x-sidebar-nav-link>
+            @endif
+
+            @if (in_array(Auth::user()->role, ['super_admin', 'it_staff']))
+                <x-sidebar-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                    <x-slot name="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                        </svg>
+                    </x-slot>
+                    {{ __('Laporan') }}
                 </x-sidebar-nav-link>
             @endif
         </nav>
