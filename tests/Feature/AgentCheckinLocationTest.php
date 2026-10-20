@@ -89,6 +89,19 @@ class AgentCheckinLocationTest extends TestCase
         $this->flushHeaders()->get('/api/agent/script')->assertUnauthorized();
     }
 
+    public function test_agent_macos_mendapat_hash_dan_script_macos(): void
+    {
+        $path = base_path('agents/macos/checkin.sh');
+
+        $this->checkin(['os_name' => 'macOS'])->assertOk()->assertJson([
+            'script_sha256' => hash_file('sha256', $path),
+        ]);
+
+        $this->withToken($this->token)->get('/api/agent/script?os=macos')
+            ->assertOk()
+            ->assertHeader('X-Script-Sha256', hash_file('sha256', $path));
+    }
+
     public function test_koordinat_tidak_valid_ditolak(): void
     {
         $this->checkin(['latitude' => 120, 'longitude' => 106.8])->assertUnprocessable();

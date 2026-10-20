@@ -83,20 +83,23 @@ class AgentController extends Controller
             return [$asset, $created];
         });
 
+        $scriptPath = self::scriptPath($data['os_name']);
+
         return response()->json([
             'status' => 'ok',
             'created' => $created,
             'asset_code' => $asset->asset_code,
-            // Agent membandingkan ini dengan hash checkin.ps1 miliknya sendiri; kalau beda,
+            // Agent membandingkan ini dengan hash script check-in miliknya sendiri; kalau beda,
             // agent mengunduh versi terbaru dari endpoint script() di bawah (update otomatis).
             // null kalau file script tidak ada di server - check-in tetap jalan, hanya update dilewati.
-            'script_sha256' => is_file(self::scriptPath()) ? hash_file('sha256', self::scriptPath()) : null,
+            'script_sha256' => is_file($scriptPath) ? hash_file('sha256', $scriptPath) : null,
         ], $created ? 201 : 200);
     }
 
-    public function script()
+    public function script(Request $request)
     {
-        $path = self::scriptPath();
+        // Agent Windows versi awal memanggil tanpa ?os=, jadi default-nya windows.
+        $path = self::scriptPath($request->query('os', 'windows'));
         abort_unless(is_file($path), 404, 'Script agent tidak tersedia di server.');
 
         return response()->file($path, [
@@ -105,8 +108,10 @@ class AgentController extends Controller
         ]);
     }
 
-    private static function scriptPath(): string
+    private static function scriptPath(string $os): string
     {
-        return base_path('agents/windows/checkin.ps1');
+        return strtolower($os) === 'macos'
+            ? base_path('agents/macos/checkin.sh')
+            : base_path('agents/windows/checkin.ps1');
     }
 }

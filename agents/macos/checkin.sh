@@ -57,8 +57,44 @@ RESPONSE=$(curl -s -w '\n%{http_code}' -X POST "$API_URL" \
 HTTP_CODE=$(echo "$RESPONSE" | tail -1)
 BODY=$(echo "$RESPONSE" | sed '$d')
 
+# Update otomatis: kalau hash checkin.sh di server beda dengan file ini, unduh versi server
+# lalu timpa file ini. Versi baru dipakai mulai check-in berikutnya. File hanya ditimpa
+# kalau hash hasil unduhan cocok dengan yang dilaporkan server.
+update_agent_script() {
+    local expected="$1"
+    local self_path="$INSTALL_DIR/$(basename "${BASH_SOURCE[0]}")"
+    local tmp_path="$self_path.download"
+    local current downloaded script_url
+
+    current=$(shasum -a 256 "$self_path" | awk '{print $1}')
+    [ "$current" = "$expected" ] && return 0
+
+    script_url="${API_URL%/checkin}/script?os=macos"
+    if ! curl -fsS -o "$tmp_path" -H "Authorization: Bearer $API_TOKEN" "$script_url"; then
+        log "UPDATE GAGAL - tidak bisa mengunduh $script_url"
+        rm -f "$tmp_path"
+        return 0
+    fi
+
+    downloaded=$(shasum -a 256 "$tmp_path" | awk '{print $1}')
+    if [ "$downloaded" != "$expected" ]; then
+        log "UPDATE GAGAL - hash unduhan ($downloaded) tidak cocok dengan server ($expected)"
+        rm -f "$tmp_path"
+        return 0
+    fi
+
+    chmod +x "$tmp_path"
+    mv -f "$tmp_path" "$self_path"
+    log "UPDATE - checkin.sh diperbarui ke versi ${expected:0:12}, berlaku mulai check-in berikutnya."
+}
+
 if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
     log "OK - $BODY"
+
+    EXPECTED_HASH=$(printf '%s' "$BODY" | sed -n 's/.*"script_sha256":"\([0-9a-f]\{64\}\)".*/\1/p')
+    if [ -n "$EXPECTED_HASH" ]; then
+        update_agent_script "$EXPECTED_HASH"
+    fi
 else
     log "GAGAL - HTTP $HTTP_CODE - $BODY"
 fi
