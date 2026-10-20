@@ -157,6 +157,9 @@
                             <span class="text-gray-500">Harga Beli</span>
                             <p class="font-medium text-gray-900 dark:text-white">
                                 {{ $asset->purchase_price ? 'Rp ' . number_format($asset->purchase_price, 0, ',', '.') : '-' }}
+                                @if ($asset->purchase_price && $asset->purchase_price_estimated)
+                                    <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 align-middle" title="Data harga beli asli hilang; ini estimasi harga pasar baru unit sejenis.">estimasi</span>
+                                @endif
                             </p>
                         </div>
                         <div>

@@ -47,6 +47,8 @@ class ReportController extends Controller
             ->groupBy('status')
             ->get();
         $totalAssetValue = $this->applyAssetFilters(Asset::query(), $filters)->sum('purchase_price');
+        $estimatedPriceCount = $this->applyAssetFilters(Asset::query(), $filters)
+            ->whereNotNull('purchase_price')->where('purchase_price_estimated', true)->count();
         $totalAssets = $this->applyAssetFilters(Asset::query(), $filters)->count();
 
         // Tren bulanan sengaja tidak ikut filter rentang tanggal (supaya sumbu waktunya tetap utuh),
@@ -71,6 +73,7 @@ class ReportController extends Controller
             'assetsPerLocation' => $assetsPerLocation,
             'assetsPerStatus' => $assetsPerStatus,
             'totalAssetValue' => $totalAssetValue,
+            'estimatedPriceCount' => $estimatedPriceCount,
             'monthlyPurchases' => $monthlyPurchases,
             'totalAssets' => $totalAssets,
             'totalCategories' => Category::count(),

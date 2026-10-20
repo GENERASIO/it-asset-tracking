@@ -218,6 +218,15 @@ class AssetController extends Controller
         $photos = $validated['photos'] ?? [];
         unset($validated['photos']);
 
+        // Harga yang diubah manual dianggap harga asli, jadi tanda "estimasi" dilepas.
+        if ($asset->purchase_price_estimated
+            && (string) ($validated['purchase_price'] ?? '') !== '' && (float) $validated['purchase_price'] !== (float) $asset->purchase_price) {
+            $validated['purchase_price_estimated'] = false;
+        }
+        if (($validated['purchase_price'] ?? null) === null) {
+            $validated['purchase_price_estimated'] = false;
+        }
+
         $asset->update($validated);
         $this->storePhotos($asset, $photos);
 

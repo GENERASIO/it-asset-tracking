@@ -29,6 +29,7 @@ class AssetsExport implements FromCollection, WithHeadings, WithMapping
             'Dipegang Oleh',
             'Tanggal Pembelian',
             'Harga Beli',
+            'Harga Estimasi',
             'Garansi Sampai',
             'Spesifikasi',
         ];
@@ -48,6 +49,7 @@ class AssetsExport implements FromCollection, WithHeadings, WithMapping
             $asset->assignedUser->name ?? '-',
             optional($asset->purchase_date)->format('Y-m-d'),
             $asset->purchase_price,
+            $asset->purchase_price !== null ? ($asset->purchase_price_estimated ? 'Ya' : 'Tidak') : '',
             optional($asset->warranty_expired_at)->format('Y-m-d'),
             $asset->specification,
         ];

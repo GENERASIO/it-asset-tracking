@@ -44,7 +44,7 @@
 
     <div class="summary-box">
         <p><strong>Total Aset:</strong> {{ $totalAssets }}</p>
-        <p><strong>Total Nilai Aset:</strong> Rp {{ number_format($totalAssetValue ?? 0, 0, ',', '.') }}</p>
+        <p><strong>Total Nilai Aset:</strong> Rp {{ number_format($totalAssetValue ?? 0, 0, ',', '.') }}@if ($estimatedPriceCount) (termasuk {{ $estimatedPriceCount }} aset dengan harga estimasi)@endif</p>
         <p><strong>Jumlah Kategori:</strong> {{ $totalCategories }}</p>
         <p><strong>Jumlah Lokasi:</strong> {{ $totalLocations }}</p>
     </div>

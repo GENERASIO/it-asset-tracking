@@ -34,6 +34,9 @@
                         <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
                             Rp {{ number_format($totalAssetValue ?? 0, 0, ',', '.') }}
                         </p>
+                        @if ($estimatedPriceCount)
+                            <p class="text-xs text-yellow-700 dark:text-yellow-400 mt-1">Termasuk {{ $estimatedPriceCount }} aset dengan harga estimasi</p>
+                        @endif
                     </div>
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                         <p class="text-sm text-gray-500">Jumlah Kategori</p>
