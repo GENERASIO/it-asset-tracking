@@ -44,8 +44,7 @@ class AssetFilterTest extends TestCase
     public function test_cari_berdasarkan_nama_lokasi(): void
     {
         $this->table(['search' => 'training center'])
-            ->assertSee('TC-001')->assertSee('TC-002')->assertDontSee('HO-001')
-            ->assertSee('Rp 14.700.000');
+            ->assertSee('TC-001')->assertSee('TC-002')->assertDontSee('HO-001');
     }
 
     public function test_filter_lokasi_dan_rentang_harga(): void
@@ -53,8 +52,7 @@ class AssetFilterTest extends TestCase
         $ho = Location::where('code', 'HO')->first();
 
         $this->table(['location_id' => $ho->id])
-            ->assertSee('HO-001')->assertSee('HO-002')->assertDontSee('TC-001')
-            ->assertSee('1 tanpa harga');
+            ->assertSee('HO-001')->assertSee('HO-002')->assertDontSee('TC-001');
 
         $this->table(['price_min' => 'Rp 7.000.000', 'price_max' => 'Rp 10.000.000'])
             ->assertSee('TC-002')->assertDontSee('TC-001')->assertDontSee('HO-001');
@@ -70,6 +68,18 @@ class AssetFilterTest extends TestCase
     {
         $this->table(['sort' => 'price', 'direction' => 'desc'])
             ->assertSeeInOrder(['HO-001', 'TC-002', 'TC-001']);
+    }
+
+    public function test_halaman_aset_tidak_menampilkan_harga(): void
+    {
+        $this->table([])->assertDontSee('Total nilai')->assertDontSee('Rp 12.500.000');
+    }
+
+    public function test_board_menampilkan_kelima_status(): void
+    {
+        $this->actingAs($this->staff)->get(route('assets.index', ['view' => 'board']))
+            ->assertOk()
+            ->assertSeeInOrder(['Available', 'In Use', 'Maintenance', 'Broken', 'Retired']);
     }
 
     public function test_hasil_kosong_menampilkan_pesan_filter(): void

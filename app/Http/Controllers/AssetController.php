@@ -72,14 +72,6 @@ class AssetController extends Controller
 
         $query = $this->filteredAssets($request)->with(['category', 'location', 'assignedUser']);
 
-        // Ringkasan hasil filter (jumlah & total nilai), dihitung dari query yang sama.
-        $summary = [
-            'count' => (clone $query)->count(),
-            'value' => (int) (clone $query)->sum('assets.purchase_price'),
-            'estimated' => (clone $query)->where('assets.purchase_price_estimated', true)->whereNotNull('assets.purchase_price')->count(),
-            'no_price' => (clone $query)->whereNull('assets.purchase_price')->count(),
-        ];
-
         if ($view === 'table') {
             $sortable = [
                 'asset_code' => 'assets.asset_code',
@@ -108,7 +100,7 @@ class AssetController extends Controller
         $categories = Category::orderBy('name')->get();
         $locations = Location::orderBy('name')->get();
 
-        return view('assets.index', compact('assets', 'categories', 'locations', 'view', 'summary'));
+        return view('assets.index', compact('assets', 'categories', 'locations', 'view'));
     }
 
     /**

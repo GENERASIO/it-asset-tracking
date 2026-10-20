@@ -9,7 +9,7 @@
             'in_use' => ['label' => 'In Use', 'text' => 'text-blue-700', 'badge' => 'bg-blue-100 text-blue-700', 'header' => 'bg-blue-50'],
             'maintenance' => ['label' => 'Maintenance', 'text' => 'text-yellow-700', 'badge' => 'bg-yellow-100 text-yellow-700', 'header' => 'bg-yellow-50'],
             'broken' => ['label' => 'Broken', 'text' => 'text-red-700', 'badge' => 'bg-red-100 text-red-700', 'header' => 'bg-red-50'],
-            'retired' => ['label' => 'Retired', 'text' => 'text-gray-600', 'badge' => 'bg-gray-100 text-gray-600', 'header' => 'bg-gray-50'],
+            'retired' => ['label' => 'Retired', 'text' => 'text-gray-600', 'badge' => 'bg-gray-200 text-gray-600', 'header' => 'bg-gray-100'],
         ];
 
         $currentSort = request('sort', 'created_at');
@@ -90,20 +90,8 @@
                     @endif
                 </form>
 
-                {{-- Baris 2: ringkasan, tampilan, export/import, tambah --}}
-                <div class="mt-4 pb-4 border-b border-gray-100 dark:border-gray-700 flex flex-wrap items-center justify-between gap-3">
-                    <div class="text-sm text-gray-600 dark:text-gray-300 flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <span><span class="font-semibold text-gray-900 dark:text-white">{{ number_format($summary['count'], 0, ',', '.') }}</span> aset{{ $hasFilters ? ' sesuai filter' : '' }}</span>
-                        <span class="text-gray-300 dark:text-gray-600">|</span>
-                        <span>Total nilai <span class="font-semibold text-gray-900 dark:text-white whitespace-nowrap">Rp {{ number_format($summary['value'], 0, ',', '.') }}</span></span>
-                        @if ($summary['estimated'])
-                            <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">{{ $summary['estimated'] }} harga estimasi</span>
-                        @endif
-                        @if ($summary['no_price'])
-                            <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">{{ $summary['no_price'] }} tanpa harga</span>
-                        @endif
-                    </div>
-
+                {{-- Baris 2: tampilan, export/import, tambah --}}
+                <div class="mt-4 pb-4 border-b border-gray-100 dark:border-gray-700 flex flex-wrap items-center justify-end gap-3">
                     <div class="flex flex-wrap items-center gap-2">
                         <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                             <a href="{{ $viewUrl('board') }}"
@@ -172,16 +160,18 @@
                     </div>
 
                     @if ($view === 'board')
-                        <div class="flex gap-4 overflow-x-auto scroll-smooth pb-4">
+                        {{-- Kelima status dibagi rata selebar layar; di layar sempit baru bisa digeser ke samping. --}}
+                        <div class="flex gap-3 overflow-x-auto scroll-smooth pb-2">
                             @foreach ($statusColumns as $key => $meta)
                                 @php $columnAssets = $assets->get($key, collect()); @endphp
-                                <div class="board-column bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 w-72 shrink-0 transition-colors duration-200" data-status="{{ $key }}">
-                                    <div class="flex items-center justify-between mb-3 px-1 {{ $meta['header'] }} rounded-lg py-2">
+                                <div class="board-column flex-1 min-w-[10rem] flex flex-col bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2.5 transition-colors duration-200" data-status="{{ $key }}">
+                                    <div class="flex items-center justify-between mb-2.5 px-3 {{ $meta['header'] }} dark:bg-gray-800 rounded-lg py-2">
                                         <span class="font-semibold text-sm {{ $meta['text'] }}">{{ $meta['label'] }}</span>
                                         <span class="text-xs px-2 py-0.5 rounded-full {{ $meta['badge'] }}">{{ $columnAssets->count() }}</span>
                                     </div>
 
-                                    <div class="board-column-body space-y-3 min-h-[80px]">
+                                    {{-- Tiap kolom scroll sendiri, supaya kolom berisi ratusan aset tidak bikin halaman sangat panjang. --}}
+                                    <div class="board-column-body space-y-2.5 min-h-[80px] max-h-[70vh] overflow-y-auto pr-0.5">
                                         @forelse ($columnAssets as $asset)
                                             <div class="asset-card relative bg-white dark:bg-gray-700 shadow rounded-lg p-3 cursor-move transition-shadow duration-200 hover:shadow-md"
                                                  data-asset-id="{{ $asset->id }}"
@@ -279,9 +269,6 @@
                                             <a href="{{ $sortUrl('location') }}" class="hover:underline">Lokasi {{ $sortArrow('location') }}</a>
                                         </th>
                                         <th class="px-4 py-2 hidden lg:table-cell">Dipegang Oleh</th>
-                                        <th class="px-4 py-2 hidden xl:table-cell text-right whitespace-nowrap">
-                                            <a href="{{ $sortUrl('price') }}" class="hover:underline">Harga {{ $sortArrow('price') }}</a>
-                                        </th>
                                         <th class="px-4 py-2">
                                             <a href="{{ $sortUrl('status') }}" class="hover:underline">Status {{ $sortArrow('status') }}</a>
                                         </th>
@@ -327,16 +314,6 @@
                                             <td class="px-4 py-2 text-gray-900 dark:text-white hidden md:table-cell">{{ $asset->category->name ?? '-' }}</td>
                                             <td class="px-4 py-2 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->location->name ?? '-' }}</td>
                                             <td class="px-4 py-2 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->assignedUser->name ?? '-' }}</td>
-                                            <td class="px-4 py-2 hidden xl:table-cell text-right whitespace-nowrap tabular-nums">
-                                                @if ($asset->purchase_price)
-                                                    <span class="{{ $asset->purchase_price_estimated ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white' }}"
-                                                          @if ($asset->purchase_price_estimated) title="Harga estimasi" @endif>
-                                                        Rp {{ number_format($asset->purchase_price, 0, ',', '.') }}@if ($asset->purchase_price_estimated)<sup class="text-yellow-600">*</sup>@endif
-                                                    </span>
-                                                @else
-                                                    <span class="text-gray-400">-</span>
-                                                @endif
-                                            </td>
                                             <td class="px-4 py-2">
                                                 <select class="status-select border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-xs"
                                                         data-asset-id="{{ $asset->id }}" onchange="handleStatusChange(this)">
@@ -356,7 +333,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="10" class="px-4 py-6 text-center text-gray-400">
+                                            <td colspan="9" class="px-4 py-6 text-center text-gray-400">
                                                 @if ($hasFilters)
                                                     Tidak ada aset yang cocok dengan filter.
                                                     <a href="{{ route('assets.index', ['view' => $view]) }}" class="text-blue-600 dark:text-blue-400 hover:underline">Reset filter</a>
