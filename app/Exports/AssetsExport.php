@@ -10,9 +10,14 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class AssetsExport implements FromCollection, WithHeadings, WithMapping
 {
+    // Tanpa argumen: semua aset. Dari halaman daftar aset: aset hasil filter yang sedang tampil.
+    public function __construct(private ?Collection $assets = null)
+    {
+    }
+
     public function collection(): Collection
     {
-        return Asset::with(['category', 'location', 'assignedUser'])->latest()->get();
+        return $this->assets ?? Asset::with(['category', 'location', 'assignedUser'])->latest()->get();
     }
 
     public function headings(): array

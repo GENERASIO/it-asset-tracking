@@ -70,27 +70,15 @@ class AssetController extends Controller
             $view = session('assets_view', 'board');
         }
 
-        $query = Asset::with(['category', 'location', 'assignedUser']);
+        $query = $this->filteredAssets($request)->with(['category', 'location', 'assignedUser']);
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('assets.asset_code', 'like', '%' . $search . '%')
-                  ->orWhere('assets.name', 'like', '%' . $search . '%')
-                  ->orWhere('assets.serial_number', 'like', '%' . $search . '%')
-                  ->orWhereHas('assignedUser', function ($uq) use ($search) {
-                      $uq->where('name', 'like', '%' . $search . '%');
-                  });
-            });
-        }
-
-        if ($request->filled('status')) {
-            $query->where('assets.status', $request->status);
-        }
-
-        if ($request->filled('category_id')) {
-            $query->where('assets.category_id', $request->category_id);
-        }
+        // Ringkasan hasil filter (jumlah & total nilai), dihitung dari query yang sama.
+        $summary = [
+            'count' => (clone $query)->count(),
+            'value' => (int) (clone $query)->sum('assets.purchase_price'),
+            'estimated' => (clone $query)->where('assets.purchase_price_estimated', true)->whereNotNull('assets.purchase_price')->count(),
+            'no_price' => (clone $query)->whereNull('assets.purchase_price')->count(),
+        ];
 
         if ($view === 'table') {
             $sortable = [
@@ -99,6 +87,7 @@ class AssetController extends Controller
                 'category' => 'categories.name',
                 'location' => 'locations.name',
                 'status' => 'assets.status',
+                'price' => 'assets.purchase_price',
                 'created_at' => 'assets.created_at',
             ];
 
@@ -117,8 +106,65 @@ class AssetController extends Controller
         }
 
         $categories = Category::orderBy('name')->get();
+        $locations = Location::orderBy('name')->get();
 
-        return view('assets.index', compact('assets', 'categories', 'view'));
+        return view('assets.index', compact('assets', 'categories', 'locations', 'view', 'summary'));
+    }
+
+    /**
+     * Filter daftar aset dari query string - dipakai halaman daftar aset dan export Excel,
+     * supaya yang diexport sama dengan yang sedang ditampilkan.
+     */
+    private function filteredAssets(Request $request)
+    {
+        $query = Asset::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('assets.asset_code', 'like', '%' . $search . '%')
+                  ->orWhere('assets.name', 'like', '%' . $search . '%')
+                  ->orWhere('assets.serial_number', 'like', '%' . $search . '%')
+                  ->orWhere('assets.brand', 'like', '%' . $search . '%')
+                  ->orWhere('assets.model', 'like', '%' . $search . '%')
+                  ->orWhereHas('assignedUser', fn ($uq) => $uq->where('name', 'like', '%' . $search . '%'))
+                  ->orWhereHas('location', fn ($lq) => $lq->where('name', 'like', '%' . $search . '%'));
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('assets.status', $request->status);
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('assets.category_id', $request->category_id);
+        }
+
+        if ($request->filled('location_id')) {
+            $query->where('assets.location_id', $request->location_id);
+        }
+
+        // Harga dari input berformat ("Rp 5.000.000") - ambil angkanya saja.
+        $priceMin = preg_replace('/\D/', '', (string) $request->query('price_min'));
+        $priceMax = preg_replace('/\D/', '', (string) $request->query('price_max'));
+
+        if ($priceMin !== '') {
+            $query->where('assets.purchase_price', '>=', (int) $priceMin);
+        }
+
+        if ($priceMax !== '') {
+            $query->where('assets.purchase_price', '<=', (int) $priceMax);
+        }
+
+        if ($request->query('price') === 'estimated') {
+            $query->whereNotNull('assets.purchase_price')->where('assets.purchase_price_estimated', true);
+        } elseif ($request->query('price') === 'actual') {
+            $query->whereNotNull('assets.purchase_price')->where('assets.purchase_price_estimated', false);
+        } elseif ($request->query('price') === 'empty') {
+            $query->whereNull('assets.purchase_price');
+        }
+
+        return $query;
     }
 
     public function create()
@@ -303,9 +349,14 @@ class AssetController extends Controller
         $asset->syncPrimaryPhoto();
     }
 
-    public function export()
+    public function export(Request $request)
     {
-        return Excel::download(new AssetsExport, 'data-aset-' . now()->format('Ymd-His') . '.xlsx');
+        $assets = $this->filteredAssets($request)
+            ->with(['category', 'location', 'assignedUser'])
+            ->latest()
+            ->get();
+
+        return Excel::download(new AssetsExport($assets), 'data-aset-' . now()->format('Ymd-His') . '.xlsx');
     }
 
     public function import(Request $request)

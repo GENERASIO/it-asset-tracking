@@ -24,6 +24,12 @@
             request()->except(['view', 'page', 'sort', 'direction']),
             ['view' => $targetView]
         ));
+
+        $filterParams = array_filter(
+            request()->only(['search', 'category_id', 'location_id', 'status', 'price', 'price_min', 'price_max']),
+            fn ($value) => $value !== null && $value !== ''
+        );
+        $hasFilters = (bool) $filterParams;
     @endphp
 
     <div class="py-8" x-data="assetsPage()">
@@ -46,7 +52,7 @@
                                 <input type="text" name="search" x-model="query" @input.debounce.300ms="fetchSuggestions()"
                                        @focus="if (results.length) open = true" @keydown.escape="open = false"
                                        autocomplete="off"
-                                       placeholder="Cari kode / nama / serial number / pemegang..."
+                                       placeholder="Cari kode / nama / serial / pemegang / lokasi..."
                                        class="w-72 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
 
                                 <div x-show="open && results.length" style="display: none;"
@@ -64,10 +70,29 @@
                             <x-searchable-select name="category_id" placeholder="Semua Kategori"
                                 :options="$categories->pluck('name', 'id')" :selected="request('category_id')" />
 
+                            <x-searchable-select name="location_id" placeholder="Semua Lokasi"
+                                :options="$locations->pluck('name', 'id')" :selected="request('location_id')" />
+
                             <x-searchable-select name="status" placeholder="Semua Status"
                                 :options="collect($statusColumns)->map(fn ($m) => $m['label'])" :selected="request('status')" />
 
-                            <button type="submit" class="bg-gray-200 px-3 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Filter</button>
+                            <x-searchable-select name="price" placeholder="Semua Harga"
+                                :options="['actual' => 'Harga asli', 'estimated' => 'Harga estimasi', 'empty' => 'Belum ada harga']" :selected="request('price')" />
+
+                            <div class="flex items-center gap-1">
+                                <x-rupiah-input name="price_min" :value="request('price_min')" placeholder="Harga dari"
+                                                class="w-36 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm" />
+                                <span class="text-gray-400">–</span>
+                                <x-rupiah-input name="price_max" :value="request('price_max')" placeholder="sampai"
+                                                class="w-36 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm" />
+                            </div>
+
+                            <button type="submit" class="bg-gray-200 dark:bg-gray-600 dark:text-white px-3 py-2 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Filter</button>
+
+                            @if ($hasFilters)
+                                <a href="{{ route('assets.index', ['view' => $view]) }}"
+                                   class="px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Reset</a>
+                            @endif
                         </form>
 
                         <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
@@ -89,7 +114,7 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
-                        <a href="{{ route('assets.export') }}"
+                        <a href="{{ route('assets.export', $filterParams) }}" title="{{ $hasFilters ? 'Export aset sesuai filter yang sedang aktif' : 'Export semua aset' }}"
                            class="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -117,6 +142,19 @@
                     @csrf
 
                     <div class="flex flex-wrap justify-end items-center gap-2 mb-4">
+                        {{-- Ringkasan hasil filter --}}
+                        <div class="mr-auto text-sm text-gray-600 dark:text-gray-300 flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <span><span class="font-semibold text-gray-900 dark:text-white">{{ number_format($summary['count'], 0, ',', '.') }}</span> aset{{ $hasFilters ? ' sesuai filter' : '' }}</span>
+                            <span class="text-gray-300 dark:text-gray-600">|</span>
+                            <span>Total nilai <span class="font-semibold text-gray-900 dark:text-white whitespace-nowrap">Rp {{ number_format($summary['value'], 0, ',', '.') }}</span></span>
+                            @if ($summary['estimated'])
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">{{ $summary['estimated'] }} harga estimasi</span>
+                            @endif
+                            @if ($summary['no_price'])
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">{{ $summary['no_price'] }} tanpa harga</span>
+                            @endif
+                        </div>
+
                         <button type="submit" id="bulk-print-btn" disabled title="Pilih minimal 1 aset dulu"
                                 class="flex items-center gap-1.5 bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap transition-all duration-150 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:pointer-events-none disabled:hover:scale-100">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -247,6 +285,9 @@
                                             <a href="{{ $sortUrl('location') }}" class="hover:underline">Lokasi {{ $sortArrow('location') }}</a>
                                         </th>
                                         <th class="px-4 py-2 hidden lg:table-cell">Dipegang Oleh</th>
+                                        <th class="px-4 py-2 hidden xl:table-cell text-right whitespace-nowrap">
+                                            <a href="{{ $sortUrl('price') }}" class="hover:underline">Harga {{ $sortArrow('price') }}</a>
+                                        </th>
                                         <th class="px-4 py-2">
                                             <a href="{{ $sortUrl('status') }}" class="hover:underline">Status {{ $sortArrow('status') }}</a>
                                         </th>
@@ -292,6 +333,16 @@
                                             <td class="px-4 py-2 text-gray-900 dark:text-white hidden md:table-cell">{{ $asset->category->name ?? '-' }}</td>
                                             <td class="px-4 py-2 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->location->name ?? '-' }}</td>
                                             <td class="px-4 py-2 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->assignedUser->name ?? '-' }}</td>
+                                            <td class="px-4 py-2 hidden xl:table-cell text-right whitespace-nowrap tabular-nums">
+                                                @if ($asset->purchase_price)
+                                                    <span class="{{ $asset->purchase_price_estimated ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white' }}"
+                                                          @if ($asset->purchase_price_estimated) title="Harga estimasi" @endif>
+                                                        Rp {{ number_format($asset->purchase_price, 0, ',', '.') }}@if ($asset->purchase_price_estimated)<sup class="text-yellow-600">*</sup>@endif
+                                                    </span>
+                                                @else
+                                                    <span class="text-gray-400">-</span>
+                                                @endif
+                                            </td>
                                             <td class="px-4 py-2">
                                                 <select class="status-select border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-xs"
                                                         data-asset-id="{{ $asset->id }}" onchange="handleStatusChange(this)">
@@ -311,8 +362,13 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="9" class="px-4 py-6 text-center text-gray-400">
-                                                Belum ada aset. Klik "+ Tambah Aset" untuk mulai.
+                                            <td colspan="10" class="px-4 py-6 text-center text-gray-400">
+                                                @if ($hasFilters)
+                                                    Tidak ada aset yang cocok dengan filter.
+                                                    <a href="{{ route('assets.index', ['view' => $view]) }}" class="text-blue-600 dark:text-blue-400 hover:underline">Reset filter</a>
+                                                @else
+                                                    Belum ada aset. Klik "+ Tambah Aset" untuk mulai.
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforelse
