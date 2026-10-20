@@ -13,7 +13,8 @@
 
     <div class="w-full max-w-sm">
         <div class="flex items-center justify-center gap-2 mb-4">
-            <div class="w-9 h-9 rounded-lg bg-brand-500 text-white flex items-center justify-center font-bold">Y</div>
+            <img src="{{ asset('images/logo.png') }}" alt="YAY Group" class="h-9 w-auto">
+
             <div>
                 <p class="font-semibold text-gray-800 text-sm leading-tight">PT. YAY Enak Semua</p>
                 <p class="text-xs text-gray-500 leading-tight">IT Asset Tracking</p>

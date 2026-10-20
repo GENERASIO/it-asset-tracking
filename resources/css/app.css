@@ -6,6 +6,71 @@ body {
     animation: fadeIn 0.3s ease-in-out;
 }
 
+/* ------------------------------------------------------------------------------------------
+ * Jaring pengaman mode gelap.
+ * Banyak halaman lama hanya punya warna untuk mode terang (bg-white, text-gray-800, link biru
+ * tua, badge pastel). Di mode gelap hasilnya kartu putih menyilaukan, judul tak terlihat, dan
+ * link sulit dibaca. Aturan di bawah memberi padanan gelap untuk kelas-kelas itu SECARA OTOMATIS,
+ * tapi hanya untuk elemen yang belum punya varian dark: sendiri ([class*="dark:..."]), jadi
+ * halaman yang sudah diatur manual tidak ikut berubah.
+ * ---------------------------------------------------------------------------------------- */
+
+/* Latar */
+.dark .bg-white:not([class*="dark:bg-"]) { background-color: theme('colors.gray.800'); }
+.dark .bg-gray-50:not([class*="dark:bg-"]) { background-color: theme('colors.gray.800'); }
+.dark .bg-gray-100:not([class*="dark:bg-"]) { background-color: theme('colors.gray.700'); }
+.dark .bg-gray-200:not([class*="dark:bg-"]) { background-color: theme('colors.gray.600'); }
+.dark [class*="hover:bg-gray-"]:not([class*="dark:hover:bg-"]):hover { background-color: theme('colors.gray.600'); }
+
+/* Badge & kotak pesan berwarna pastel -> versi gelap yang tidak silau */
+.dark .bg-green-50:not([class*="dark:bg-"]), .dark .bg-green-100:not([class*="dark:bg-"]) { background-color: rgb(20 83 45 / 0.45); }
+.dark .bg-blue-50:not([class*="dark:bg-"]), .dark .bg-blue-100:not([class*="dark:bg-"]) { background-color: rgb(30 58 138 / 0.45); }
+.dark .bg-yellow-50:not([class*="dark:bg-"]), .dark .bg-yellow-100:not([class*="dark:bg-"]) { background-color: rgb(113 63 18 / 0.45); }
+.dark .bg-red-50:not([class*="dark:bg-"]), .dark .bg-red-100:not([class*="dark:bg-"]) { background-color: rgb(127 29 29 / 0.45); }
+.dark .bg-purple-50:not([class*="dark:bg-"]), .dark .bg-purple-100:not([class*="dark:bg-"]) { background-color: rgb(88 28 135 / 0.45); }
+.dark .bg-orange-50:not([class*="dark:bg-"]), .dark .bg-orange-100:not([class*="dark:bg-"]) { background-color: rgb(124 45 18 / 0.45); }
+
+/* Teks */
+.dark .text-black:not([class*="dark:text-"]),
+.dark .text-gray-900:not([class*="dark:text-"]),
+.dark .text-gray-800:not([class*="dark:text-"]) { color: theme('colors.gray.100'); }
+.dark .text-gray-700:not([class*="dark:text-"]) { color: theme('colors.gray.200'); }
+.dark .text-gray-600:not([class*="dark:text-"]) { color: theme('colors.gray.300'); }
+.dark .text-gray-500:not([class*="dark:text-"]) { color: theme('colors.gray.400'); }
+
+/* Link & teks berwarna: versi lebih terang supaya terbaca di latar gelap */
+.dark .text-brand-500:not([class*="dark:text-"]), .dark .text-brand-600:not([class*="dark:text-"]), .dark .text-brand-700:not([class*="dark:text-"]),
+.dark .text-blue-500:not([class*="dark:text-"]), .dark .text-blue-600:not([class*="dark:text-"]), .dark .text-blue-700:not([class*="dark:text-"]) { color: theme('colors.blue.400'); }
+.dark .text-green-600:not([class*="dark:text-"]), .dark .text-green-700:not([class*="dark:text-"]), .dark .text-green-800:not([class*="dark:text-"]) { color: theme('colors.green.400'); }
+.dark .text-yellow-600:not([class*="dark:text-"]), .dark .text-yellow-700:not([class*="dark:text-"]), .dark .text-yellow-800:not([class*="dark:text-"]) { color: theme('colors.yellow.300'); }
+.dark .text-red-600:not([class*="dark:text-"]), .dark .text-red-700:not([class*="dark:text-"]), .dark .text-red-800:not([class*="dark:text-"]) { color: theme('colors.red.400'); }
+.dark .text-purple-600:not([class*="dark:text-"]), .dark .text-purple-700:not([class*="dark:text-"]) { color: theme('colors.purple.300'); }
+.dark .text-orange-600:not([class*="dark:text-"]), .dark .text-orange-700:not([class*="dark:text-"]) { color: theme('colors.orange.300'); }
+
+/* Garis */
+.dark .border-gray-100:not([class*="dark:border-"]),
+.dark .border-gray-200:not([class*="dark:border-"]) { border-color: theme('colors.gray.700'); }
+.dark .border-gray-300:not([class*="dark:border-"]) { border-color: theme('colors.gray.600'); }
+
+/* Form input yang belum punya gaya gelap */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([class*="dark:bg-"]),
+.dark select:not([class*="dark:bg-"]),
+.dark textarea:not([class*="dark:bg-"]) {
+    background-color: theme('colors.gray.700');
+    border-color: theme('colors.gray.600');
+    color: theme('colors.gray.100');
+}
+.dark input::placeholder, .dark textarea::placeholder { color: theme('colors.gray.400'); }
+.dark [type="checkbox"]:not(:checked), .dark [type="radio"]:not(:checked) {
+    background-color: theme('colors.gray.700');
+    border-color: theme('colors.gray.500');
+}
+.dark [type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.85); }
+.dark input[type="file"] { color: theme('colors.gray.300'); }
+
+/* Pagination bawaan Laravel memakai dark:text-gray-600 untuk "Showing 1 to 15 of ..." - terlalu redup. */
+.dark nav[role="navigation"] .leading-5 { color: theme('colors.gray.400'); }
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }

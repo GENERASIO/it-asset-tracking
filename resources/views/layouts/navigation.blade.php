@@ -11,7 +11,7 @@
     <div class="lg:hidden bg-gradient-to-br from-indigo-950 via-purple-900 to-violet-800 border-b border-indigo-900">
         <div class="flex justify-between items-center h-16 px-4">
             <a href="{{ route('dashboard') }}" class="flex items-center">
-                <div class="bg-white rounded-lg px-3 py-1.5 flex items-center mr-2">
+                <div class="bg-white dark:bg-white rounded-lg px-3 py-1.5 flex items-center mr-2">
                     <img src="{{ asset('images/logo.png') }}" alt="YAY Group" class="h-8 w-auto">
                 </div>
                 <div class="leading-tight">
@@ -143,7 +143,7 @@
          x-init="$watch('collapsed', value => localStorage.setItem('sidebarCollapsed', value))">
         <!-- Icon Rail -->
         <div class="flex flex-col items-center w-16 h-full shrink-0 bg-gradient-to-b from-indigo-950 via-purple-900 to-violet-800 border-r border-indigo-900 py-4 gap-3">
-            <a href="{{ route('dashboard') }}" class="w-10 h-10 rounded-lg bg-white flex items-center justify-center shrink-0">
+            <a href="{{ route('dashboard') }}" class="w-10 h-10 rounded-lg bg-white dark:bg-white flex items-center justify-center shrink-0">
                 <img src="{{ asset('images/logo.png') }}" alt="YAY Group" class="h-6 w-auto">
             </a>
 
