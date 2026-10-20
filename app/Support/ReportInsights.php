@@ -31,7 +31,9 @@ class ReportInsights
         $old = $ages['old']['count'] ?? 0;
         if ($old > 0) {
             $newGroup = $assets->filter(fn ($a) => DeviceAge::classify($a->specification) === 'new' && $a->purchase_price);
-            $unitPrice = $newGroup->isNotEmpty() ? (int) round($newGroup->avg('purchase_price'), -5) : self::DEFAULT_REPLACEMENT_PRICE;
+            // Median, bukan rata-rata: beberapa laptop gaming/desain yang mahal tidak boleh
+            // menaikkan perkiraan harga laptop pengganti untuk staf biasa.
+            $unitPrice = $newGroup->isNotEmpty() ? (int) round($newGroup->median('purchase_price'), -5) : self::DEFAULT_REPLACEMENT_PRICE;
 
             $insights[] = [
                 'level' => $pct($old) >= 20 ? 'danger' : 'warning',
