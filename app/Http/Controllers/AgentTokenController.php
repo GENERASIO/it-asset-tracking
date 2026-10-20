@@ -66,6 +66,18 @@ class AgentTokenController extends Controller
     }
 
     /**
+     * Updater untuk laptop Windows yang sudah terpasang agent versi lama: hanya menimpa
+     * checkin.ps1 (token lama tetap dipakai), jadi tidak butuh token baru.
+     */
+    public function downloadWindowsUpdater()
+    {
+        $path = base_path('agents/windows/ITAssetAgentUpdate.exe');
+        abort_unless(is_file($path), 404, 'File updater belum tersedia di server.');
+
+        return response()->download($path, 'ITAssetAgentUpdate.exe');
+    }
+
+    /**
      * Download paket agent (script + config berisi token) yang baru saja dibuat.
      * Hanya tersedia selama masih dalam window reveal 10 menit sejak token dibuat.
      */

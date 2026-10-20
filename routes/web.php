@@ -35,6 +35,7 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
     Route::resource('users', UserController::class)->except(['show']);
     Route::resource('agent-tokens', AgentTokenController::class)->only(['index', 'store', 'destroy']);
     Route::get('agent-tokens/download/{os}', [AgentTokenController::class, 'downloadPackage'])->name('agent-tokens.download');
+    Route::get('agent-tokens/updater/windows', [AgentTokenController::class, 'downloadWindowsUpdater'])->name('agent-tokens.updater');
 });
 
 Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {

@@ -51,6 +51,20 @@
                 </form>
             </div>
 
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 flex flex-wrap items-center justify-between gap-4">
+                <div class="min-w-[240px] flex-1">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Update Agent Windows Lama</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Untuk laptop yang sudah terpasang agent sebelum ada fitur lokasi &amp; update otomatis.
+                        Jalankan sekali di laptop tersebut (klik Yes di izin admin) &mdash; tidak perlu token baru.
+                        Setelah itu agent akan update sendiri.
+                    </p>
+                </div>
+                <a href="{{ route('agent-tokens.updater') }}" class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-150">
+                    Download Updater (.exe)
+                </a>
+            </div>
+
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Daftar Token</h3>
                 <div class="overflow-x-auto">
