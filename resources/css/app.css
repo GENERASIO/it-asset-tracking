@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+[x-cloak] { display: none !important; }
+
 body {
     animation: fadeIn 0.3s ease-in-out;
 }

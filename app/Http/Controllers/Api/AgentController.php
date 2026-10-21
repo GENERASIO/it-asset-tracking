@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\Category;
 use App\Models\Location;
+use App\Models\PriceReference;
 use App\Services\AgentInventorySync;
 use App\Services\AssetCodeGenerator;
 use Illuminate\Http\Request;
@@ -66,6 +67,17 @@ class AgentController extends Controller
             }
             if (empty($asset->model) && ! empty($data['model'])) {
                 $asset->model = $data['model'];
+            }
+
+            // Auto-isi harga beli dari buku harga per model, kalau masih kosong.
+            // Harga yang sudah diisi manual tidak ditimpa.
+            if (is_null($asset->purchase_price)) {
+                $price = PriceReference::priceFor($asset->name)
+                    ?? PriceReference::priceFor(trim(($asset->brand ?? '').' '.($asset->model ?? '')));
+                if (! is_null($price)) {
+                    $asset->purchase_price = $price;
+                    $asset->purchase_price_estimated = false;
+                }
             }
 
             $asset->hostname = $data['hostname'];

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AgentTokenController;
 use App\Http\Controllers\BastController;
 use App\Http\Controllers\SoftwareLicenseController;
+use App\Http\Controllers\PriceReferenceController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\AssetController;
@@ -56,6 +57,10 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::post('/barcode/print-batch', [BarcodeController::class, 'printBatch'])->name('barcode.print-batch');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export-pdf');
+    Route::get('/price-references', [PriceReferenceController::class, 'index'])->name('price-references.index');
+    Route::post('/price-references', [PriceReferenceController::class, 'store'])->name('price-references.store');
+    Route::put('/price-references/{priceReference}', [PriceReferenceController::class, 'update'])->name('price-references.update');
+    Route::delete('/price-references/{priceReference}', [PriceReferenceController::class, 'destroy'])->name('price-references.destroy');
     Route::get('/software-licenses', [SoftwareLicenseController::class, 'index'])->name('software-licenses.index');
     Route::post('/software-licenses', [SoftwareLicenseController::class, 'store'])->name('software-licenses.store');
     Route::get('/software-licenses/{entitlement}/edit', [SoftwareLicenseController::class, 'edit'])->name('software-licenses.edit');
