@@ -60,13 +60,15 @@
                     @endforeach
                 </div>
 
-                <div class="flex items-center gap-3 pt-2">
+                <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 pt-4 mt-1 border-t border-gray-100 dark:border-gray-700">
+                    <a href="{{ route('asset-merge.index') }}"
+                       class="text-center px-5 py-2.5 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Batal</a>
                     <button type="submit" x-bind:disabled="target === ''"
-                            class="bg-brand-500 hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg text-sm"
+                            class="inline-flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg text-sm font-medium"
                             onclick="return confirm('Gabungkan record agent ini ke aset tujuan? Record agent akan dihapus.')">
-                        Gabungkan
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+                        <span x-text="target === '' ? 'Pilih aset tujuan dulu' : 'Gabungkan Sekarang'"></span>
                     </button>
-                    <a href="{{ route('asset-merge.index') }}" class="text-gray-500 text-sm hover:underline">Batal</a>
                 </div>
             </form>
 

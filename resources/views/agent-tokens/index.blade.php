@@ -53,15 +53,16 @@
 
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 flex flex-wrap items-center justify-between gap-4">
                 <div class="min-w-[240px] flex-1">
-                    <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Update Agent Windows Lama</h3>
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Perbarui Agent yang Sudah Terpasang</h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
-                        Untuk laptop yang sudah terpasang agent sebelum ada fitur lokasi &amp; update otomatis.
-                        Jalankan sekali di laptop tersebut (klik Yes di izin admin) &mdash; tidak perlu token baru.
-                        Setelah itu agent akan update sendiri.
+                        Installer <strong>Setup.exe</strong> sekarang serba-guna: di laptop baru ia install penuh,
+                        di laptop yang agennya <strong>sudah terpasang</strong> ia cukup menyegarkan script &amp;
+                        menyalakan lokasi &mdash; <strong>tanpa token baru</strong>. Jadi tidak ada lagi updater terpisah.
+                        File di bawah ini adalah Setup.exe yang sama; jalankan langsung di laptop lama (klik Yes di izin admin).
                     </p>
                 </div>
                 <a href="{{ route('agent-tokens.updater') }}" class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-150">
-                    Download Updater (.exe)
+                    Download Setup.exe (updater)
                 </a>
             </div>
 

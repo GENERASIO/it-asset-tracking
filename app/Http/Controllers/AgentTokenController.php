@@ -66,15 +66,16 @@ class AgentTokenController extends Controller
     }
 
     /**
-     * Updater untuk laptop Windows yang sudah terpasang agent versi lama: hanya menimpa
-     * checkin.ps1 (token lama tetap dipakai), jadi tidak butuh token baru.
+     * Installer tunggal (ITAssetAgentSetup.exe) juga berfungsi sebagai updater: kalau
+     * dijalankan di laptop yang agennya SUDAH terpasang, ia menyegarkan script +
+     * menyalakan lokasi + check-in tanpa butuh token/config baru.
      */
     public function downloadWindowsUpdater()
     {
-        $path = base_path('agents/windows/ITAssetAgentUpdate.exe');
-        abort_unless(is_file($path), 404, 'File updater belum tersedia di server.');
+        $path = base_path('agents/windows/ITAssetAgentSetup.exe');
+        abort_unless(is_file($path), 404, 'File installer belum tersedia di server.');
 
-        return response()->download($path, 'ITAssetAgentUpdate.exe');
+        return response()->download($path, 'ITAssetAgentSetup.exe');
     }
 
     /**
