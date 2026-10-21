@@ -387,4 +387,18 @@ class AssetController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function toggleLost(Request $request, Asset $asset)
+    {
+        // Tandai hilang / ditemukan. Saat hilang, agent melacak lokasi di mana pun (bukan hanya
+        // Wi-Fi kantor) sampai ditandai ditemukan lagi.
+        $lost = ! $asset->reported_lost_at;
+        $asset->update(['reported_lost_at' => $lost ? now() : null]);
+
+        $message = $lost
+            ? 'Aset ditandai HILANG. Agent akan melacak lokasi di mana pun pada check-in berikutnya.'
+            : 'Aset ditandai sudah ditemukan. Lokasi kembali hanya dicatat di Wi-Fi kantor.';
+
+        return back()->with('success', $message);
+    }
 }

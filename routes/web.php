@@ -44,6 +44,7 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::resource('assets', AssetController::class)->except(['show']);
     Route::delete('/assets/{asset}/photos/{photo}', [AssetController::class, 'destroyPhoto'])->name('assets.photos.destroy');
     Route::patch('/assets/{asset}/update-status', [AssetController::class, 'updateStatus'])->name('assets.update-status');
+    Route::post('/assets/{asset}/toggle-lost', [AssetController::class, 'toggleLost'])->name('assets.toggle-lost');
     Route::get('/assets-export', [AssetController::class, 'export'])->name('assets.export');
     Route::post('/assets-import', [AssetController::class, 'import'])->name('assets.import');
     Route::get('/assets-search-suggestions', [AssetController::class, 'searchSuggestions'])->name('assets.search-suggestions');

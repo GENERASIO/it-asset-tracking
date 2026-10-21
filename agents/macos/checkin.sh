@@ -46,43 +46,49 @@ LOCATION_APP="$INSTALL_DIR/ITAssetLocation.app"
 GEO_JSON=""
 GEO_INFO="lokasi=-"
 
-# Lokasi HANYA dicatat saat tersambung Wi-Fi kantor, supaya Mac yang dibawa pulang tidak terlacak.
-DEFAULT_SSIDS="SUSHI|FreeWifi-SUSHI|yaygroup_lt1|Yaygroup LT2|yaygroup|TrainingCenter|TrainingCenter_Guest"
-ALLOWED_SSIDS="${LOCATION_SSIDS:-$DEFAULT_SSIDS}"
-CURRENT_SSID=$(networksetup -getairportnetwork en0 2>/dev/null | sed -n 's/^Current Wi-Fi Network: //p')
+# Ambil lokasi dari ITAssetLocation.app. Set GEO_JSON + GEO_INFO kalau berhasil. Return 0/1.
+capture_location() {
+    GEO_JSON=""
+    [ -d "$LOCATION_APP" ] || { log "Lokasi tidak diambil - ITAssetLocation.app tidak ada."; return 1; }
 
-ssid_allowed=false
-if [ -n "$CURRENT_SSID" ]; then
-    IFS='|' read -ra _ssid_list <<< "$ALLOWED_SSIDS"
-    for s in "${_ssid_list[@]}"; do
-        [ "$s" = "$CURRENT_SSID" ] && ssid_allowed=true && break
-    done
-fi
-
-if [ "$ssid_allowed" != true ]; then
-    log "Lokasi dilewati - bukan Wi-Fi kantor (SSID: ${CURRENT_SSID:-tidak tersambung})."
-elif [ -d "$LOCATION_APP" ]; then
-    LOCATION_FILE="$INSTALL_DIR/location.txt"
-    rm -f "$LOCATION_FILE"
-
-    if open -W -n -g -a "$LOCATION_APP" --args "$LOCATION_FILE" 2>/dev/null && [ -f "$LOCATION_FILE" ]; then
-        read -r GEO_STATUS GEO_LAT GEO_LNG GEO_ACC < "$LOCATION_FILE" || true
-
-        NUM='^-?[0-9]+(\.[0-9]+)?$'
-        if [ "${GEO_STATUS:-}" = "OK" ] && [[ "${GEO_LAT:-}" =~ $NUM ]] && [[ "${GEO_LNG:-}" =~ $NUM ]] && [[ "${GEO_ACC:-}" =~ $NUM ]]; then
+    local f="$INSTALL_DIR/location.txt"
+    rm -f "$f"
+    if open -W -n -g -a "$LOCATION_APP" --args "$f" 2>/dev/null && [ -f "$f" ]; then
+        read -r GEO_STATUS GEO_LAT GEO_LNG GEO_ACC < "$f" || true
+        rm -f "$f"
+        local num='^-?[0-9]+(\.[0-9]+)?$'
+        if [ "${GEO_STATUS:-}" = "OK" ] && [[ "${GEO_LAT:-}" =~ $num ]] && [[ "${GEO_LNG:-}" =~ $num ]] && [[ "${GEO_ACC:-}" =~ $num ]]; then
             GEO_JSON=",
   \"latitude\": $GEO_LAT,
   \"longitude\": $GEO_LNG,
   \"location_accuracy_m\": $GEO_ACC"
             GEO_INFO="lokasi=$GEO_LAT,$GEO_LNG (+/-${GEO_ACC}m)"
-        else
-            log "Lokasi tidak diambil - $(cat "$LOCATION_FILE")"
+            return 0
         fi
-    else
-        log "Lokasi tidak diambil - ITAssetLocation.app gagal dijalankan atau tidak menulis hasil."
+        log "Lokasi tidak diambil - ${GEO_STATUS:-?}"
+        return 1
     fi
+    rm -f "$f"
+    log "Lokasi tidak diambil - ITAssetLocation.app gagal dijalankan."
+    return 1
+}
 
-    rm -f "$LOCATION_FILE"
+# Normalnya lokasi hanya dicatat saat tersambung Wi-Fi kantor. Kalau aset ditandai HILANG
+# (diketahui dari respons check-in), lokasi dikirim di fase kedua di bawah walau bukan Wi-Fi kantor.
+DEFAULT_SSIDS="SUSHI|FreeWifi-SUSHI|yaygroup_lt1|Yaygroup LT2|yaygroup|TrainingCenter|TrainingCenter_Guest"
+ALLOWED_SSIDS="${LOCATION_SSIDS:-$DEFAULT_SSIDS}"
+CURRENT_SSID=$(networksetup -getairportnetwork en0 2>/dev/null | sed -n 's/^Current Wi-Fi Network: //p')
+
+on_office_wifi=false
+if [ -n "$CURRENT_SSID" ]; then
+    IFS='|' read -ra _ssid_list <<< "$ALLOWED_SSIDS"
+    for s in "${_ssid_list[@]}"; do
+        [ "$s" = "$CURRENT_SSID" ] && on_office_wifi=true && break
+    done
+fi
+
+if [ "$on_office_wifi" = true ]; then
+    capture_location || true
 fi
 
 JSON=$(cat <<EOF
@@ -143,6 +149,19 @@ update_agent_script() {
 
 if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
     log "OK - $BODY $GEO_INFO"
+
+    # Fase kedua: aset ditandai HILANG tapi bukan Wi-Fi kantor -> ambil lokasi di mana pun, kirim lagi.
+    if [ "$on_office_wifi" != true ] && printf '%s' "$BODY" | grep -q '"track_location_always":true'; then
+        if capture_location; then
+            LOST_JSON="{\"serial_number\":\"$(json_escape "$SERIAL")\",\"hostname\":\"$(json_escape "$HOSTNAME")\",\"os_name\":\"macOS\"$GEO_JSON}"
+            curl -s -o /dev/null -X POST "$API_URL" -H "Authorization: Bearer $API_TOKEN" -H "Content-Type: application/json" -d "$LOST_JSON"
+            log "MODE HILANG - lokasi dikirim dari luar kantor: $GEO_INFO"
+        else
+            log "MODE HILANG - lokasi tidak bisa diambil."
+        fi
+    elif [ "$on_office_wifi" != true ]; then
+        log "Lokasi dilewati - bukan Wi-Fi kantor (SSID: ${CURRENT_SSID:-tidak tersambung})."
+    fi
 
     EXPECTED_HASH=$(printf '%s' "$BODY" | sed -n 's/.*"script_sha256":"\([0-9a-f]\{64\}\)".*/\1/p')
     if [ -n "$EXPECTED_HASH" ]; then

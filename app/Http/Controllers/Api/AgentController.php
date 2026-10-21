@@ -108,6 +108,8 @@ class AgentController extends Controller
             // agent mengunduh versi terbaru dari endpoint script() di bawah (update otomatis).
             // null kalau file script tidak ada di server - check-in tetap jalan, hanya update dilewati.
             'script_sha256' => is_file($scriptPath) ? hash_file('sha256', $scriptPath) : null,
+            // Kalau aset ditandai hilang, agent melacak lokasi di mana pun (abaikan batas Wi-Fi kantor).
+            'track_location_always' => (bool) $asset->reported_lost_at,
         ], $created ? 201 : 200);
     }
 

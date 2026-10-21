@@ -59,11 +59,34 @@
                            class="text-center bg-gray-100 dark:bg-gray-700 dark:text-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Cetak Label</a>
                         <a href="{{ route('assets.edit', $asset) }}"
                            class="text-center bg-brand-500 hover:bg-brand-600 text-white px-3 py-1.5 rounded-lg text-sm transition-all duration-150 hover:scale-105 active:scale-95">Edit</a>
+                        @if (! $asset->reported_lost_at)
+                            <form method="POST" action="{{ route('assets.toggle-lost', $asset) }}"
+                                  onsubmit="event.preventDefault(); confirmAction('Tandai aset ini HILANG? Agent akan melacak lokasinya di mana pun (termasuk di luar kantor) sampai ditandai ditemukan.', () => this.submit(), 'Tandai Hilang');">
+                                @csrf
+                                <button type="submit" class="text-center border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-lg text-sm transition-all duration-150 hover:bg-red-50 dark:hover:bg-red-900/30">Tandai Hilang</button>
+                            </form>
+                        @endif
                     @endif
                     <a href="{{ $isStaff ? route('assets.index') : route('dashboard') }}"
                        class="text-center text-gray-500 dark:text-gray-400 px-3 py-1.5 text-sm">Kembali</a>
                 </div>
             </div>
+
+            @if ($asset->reported_lost_at)
+                <div class="p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="text-sm text-red-700 dark:text-red-300">
+                        <p class="font-semibold">⚠ Aset ditandai HILANG sejak {{ $asset->reported_lost_at->translatedFormat('d M Y H:i') }}</p>
+                        <p>Agent melacak lokasi di mana pun (bukan hanya Wi-Fi kantor) sampai ditandai ditemukan.</p>
+                    </div>
+                    @if ($isStaff)
+                        <form method="POST" action="{{ route('assets.toggle-lost', $asset) }}"
+                              onsubmit="event.preventDefault(); confirmAction('Tandai aset ini sudah ditemukan? Pelacakan lokasi kembali hanya di Wi-Fi kantor.', () => this.submit(), 'Tandai Ditemukan');">
+                            @csrf
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 whitespace-nowrap">Tandai Ditemukan</button>
+                        </form>
+                    @endif
+                </div>
+            @endif
 
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6" x-data="{ tab: 'detail', photoIndex: 0 }">
                 <!-- Hero Photo -->

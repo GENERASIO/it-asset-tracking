@@ -252,20 +252,17 @@ try {
         username      = $env:USERNAME
     }
 
-    # Lokasi hanya dicatat kalau tersambung ke Wi-Fi kantor (lihat $DefaultLocationSsids).
+    # Normalnya lokasi hanya dicatat saat tersambung Wi-Fi kantor (lihat $DefaultLocationSsids).
+    # Kalau aset ditandai HILANG di server, batasan ini diabaikan - tapi status itu baru diketahui
+    # dari respons check-in, jadi lokasi untuk aset hilang dikirim di fase kedua (lihat bawah).
     $allowedSsids = if ($config.LocationSsids) { @($config.LocationSsids) } else { $DefaultLocationSsids }
     $currentSsid = Get-CurrentSsid
+    $onOfficeWifi = [bool]($currentSsid -and ($allowedSsids -contains $currentSsid))
     $geo = $null
 
-    if ($currentSsid -and ($allowedSsids -contains $currentSsid)) {
+    if ($onOfficeWifi) {
         $geo = Get-GeoLocation
         if ($geo) { $payload += $geo }
-    }
-    elseif ($currentSsid) {
-        Write-Log "Lokasi dilewati - bukan Wi-Fi kantor (SSID: $currentSsid)."
-    }
-    else {
-        Write-Log "Lokasi dilewati - tidak tersambung Wi-Fi."
     }
 
     # Key hanya dikirim kalau pengambilannya berhasil; kalau tidak dikirim, server
@@ -288,6 +285,28 @@ try {
     $geoInfo = if ($geo) { "lokasi=$($geo.latitude),$($geo.longitude) (+/-$($geo.location_accuracy_m)m)" } else { 'lokasi=-' }
     $invInfo = "aplikasi=$(if ($null -ne $software) { $software.Count } else { '-' }) lisensi=$(if ($null -ne $licenses) { $licenses.Count } else { '-' })"
     Write-Log "OK - asset_code=$($response.asset_code) created=$($response.created) $geoInfo $invInfo"
+
+    # Fase kedua: aset ditandai HILANG tapi tidak di Wi-Fi kantor -> ambil lokasi di mana pun
+    # dan kirim sekali lagi, supaya laptop hilang tetap bisa dilacak.
+    if (-not $onOfficeWifi -and $response.track_location_always) {
+        $lostGeo = Get-GeoLocation
+        if ($lostGeo) {
+            $lostBody = @{
+                serial_number = $bios.SerialNumber
+                hostname      = $env:COMPUTERNAME
+                os_name       = 'Windows'
+            } + $lostGeo
+            $lostJson = $lostBody | ConvertTo-Json -Compress
+            Invoke-RestMethod -Uri $config.ApiUrl -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($lostJson)) -ContentType 'application/json; charset=utf-8' -Headers $headers | Out-Null
+            Write-Log "MODE HILANG - lokasi dikirim dari luar kantor: $($lostGeo.latitude),$($lostGeo.longitude) (+/-$($lostGeo.location_accuracy_m)m)"
+        }
+        else {
+            Write-Log "MODE HILANG - lokasi tidak bisa diambil (Location Services mati / belum tersedia)."
+        }
+    }
+    elseif (-not $onOfficeWifi) {
+        Write-Log "Lokasi dilewati - bukan Wi-Fi kantor (SSID: $(if ($currentSsid) { $currentSsid } else { 'tidak tersambung' }))."
+    }
 
     Update-AgentScript -ExpectedHash $response.script_sha256 -Config $config -Headers $headers
 }
