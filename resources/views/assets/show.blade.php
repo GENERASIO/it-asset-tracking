@@ -281,6 +281,18 @@
                                     <p class="text-xs text-gray-500 mb-2">Diambil {{ $asset->geo_captured_at?->diffForHumans() ?? '-' }}</p>
                                     <iframe src="{{ $osmEmbed }}" class="w-full h-64 rounded-lg border border-gray-200 dark:border-gray-700" loading="lazy" title="Peta lokasi {{ $asset->asset_code }}"></iframe>
                                 </div>
+                            @else
+                                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <span class="text-sm text-gray-500">Lokasi Terakhir (GPS)</span>
+                                    <div class="mt-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 text-sm">
+                                        <p class="font-medium">Belum ada titik GPS.</p>
+                                        <p class="mt-1 text-xs">Lokasi hanya terekam saat laptop tersambung Wi-Fi kantor <span class="font-medium">dan</span> Location Services Windows aktif. Kalau belum muncul:</p>
+                                        <ul class="mt-1 text-xs list-disc list-inside space-y-0.5">
+                                            <li>Jalankan <span class="font-medium">updater .exe</span> di laptop ini untuk menyalakan Location Services, atau</li>
+                                            <li>Pastikan laptop pernah tersambung Wi-Fi kantor setelah agent terpasang.</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             @endif
                         </div>
                     @endif
