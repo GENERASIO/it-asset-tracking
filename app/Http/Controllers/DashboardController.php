@@ -27,6 +27,17 @@ class DashboardController extends Controller
                 'locations' => Location::count(),
             ];
 
+            // Rincian jumlah aset per kategori + pecahan statusnya (karena tidak semua aset laptop).
+            $statusKeys = ['available', 'in_use', 'maintenance', 'broken', 'retired'];
+            $byCategory = Category::withCount([
+                'assets',
+                'assets as available_count' => fn ($q) => $q->where('status', 'available'),
+                'assets as in_use_count' => fn ($q) => $q->where('status', 'in_use'),
+                'assets as maintenance_count' => fn ($q) => $q->where('status', 'maintenance'),
+                'assets as broken_count' => fn ($q) => $q->where('status', 'broken'),
+                'assets as retired_count' => fn ($q) => $q->where('status', 'retired'),
+            ])->orderByDesc('assets_count')->get();
+
             $recentAssets = Asset::with(['category', 'location'])->latest()->take(5)->get();
 
             $warrantySoon = Asset::whereNotNull('warranty_expired_at')
@@ -88,7 +99,7 @@ class DashboardController extends Controller
                 ->take(10)
                 ->values();
 
-            return view('dashboard', compact('stats', 'recentAssets', 'warrantySoon', 'warrantyAlerts', 'overdueMaintenances', 'recentActivities'));
+            return view('dashboard', compact('stats', 'byCategory', 'recentAssets', 'warrantySoon', 'warrantyAlerts', 'overdueMaintenances', 'recentActivities'));
         }
 
         // Role "user" biasa: lihat aset miliknya sendiri

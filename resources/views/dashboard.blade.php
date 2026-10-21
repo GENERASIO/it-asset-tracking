@@ -103,6 +103,43 @@
                     </div>
                 </div>
 
+                {{-- PER KATEGORI --}}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aset per Kategori</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                                <tr>
+                                    <th class="py-2 pr-4">Kategori</th>
+                                    <th class="py-2 px-3 text-right">Total</th>
+                                    <th class="py-2 px-3 text-right">Available</th>
+                                    <th class="py-2 px-3 text-right">In Use</th>
+                                    <th class="py-2 px-3 text-right">Maintenance</th>
+                                    <th class="py-2 px-3 text-right">Broken</th>
+                                    <th class="py-2 px-3 text-right">Retired</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($byCategory as $cat)
+                                    <tr class="border-b last:border-b-0 border-gray-100 dark:border-gray-700">
+                                        <td class="py-2 pr-4 text-gray-900 dark:text-white">
+                                            <a href="{{ route('assets.index', ['view' => 'table', 'category_id' => $cat->id]) }}" class="hover:underline">{{ $cat->name }}</a>
+                                        </td>
+                                        <td class="py-2 px-3 text-right font-semibold text-gray-900 dark:text-white tabular-nums">{{ $cat->assets_count }}</td>
+                                        <td class="py-2 px-3 text-right tabular-nums {{ $cat->available_count ? 'text-green-600 dark:text-green-400' : 'text-gray-300 dark:text-gray-600' }}">{{ $cat->available_count }}</td>
+                                        <td class="py-2 px-3 text-right tabular-nums {{ $cat->in_use_count ? 'text-blue-600 dark:text-blue-400' : 'text-gray-300 dark:text-gray-600' }}">{{ $cat->in_use_count }}</td>
+                                        <td class="py-2 px-3 text-right tabular-nums {{ $cat->maintenance_count ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600' }}">{{ $cat->maintenance_count }}</td>
+                                        <td class="py-2 px-3 text-right tabular-nums {{ $cat->broken_count ? 'text-red-600 dark:text-red-400' : 'text-gray-300 dark:text-gray-600' }}">{{ $cat->broken_count }}</td>
+                                        <td class="py-2 px-3 text-right tabular-nums {{ $cat->retired_count ? 'text-gray-600 dark:text-gray-300' : 'text-gray-300 dark:text-gray-600' }}">{{ $cat->retired_count }}</td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="7" class="py-4 text-center text-gray-400">Belum ada kategori.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 {{-- QUICK ACTIONS --}}
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aksi Cepat</h3>
