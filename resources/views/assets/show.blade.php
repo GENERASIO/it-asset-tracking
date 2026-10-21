@@ -185,6 +185,24 @@
                                 @endif
                             </p>
                         </div>
+                        @if (! is_null($asset->current_value))
+                            <div>
+                                <span class="text-gray-500">Nilai Sekarang</span>
+                                <p class="font-medium text-gray-900 dark:text-white">
+                                    Rp {{ number_format($asset->current_value, 0, ',', '.') }}
+                                </p>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Penyusutan</span>
+                                @php $susut = ($asset->purchase_price ?? 0) - $asset->current_value; @endphp
+                                <p class="font-medium text-red-600 dark:text-red-400">
+                                    Rp {{ number_format(max(0, $susut), 0, ',', '.') }}
+                                    @if ($asset->purchase_price)
+                                        <span class="text-xs text-gray-500">({{ round($susut / $asset->purchase_price * 100) }}%)</span>
+                                    @endif
+                                </p>
+                            </div>
+                        @endif
                         <div>
                             <span class="text-gray-500">Garansi Sampai</span>
                             <p class="font-medium text-gray-900 dark:text-white">{{ optional($asset->warranty_expired_at)->format('d M Y') ?? '-' }}</p>

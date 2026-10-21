@@ -196,17 +196,17 @@
             {{-- Indikator utama --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="{{ $card }}">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Perkiraan Nilai Buku</p>
-                    <p class="text-xs text-gray-400">Nilai aset sekarang setelah penyusutan (habis dalam 4 tahun)</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Nilai Aset Sekarang</p>
+                    <p class="text-xs text-gray-400">Angka tim aset bila ada, selebihnya perkiraan susut garis lurus 4 tahun</p>
                     <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white tabular-nums whitespace-nowrap">{{ $rp($bookValue) }}</p>
                     <p class="mt-auto pt-2 text-xs text-gray-500 dark:text-gray-400">
                         @if ($bookValueCoverage)
-                            Dari {{ $bookValueCoverage }} aset bertanggal beli (nilai beli {{ $rp($bookValuePurchase) }}), susut garis lurus 4 tahun.
+                            Dari {{ $bookValueCoverage }} aset yang punya data nilai (nilai beli {{ $rp($bookValuePurchase) }}).
                         @else
-                            Belum bisa dihitung — tanggal beli belum diisi.
+                            Belum bisa dihitung — harga/tanggal beli belum diisi.
                         @endif
                         @if ($bookValueCoverage < $totalAssets)
-                            <span class="text-yellow-700 dark:text-yellow-400">{{ $totalAssets - $bookValueCoverage }} aset belum punya tanggal beli.</span>
+                            <span class="text-yellow-700 dark:text-yellow-400">{{ $totalAssets - $bookValueCoverage }} aset belum punya data nilai.</span>
                         @endif
                     </p>
                 </div>

@@ -53,8 +53,8 @@
         <p><strong>Total Nilai Aset:</strong> Rp {{ number_format($totalAssetValue ?? 0, 0, ',', '.') }}@if ($estimatedPriceCount) (termasuk {{ $estimatedPriceCount }} aset dengan harga estimasi)@endif</p>
         <p><strong>Jumlah Kategori:</strong> {{ $totalCategories }}</p>
         <p><strong>Jumlah Lokasi:</strong> {{ $totalLocations }}</p>
-        <p><strong>Perkiraan Nilai Buku:</strong> Rp {{ number_format($bookValue, 0, ',', '.') }}
-            (dari {{ $bookValueCoverage }} aset bertanggal beli, susut garis lurus 4 tahun)</p>
+        <p><strong>Nilai Aset Sekarang:</strong> Rp {{ number_format($bookValue, 0, ',', '.') }}
+            (dari {{ $bookValueCoverage }} aset — angka tim aset bila ada, selebihnya perkiraan susut garis lurus 4 tahun)</p>
         <p><strong>Stok Cadangan (Available):</strong> {{ $spareCount }} unit</p>
         <p><strong>Skor Kelengkapan Data:</strong> {{ $dataScore }}%</p>
     </div>

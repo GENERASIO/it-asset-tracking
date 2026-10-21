@@ -47,8 +47,8 @@ class ReportAnalysisTest extends TestCase
         $this->actingAs($this->staff)->get(route('reports.index'))
             ->assertOk()
             // Nilai buku: Rp 8 jt dibeli 2 tahun lalu, susut 4 tahun -> ~Rp 4 jt.
-            ->assertSee('Perkiraan Nilai Buku')
-            ->assertSee('Dari 1 aset bertanggal beli')
+            ->assertSee('Nilai Aset Sekarang')
+            ->assertSee('Dari 1 aset yang punya data nilai')
             ->assertSee('Umur Perangkat')
             ->assertSee('Baru (2023+)')
             ->assertSee('Tua (2020 ke bawah)')

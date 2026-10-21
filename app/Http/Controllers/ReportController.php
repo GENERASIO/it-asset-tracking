@@ -110,10 +110,15 @@ class ReportController extends Controller
             ->sortByDesc('value')
             ->values();
 
-        // Nilai buku: garis lurus 4 tahun (komputer = harta Kelompok 1 untuk pajak),
-        // hanya untuk aset yang punya tanggal beli dan harga.
-        $dated = $assets->filter(fn ($a) => $a->purchase_date && $a->purchase_price);
+        // Nilai sekarang: pakai angka tim aset (current_value) kalau ada; selebihnya
+        // perkiraan garis lurus 4 tahun (komputer = harta Kelompok 1 untuk pajak),
+        // untuk aset yang punya tanggal beli dan harga.
+        $dated = $assets->filter(fn ($a) => ! is_null($a->current_value) || ($a->purchase_date && $a->purchase_price));
         $bookValue = (int) $dated->sum(function ($a) {
+            if (! is_null($a->current_value)) {
+                return $a->current_value;
+            }
+
             $years = $a->purchase_date->diffInDays(now()) / 365.25;
 
             return $a->purchase_price * max(0, 1 - $years / 4);

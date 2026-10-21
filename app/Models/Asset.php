@@ -12,7 +12,7 @@ class Asset extends Model
     protected $fillable = [
         'asset_code', 'name', 'category_id', 'brand', 'model', 'serial_number',
         'specification', 'location_id', 'assigned_to', 'status',
-        'purchase_date', 'purchase_price', 'purchase_price_estimated', 'warranty_expired_at', 'photo',
+        'purchase_date', 'purchase_price', 'current_value', 'purchase_price_estimated', 'warranty_expired_at', 'photo',
         'hostname', 'os_name', 'os_version', 'cpu', 'ram_gb', 'storage_gb', 'mac_address', 'last_seen_at',
         'latitude', 'longitude', 'location_accuracy_m', 'geo_captured_at', 'reported_lost_at',
         'inventory_synced_at', 'crack_indicators',
@@ -22,6 +22,7 @@ class Asset extends Model
         'purchase_date' => 'date',
         'warranty_expired_at' => 'date',
         'purchase_price' => 'integer',
+        'current_value' => 'integer',
         'purchase_price_estimated' => 'boolean',
         'last_seen_at' => 'datetime',
         'latitude' => 'decimal:7',
