@@ -315,20 +315,29 @@
                                             <td class="px-4 py-2 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->location->name ?? '-' }}</td>
                                             <td class="px-4 py-2 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->assignedUser->name ?? '-' }}</td>
                                             <td class="px-4 py-2">
-                                                <select class="status-select border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-xs"
-                                                        data-asset-id="{{ $asset->id }}" onchange="handleStatusChange(this)">
+                                                <select class="status-select {{ $statusColumns[$asset->status]['badge'] ?? 'bg-gray-100 text-gray-600' }} border-0 rounded-full text-xs font-medium py-1 pl-2.5 pr-7 cursor-pointer focus:ring-2 focus:ring-brand-400"
+                                                        data-asset-id="{{ $asset->id }}" onchange="handleStatusChange(this)" title="Ubah status">
                                                     @foreach ($statusColumns as $key => $meta)
                                                         <option value="{{ $key }}" @selected($asset->status === $key)>{{ $meta['label'] }}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
-                                            <td class="px-4 py-2 text-right space-x-2 whitespace-nowrap sticky right-0 z-10 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700">
-                                                <a href="{{ route('assets.edit', $asset) }}" class="text-brand-500 hover:underline">Edit</a>
-                                                <a href="{{ route('barcode.print', $asset) }}" target="_blank" class="text-gray-600 dark:text-gray-300 hover:underline">Label</a>
-                                                <button type="button" class="text-red-600 hover:underline"
-                                                        onclick="confirmDeleteAsset('{{ route('assets.destroy', $asset) }}')">
-                                                    Hapus
-                                                </button>
+                                            <td class="px-4 py-2 text-right whitespace-nowrap sticky right-0 z-10 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <a href="{{ route('assets.edit', $asset) }}" title="Edit aset"
+                                                       class="inline-flex p-1.5 rounded-lg text-brand-500 hover:bg-brand-50 dark:hover:bg-gray-700">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zM19.5 7.125L16.875 4.5"/></svg>
+                                                    </a>
+                                                    <a href="{{ route('barcode.print', $asset) }}" target="_blank" title="Cetak label"
+                                                       class="inline-flex p-1.5 rounded-lg text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/></svg>
+                                                    </a>
+                                                    <button type="button" title="Hapus aset"
+                                                            class="inline-flex p-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-gray-700"
+                                                            onclick="confirmDeleteAsset('{{ route('assets.destroy', $asset) }}')">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     @empty
