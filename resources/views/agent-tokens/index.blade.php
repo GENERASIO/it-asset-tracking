@@ -39,6 +39,15 @@
                 </div>
             @endif
 
+            <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-sm space-y-1">
+                <p class="font-semibold">Satu token untuk semua laptop — tidak perlu bikin token per laptop.</p>
+                <ul class="list-disc list-inside">
+                    <li>Bikin token <strong>sekali</strong>, download zip-nya, lalu <strong>simpan zip itu</strong> dan pakai ulang di semua laptop baru.</li>
+                    <li>Download paket (zip berisi token) hanya bisa <strong>dalam 10 menit</strong> setelah token dibuat. Lewat itu, simpanan zip Anda tetap bisa dipakai.</li>
+                    <li>Mau <strong>update</strong> laptop yang agennya sudah terpasang? Tidak perlu token — pakai tombol <strong>"Download Setup.exe (updater)"</strong> di bawah.</li>
+                </ul>
+            </div>
+
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Buat Token Baru</h3>
                 <form method="POST" action="{{ route('agent-tokens.store') }}" class="flex flex-wrap gap-2">
