@@ -24,7 +24,7 @@
                 <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Tambah / Perbarui Harga Model</h3>
                 <form method="POST" action="{{ route('price-references.store') }}" class="grid sm:grid-cols-12 gap-3 items-end">
                     @csrf
-                    <div class="sm:col-span-5">
+                    <div class="sm:col-span-6">
                         <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Nama model (seperti yang dibaca agent)</label>
                         <input type="text" name="match_name" required value="{{ old('match_name') }}" list="model-suggestions"
                                placeholder="mis. Dell Inc. Vostro 3400"
@@ -35,15 +35,10 @@
                             @endforeach
                         </datalist>
                     </div>
-                    <div class="sm:col-span-3">
+                    <div class="sm:col-span-4">
                         <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Harga beli / unit</label>
                         <x-rupiah-input name="purchase_price" :value="old('purchase_price')"
                             class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm" />
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Catatan</label>
-                        <input type="text" name="note" value="{{ old('note') }}" placeholder="opsional"
-                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm">
                     </div>
                     <div class="sm:col-span-2">
                         <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm">Simpan</button>
@@ -65,7 +60,6 @@
                             <th class="px-4 py-3 text-left">Nama Model</th>
                             <th class="px-4 py-3 text-right">Harga Beli</th>
                             <th class="px-4 py-3 text-center">Unit Cocok</th>
-                            <th class="px-4 py-3 text-left">Catatan</th>
                             <th class="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -76,7 +70,6 @@
                                 <td class="px-4 py-3 font-medium">{{ $ref->match_name }}</td>
                                 <td class="px-4 py-3 text-right tabular-nums">Rp {{ number_format($ref->purchase_price, 0, ',', '.') }}</td>
                                 <td class="px-4 py-3 text-center">{{ $counts[$ref->match_name] ?? 0 }}</td>
-                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $ref->note ?? '-' }}</td>
                                 <td class="px-4 py-3 text-right whitespace-nowrap">
                                     <button type="button" @click="edit = true" class="text-brand-500 hover:underline">Edit</button>
                                     <form method="POST" action="{{ route('price-references.destroy', $ref) }}" class="inline"
@@ -88,15 +81,13 @@
                             </tr>
                             {{-- edit inline --}}
                             <tr x-show="edit" x-cloak>
-                                <td colspan="5" class="px-4 py-3">
+                                <td colspan="4" class="px-4 py-3">
                                     <form method="POST" action="{{ route('price-references.update', $ref) }}" class="flex flex-wrap gap-2 items-center">
                                         @csrf @method('PUT')
                                         <input type="text" name="match_name" value="{{ $ref->match_name }}" required
                                                class="flex-1 min-w-[12rem] rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm">
                                         <x-rupiah-input name="purchase_price" :value="$ref->purchase_price"
                                             class="w-40 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm" />
-                                        <input type="text" name="note" value="{{ $ref->note }}" placeholder="catatan"
-                                               class="w-40 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm">
                                         <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-3 py-2 rounded-lg text-sm">Simpan</button>
                                         <button type="button" @click="edit = false" class="text-gray-500 px-2 text-sm">Batal</button>
                                     </form>
@@ -105,7 +96,7 @@
                         </tbody>
                     @empty
                         <tbody>
-                            <tr><td colspan="5" class="px-4 py-6 text-center text-gray-400">Belum ada harga model.</td></tr>
+                            <tr><td colspan="4" class="px-4 py-6 text-center text-gray-400">Belum ada harga model.</td></tr>
                         </tbody>
                     @endforelse
                 </table>
