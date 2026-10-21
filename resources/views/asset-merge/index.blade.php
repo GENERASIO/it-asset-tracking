@@ -37,7 +37,21 @@
                                 <td class="px-4 py-3 font-mono font-semibold text-brand-500">
                                     <a href="{{ route('assets.show', $c) }}" class="hover:underline">{{ $c->asset_code }}</a>
                                 </td>
-                                <td class="px-4 py-3">{{ $c->name }}</td>
+                                <td class="px-4 py-3">
+                                    {{ $c->name }}
+                                    @php $match = $glpiMatches[$c->name] ?? 0; @endphp
+                                    <div class="mt-1">
+                                        @if ($match > 0)
+                                            <span class="inline-block text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
+                                                {{ $match }} kemungkinan cocok · model sama tanpa serial (GLPI)
+                                            </span>
+                                        @else
+                                            <span class="inline-block text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                                                tidak ada kecocokan · mungkin laptop baru
+                                            </span>
+                                        @endif
+                                    </div>
+                                </td>
                                 <td class="px-4 py-3 font-mono">{{ $c->serial_number ?? '-' }}</td>
                                 <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden sm:table-cell">{{ $c->last_seen_at?->diffForHumans() ?? '-' }}</td>
                                 <td class="px-4 py-3 text-right">

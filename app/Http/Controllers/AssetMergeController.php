@@ -19,7 +19,17 @@ class AssetMergeController extends Controller
     {
         $candidates = $this->candidateQuery()->with(['category', 'location'])->orderByDesc('last_seen_at')->get();
 
-        return view('asset-merge.index', compact('candidates'));
+        // Indikator: untuk tiap kandidat, berapa aset lama dgn MODEL SAMA tapi BELUM punya
+        // serial & bukan buatan agent (ciri record hasil migrasi GLPI yang kemungkinan cocok).
+        $names = $candidates->pluck('name')->filter()->unique()->all();
+        $glpiMatches = empty($names) ? collect() : Asset::whereIn('name', $names)
+            ->where(fn ($q) => $q->whereNull('serial_number')->orWhere('serial_number', ''))
+            ->whereNull('last_seen_at')
+            ->selectRaw('name, COUNT(*) as c')
+            ->groupBy('name')
+            ->pluck('c', 'name');
+
+        return view('asset-merge.index', compact('candidates', 'glpiMatches'));
     }
 
     public function create(Asset $asset)
@@ -28,7 +38,10 @@ class AssetMergeController extends Controller
         $targets = Asset::with(['assignedUser', 'location'])
             ->where('id', '!=', $asset->id)
             ->orderBy('asset_code')
-            ->get();
+            ->get()
+            // Kandidat yang kemungkinan cocok (model sama + belum ada serial) ditaruh paling atas.
+            ->sortByDesc(fn ($t) => $t->name === $asset->name && empty($t->serial_number) ? 1 : 0)
+            ->values();
 
         return view('asset-merge.create', compact('asset', 'targets'));
     }

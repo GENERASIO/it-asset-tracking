@@ -50,6 +50,9 @@
                             <div class="text-sm">
                                 <span class="font-mono font-semibold text-brand-500">{{ $t->asset_code }}</span>
                                 <span class="text-gray-900 dark:text-white">· {{ $t->name }}</span>
+                                @if ($t->name === $asset->name && empty($t->serial_number))
+                                    <span class="ml-1 text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">kemungkinan cocok</span>
+                                @endif
                                 <div class="text-xs text-gray-500 dark:text-gray-400">
                                     Pemegang: {{ optional($t->assignedUser)->name ?? '-' }} ·
                                     Lokasi: {{ optional($t->location)->name ?? '-' }} ·

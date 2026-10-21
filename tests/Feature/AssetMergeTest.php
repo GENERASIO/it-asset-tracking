@@ -62,6 +62,31 @@ class AssetMergeTest extends TestCase
         $this->assertSame(1, DB::table('asset_logs')->where('asset_id', $target->id)->count());
     }
 
+    public function test_index_menandai_kemungkinan_cocok_glpi(): void
+    {
+        $staff = User::factory()->create(['role' => 'it_staff']);
+        $cat = Category::create(['name' => 'Lainnya', 'code' => 'LAI']);
+        $loc = Location::create(['name' => 'Tidak Diketahui', 'code' => 'TDK']);
+        $locHO = Location::create(['name' => 'Head Office', 'code' => 'HO']);
+
+        // Record GLPI: model sama, tanpa serial, bukan agent, punya pemegang.
+        Asset::create([
+            'asset_code' => 'LAI-HO-0001', 'name' => 'Dell Inc. Vostro 3400',
+            'category_id' => $cat->id, 'location_id' => $locHO->id, 'status' => 'in_use',
+            'serial_number' => null, 'assigned_to' => User::factory()->create()->id,
+        ]);
+        // Kandidat buatan agent.
+        Asset::create([
+            'asset_code' => 'LAI-TDK-0001', 'name' => 'Dell Inc. Vostro 3400',
+            'category_id' => $cat->id, 'location_id' => $loc->id, 'status' => 'in_use',
+            'serial_number' => 'BV83JK3', 'last_seen_at' => now(),
+        ]);
+
+        $this->actingAs($staff)->get(route('asset-merge.index'))
+            ->assertOk()
+            ->assertSee('kemungkinan cocok');
+    }
+
     public function test_tidak_bisa_gabung_ke_diri_sendiri(): void
     {
         $staff = User::factory()->create(['role' => 'it_staff']);
