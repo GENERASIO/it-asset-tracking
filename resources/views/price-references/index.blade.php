@@ -22,10 +22,10 @@
             {{-- Form tambah --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
                 <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Tambah / Perbarui Harga Model</h3>
-                <form method="POST" action="{{ route('price-references.store') }}" class="grid sm:grid-cols-12 gap-3 items-end">
+                <form method="POST" action="{{ route('price-references.store') }}" class="flex flex-col sm:flex-row sm:items-end gap-3">
                     @csrf
-                    <div class="sm:col-span-6">
-                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Nama model (seperti yang dibaca agent)</label>
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Nama model <span class="text-gray-400">(sesuai yang dibaca agent)</span></label>
                         <input type="text" name="match_name" required value="{{ old('match_name') }}" list="model-suggestions"
                                placeholder="mis. Dell Inc. Vostro 3400"
                                class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm">
@@ -35,14 +35,12 @@
                             @endforeach
                         </datalist>
                     </div>
-                    <div class="sm:col-span-4">
+                    <div class="sm:w-48">
                         <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Harga beli / unit</label>
                         <x-rupiah-input name="purchase_price" :value="old('purchase_price')"
                             class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm" />
                     </div>
-                    <div class="sm:col-span-2">
-                        <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm">Simpan</button>
-                    </div>
+                    <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-lg text-sm whitespace-nowrap">Simpan</button>
                 </form>
                 @if ($missing->isNotEmpty())
                     <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
