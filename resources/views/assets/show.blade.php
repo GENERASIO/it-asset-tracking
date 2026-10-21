@@ -290,7 +290,15 @@
                                         @endif
                                     </p>
                                     <p class="text-xs text-gray-500 mb-2">Diambil {{ $asset->geo_captured_at?->diffForHumans() ?? '-' }}</p>
-                                    <iframe src="{{ $osmEmbed }}" class="w-full h-64 rounded-lg border border-gray-200 dark:border-gray-700" loading="lazy" title="Peta lokasi {{ $asset->asset_code }}"></iframe>
+                                    <div class="relative" x-data>
+                                        <iframe x-ref="map" data-home="{{ $osmEmbed }}" src="{{ $osmEmbed }}" class="w-full h-64 rounded-lg border border-gray-200 dark:border-gray-700" loading="lazy" title="Peta lokasi {{ $asset->asset_code }}"></iframe>
+                                        <button type="button" title="Kembali ke titik laptop"
+                                                @click="$refs.map.src = $refs.map.dataset.home + '&_=' + Date.now()"
+                                                class="absolute left-2 top-2 z-[400] flex items-center gap-1 bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 text-xs px-2.5 py-1.5 rounded-lg shadow border border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18zM12 3v2m0 14v2m9-9h-2M5 12H3"/><circle cx="12" cy="12" r="2.5"/></svg>
+                                            Titik laptop
+                                        </button>
+                                    </div>
                                 </div>
                             @else
                                 <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
