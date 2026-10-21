@@ -8,6 +8,7 @@ use App\Http\Controllers\PriceReferenceController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\AssetMergeController;
 use App\Http\Controllers\AssetLogController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\DashboardController;
@@ -46,6 +47,9 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::delete('/assets/{asset}/photos/{photo}', [AssetController::class, 'destroyPhoto'])->name('assets.photos.destroy');
     Route::patch('/assets/{asset}/update-status', [AssetController::class, 'updateStatus'])->name('assets.update-status');
     Route::post('/assets/{asset}/toggle-lost', [AssetController::class, 'toggleLost'])->name('assets.toggle-lost');
+    Route::get('/asset-merge', [AssetMergeController::class, 'index'])->name('asset-merge.index');
+    Route::get('/asset-merge/{asset}', [AssetMergeController::class, 'create'])->name('asset-merge.create');
+    Route::post('/asset-merge/{asset}', [AssetMergeController::class, 'store'])->name('asset-merge.store');
     Route::get('/assets-export', [AssetController::class, 'export'])->name('assets.export');
     Route::post('/assets-import', [AssetController::class, 'import'])->name('assets.import');
     Route::get('/assets-search-suggestions', [AssetController::class, 'searchSuggestions'])->name('assets.search-suggestions');

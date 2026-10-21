@@ -88,6 +88,17 @@
                 </div>
             @endif
 
+            @if ($isStaff && $asset->last_seen_at && ! $asset->assigned_to && optional($asset->location)->name === 'Tidak Diketahui')
+                <div class="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="text-sm text-yellow-800 dark:text-yellow-200">
+                        <p class="font-semibold">Aset ini didaftarkan otomatis oleh agent.</p>
+                        <p>Kalau laptop ini sebenarnya sudah punya data lama (cuma serial-nya beda), gabungkan supaya pemegang & histori tidak kembar.</p>
+                    </div>
+                    <a href="{{ route('asset-merge.create', $asset) }}"
+                       class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap">Gabungkan ke aset lama</a>
+                </div>
+            @endif
+
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6" x-data="{ tab: 'detail', photoIndex: 0 }">
                 <!-- Hero Photo -->
                 @if ($asset->photos->isNotEmpty())
