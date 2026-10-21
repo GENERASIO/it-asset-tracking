@@ -10,10 +10,14 @@
                 <div class="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
             @endif
 
-            <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-sm">
-                Aset di bawah ini kemungkinan <strong>dibuat otomatis oleh agent</strong> (ada data agent, belum ada pemegang,
-                lokasi masih "Tidak Diketahui"). Kalau salah satunya sebenarnya laptop yang <strong>sudah ada datanya</strong>
-                (cuma serial-nya beda), <strong>gabungkan</strong> ke aset lama supaya nama pemegang & histori tidak kembar.
+            <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-sm space-y-2">
+                <p>Ini <strong>daftar untuk ditinjau</strong>, bukan daftar aset kembar. Yang masuk sini: aset yang
+                    <strong>dibuat otomatis agent</strong> + <strong>belum ada pemegang</strong> + <strong>lokasi masih "Tidak Diketahui"</strong>.</p>
+                <p>Untuk tiap aset, pilih salah satu:</p>
+                <ul class="list-disc list-inside">
+                    <li><strong>Laptop baru</strong> (belum pernah ada di sistem) → buka asetnya, <strong>Edit</strong> isi pemegang &amp; lokasi. Otomatis hilang dari daftar ini.</li>
+                    <li><strong>Laptop lama</strong> yang serial-nya beda di record lama → <strong>Gabungkan</strong> ke aset lama supaya pemegang &amp; histori tidak kembar.</li>
+                </ul>
             </div>
 
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
