@@ -154,7 +154,11 @@ class StfController extends Controller
         $logoPath = public_path('images/logo.png');
         $logo = is_file($logoPath) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath)) : null;
 
-        return Pdf::loadView('stf.pdf', compact('stf', 'logo'))
+        // Tanda tangan atasan (Aris Munandar) ditempel otomatis di kolom Atasan.
+        $arisSignPath = public_path('images/signature-aris.png');
+        $arisSignature = is_file($arisSignPath) ? 'data:image/png;base64,'.base64_encode(file_get_contents($arisSignPath)) : null;
+
+        return Pdf::loadView('stf.pdf', compact('stf', 'logo', 'arisSignature'))
             ->setPaper('a4', 'landscape')
             ->download('STF-'.$stf->id.'.pdf');
     }

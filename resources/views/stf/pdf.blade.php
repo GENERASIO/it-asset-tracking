@@ -72,7 +72,7 @@
         <tr>
             <td class="space"></td>
             <td class="space"></td>
-            <td class="space"></td>
+            <td class="space">@if (($arisSignature ?? null) && $stf->supervisor_name === 'Aris Munandar')<img src="{{ $arisSignature }}" style="height:72px" alt="Tanda tangan">@endif</td>
             <td class="space"></td>
         </tr>
         <tr>
