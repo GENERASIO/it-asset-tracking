@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AgentTokenController;
 use App\Http\Controllers\BastController;
+use App\Http\Controllers\StfController;
 use App\Http\Controllers\SoftwareLicenseController;
 use App\Http\Controllers\PriceReferenceController;
 use App\Http\Controllers\CategoryController;
@@ -78,6 +79,12 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::post('/bast/{bast}/signed', [BastController::class, 'uploadSigned'])->name('bast.signed.upload');
     Route::get('/bast/{bast}/signed', [BastController::class, 'signedFile'])->name('bast.signed.show');
     Route::delete('/bast/{bast}', [BastController::class, 'destroy'])->name('bast.destroy');
+    Route::get('/stf', [StfController::class, 'index'])->name('stf.index');
+    Route::get('/stf/create', [StfController::class, 'create'])->name('stf.create');
+    Route::post('/stf', [StfController::class, 'store'])->name('stf.store');
+    Route::get('/stf/{stf}', [StfController::class, 'show'])->name('stf.show');
+    Route::get('/stf/{stf}/pdf', [StfController::class, 'pdf'])->name('stf.pdf');
+    Route::delete('/stf/{stf}', [StfController::class, 'destroy'])->name('stf.destroy');
 });
 
 Route::middleware(['auth'])->group(function () {
