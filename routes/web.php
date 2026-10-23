@@ -83,6 +83,7 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::get('/stf/create', [StfController::class, 'create'])->name('stf.create');
     Route::post('/stf', [StfController::class, 'store'])->name('stf.store');
     Route::get('/stf/{stf}', [StfController::class, 'show'])->name('stf.show');
+    Route::put('/stf/{stf}/items', [StfController::class, 'updateItems'])->name('stf.items.update');
     Route::get('/stf/{stf}/pdf', [StfController::class, 'pdf'])->name('stf.pdf');
     Route::delete('/stf/{stf}', [StfController::class, 'destroy'])->name('stf.destroy');
 });

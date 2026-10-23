@@ -31,30 +31,41 @@
                 </dl>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                        <tr>
-                            <th class="px-4 py-3 text-left">No</th>
-                            <th class="px-4 py-3 text-left">Asset No</th>
-                            <th class="px-4 py-3 text-left">Deskripsi</th>
-                            <th class="px-4 py-3 text-center">Qty</th>
-                            <th class="px-4 py-3 text-left">Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700 text-gray-900 dark:text-white">
-                        @foreach ($stf->items as $item)
-                            <tr>
-                                <td class="px-4 py-3">{{ $loop->iteration }}</td>
-                                <td class="px-4 py-3 font-mono">{{ $item->asset_no }}</td>
-                                <td class="px-4 py-3">{{ $item->description }}</td>
-                                <td class="px-4 py-3 text-center">{{ $item->quantity }}</td>
-                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $item->notes ?? '-' }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+            @php
+                $input = 'block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm';
+            @endphp
+            <form method="POST" action="{{ route('stf.items.update', $stf) }}" class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-4">
+                @csrf @method('PUT')
+                <div class="flex items-center justify-between">
+                    <h3 class="font-semibold text-gray-900 dark:text-white">Rincian Aset</h3>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Bisa diedit, mis. isi spesifikasi manual.</span>
+                </div>
+                @foreach ($stf->items as $i => $item)
+                    <div class="border border-gray-100 dark:border-gray-700 rounded-lg p-4 space-y-3">
+                        <p class="text-xs text-gray-500">{{ $loop->iteration }}. <span class="font-mono text-brand-500">{{ $item->asset_no }}</span></p>
+                        <input type="hidden" name="items[{{ $i }}][id]" value="{{ $item->id }}">
+                        <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
+                            <div class="md:col-span-3">
+                                <label class="text-xs text-gray-500">Deskripsi</label>
+                                <input type="text" name="items[{{ $i }}][description]" required class="{{ $input }}" value="{{ $item->description }}">
+                            </div>
+                            <div class="md:col-span-1">
+                                <label class="text-xs text-gray-500">Qty</label>
+                                <input type="number" min="1" name="items[{{ $i }}][quantity]" required class="{{ $input }}" value="{{ $item->quantity }}">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="text-xs text-gray-500">Notes</label>
+                                <input type="text" name="items[{{ $i }}][notes]" class="{{ $input }}" value="{{ $item->notes }}">
+                            </div>
+                            <div class="md:col-span-6">
+                                <label class="text-xs text-gray-500">Spesifikasi (Processor, RAM, SSD)</label>
+                                <textarea name="items[{{ $i }}][spec]" rows="2" class="{{ $input }}" placeholder="mis. Processor: Intel i5 | RAM: 8 GB | SSD: 256 GB">{{ $item->spec }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+                <button type="submit" class="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600">Simpan Perubahan</button>
+            </form>
 
             <a href="{{ route('stf.index') }}" class="text-sm text-brand-500 hover:underline">&larr; Kembali ke daftar STF</a>
         </div>

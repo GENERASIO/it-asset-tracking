@@ -159,6 +159,29 @@ class StfController extends Controller
         return view('stf.show', compact('stf'));
     }
 
+    public function updateItems(Request $request, StfDocument $stf)
+    {
+        $data = $request->validate([
+            'items' => ['required', 'array'],
+            'items.*.id' => ['required', 'integer'],
+            'items.*.description' => ['required', 'string', 'max:255'],
+            'items.*.spec' => ['nullable', 'string', 'max:500'],
+            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:10000'],
+            'items.*.notes' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        foreach ($data['items'] as $row) {
+            $stf->items()->where('id', $row['id'])->update([
+                'description' => $row['description'],
+                'spec' => $row['spec'] ?? null,
+                'quantity' => $row['quantity'],
+                'notes' => $row['notes'] ?? null,
+            ]);
+        }
+
+        return redirect()->route('stf.show', $stf)->with('success', 'Rincian STF diperbarui.');
+    }
+
     public function pdf(StfDocument $stf)
     {
         $stf->load(['items', 'fromLocation', 'toLocation']);
