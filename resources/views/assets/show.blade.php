@@ -301,15 +301,22 @@
                                     </div>
                                 </div>
                             @else
+                                @php
+                                    $locStatus = $asset->location_status;
+                                    $locInfo = match ($locStatus) {
+                                        'skipped_not_office_wifi' => ['Laptop sedang tidak tersambung Wi-Fi kantor.', 'Ini normal — lokasi hanya direkam saat di Wi-Fi kantor. Akan muncul otomatis saat laptop kembali ke Wi-Fi kantor dan check-in berikutnya.'],
+                                        'unavailable' => ['Di Wi-Fi kantor, tapi Windows belum bisa menentukan posisi.', 'Location Services mungkin baru dinyalakan atau belum dapat sinyal. Coba jalankan check-in lagi sebentar lagi (Task Scheduler → ITAssetAgentCheckin → Run).'],
+                                        default => ['Belum ada titik GPS.', 'Pastikan Location Services aktif (jalankan Setup.exe) dan laptop pernah tersambung Wi-Fi kantor setelah agent terpasang. Titik muncul pada check-in berikutnya.'],
+                                    };
+                                @endphp
                                 <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                                     <span class="text-sm text-gray-500">Lokasi Terakhir (GPS)</span>
                                     <div class="mt-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 text-sm">
-                                        <p class="font-medium">Belum ada titik GPS.</p>
-                                        <p class="mt-1 text-xs">Lokasi hanya terekam saat laptop tersambung Wi-Fi kantor <span class="font-medium">dan</span> Location Services Windows aktif. Kalau belum muncul:</p>
-                                        <ul class="mt-1 text-xs list-disc list-inside space-y-0.5">
-                                            <li>Jalankan <span class="font-medium">updater .exe</span> di laptop ini untuk menyalakan Location Services, atau</li>
-                                            <li>Pastikan laptop pernah tersambung Wi-Fi kantor setelah agent terpasang.</li>
-                                        </ul>
+                                        <p class="font-medium">{{ $locInfo[0] }}</p>
+                                        <p class="mt-1 text-xs">{{ $locInfo[1] }}</p>
+                                        @if ($asset->last_seen_at)
+                                            <p class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80">Check-in terakhir: {{ $asset->last_seen_at->diffForHumans() }}.</p>
+                                        @endif
                                     </div>
                                 </div>
                             @endif

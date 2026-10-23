@@ -14,7 +14,7 @@ class Asset extends Model
         'specification', 'location_id', 'assigned_to', 'status',
         'purchase_date', 'purchase_price', 'current_value', 'purchase_price_estimated', 'warranty_expired_at', 'photo',
         'hostname', 'os_name', 'os_version', 'cpu', 'ram_gb', 'storage_gb', 'mac_address', 'last_seen_at',
-        'latitude', 'longitude', 'location_accuracy_m', 'geo_captured_at', 'reported_lost_at',
+        'latitude', 'longitude', 'location_accuracy_m', 'geo_captured_at', 'location_status', 'reported_lost_at',
         'inventory_synced_at', 'crack_indicators',
     ];
 

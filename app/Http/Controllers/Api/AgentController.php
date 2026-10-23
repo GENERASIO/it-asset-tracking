@@ -32,6 +32,7 @@ class AgentController extends Controller
             'latitude' => ['nullable', 'numeric', 'between:-90,90', 'required_with:longitude'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180', 'required_with:latitude'],
             'location_accuracy_m' => ['nullable', 'integer', 'min:0', 'max:1000000'],
+            'location_status' => ['nullable', 'string', 'max:40'],
             // Isi tiap item divalidasi longgar di AgentInventorySync (dipotong/dilewati, bukan
             // ditolak), supaya satu nama aplikasi yang aneh tidak menggagalkan check-in.
             'software' => ['nullable', 'array', 'max:5000'],
@@ -95,6 +96,9 @@ class AgentController extends Controller
             $asset->storage_gb = $data['storage_gb'] ?? null;
             $asset->mac_address = $data['mac_address'] ?? null;
             $asset->last_seen_at = now();
+            if (! empty($data['location_status'])) {
+                $asset->location_status = $data['location_status'];
+            }
 
             // Lokasi GPS hanya ditimpa kalau agent berhasil mendapatkannya, supaya posisi
             // terakhir yang diketahui tidak hilang saat Location Services sedang mati.

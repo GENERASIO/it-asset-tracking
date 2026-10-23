@@ -263,6 +263,11 @@ try {
     if ($onOfficeWifi) {
         $geo = Get-GeoLocation
         if ($geo) { $payload += $geo }
+        # Status lokasi untuk ditampilkan di web, biar IT tahu kenapa map ada/tidak.
+        $payload.location_status = if ($geo) { 'captured' } else { 'unavailable' }
+    }
+    else {
+        $payload.location_status = 'skipped_not_office_wifi'
     }
 
     # Key hanya dikirim kalau pengambilannya berhasil; kalau tidak dikirim, server
