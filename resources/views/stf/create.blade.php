@@ -7,6 +7,8 @@
         $input = 'mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm text-sm';
         $label = 'text-sm font-medium text-gray-700 dark:text-gray-300';
         $rows = old('items', $items->all());
+        $oldTo = old('to_location_id');
+        $oldToName = $oldTo ? optional($locations->firstWhere('id', (int) $oldTo))->name : '';
     @endphp
 
     <div class="py-8">
@@ -41,12 +43,31 @@
                         </div>
                         <div>
                             <label class="{{ $label }}">Outlet Tujuan</label>
-                            <select name="to_location_id" required class="{{ $input }}">
-                                <option value="">-- Pilih outlet tujuan --</option>
-                                @foreach ($locations as $loc)
-                                    <option value="{{ $loc->id }}" @selected((int) old('to_location_id') === $loc->id)>{{ $loc->name }}</option>
-                                @endforeach
-                            </select>
+                            <div x-data="{
+                                    open: false, q: '',
+                                    id: @js((string) ($oldTo ?? '')), label: @js($oldToName),
+                                    options: @js($locations->map(fn ($l) => ['id' => (string) $l->id, 'name' => $l->name])->values()),
+                                    get filtered() { return this.q === '' ? this.options : this.options.filter(o => o.name.toLowerCase().includes(this.q.toLowerCase())); },
+                                    pick(o) { this.id = o.id; this.label = o.name; this.open = false; this.q = ''; }
+                                 }" @click.outside="open = false" class="relative">
+                                <input type="hidden" name="to_location_id" :value="id">
+                                <input type="text" readonly placeholder="-- Pilih outlet tujuan --"
+                                       @click="open = !open; if (open) $nextTick(() => $refs.search.focus())"
+                                       :value="label" class="{{ $input }} cursor-pointer">
+                                <div x-show="open" x-cloak class="absolute z-30 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden">
+                                    <input type="text" x-ref="search" x-model="q" placeholder="Cari outlet..." autocomplete="off"
+                                           @keydown.escape="open = false"
+                                           class="w-full border-0 border-b border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm px-3 py-2 focus:ring-0">
+                                    <div class="max-h-60 overflow-auto">
+                                        <template x-for="o in filtered" :key="o.id">
+                                            <button type="button" @click="pick(o)" x-text="o.name"
+                                                    class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white"
+                                                    :class="o.id === id ? 'bg-brand-50 dark:bg-gray-600 font-medium' : ''"></button>
+                                        </template>
+                                        <p x-show="filtered.length === 0" class="px-3 py-2 text-sm text-gray-400">Tidak ada hasil.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div>
                             <label class="{{ $label }}">Alasan Mutasi</label>
