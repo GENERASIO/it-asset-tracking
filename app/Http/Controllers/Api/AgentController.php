@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\AssetLog;
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\PriceReference;
@@ -38,7 +39,10 @@ class AgentController extends Controller
             'crack_indicators' => ['nullable', 'array', 'max:50'],
         ]);
 
-        [$asset, $created] = DB::transaction(function () use ($data) {
+        // Pelaku log = user pembuat token agent yang dipakai laptop ini.
+        $handledBy = optional($request->attributes->get('agentToken'))->created_by;
+
+        [$asset, $created] = DB::transaction(function () use ($data, $handledBy) {
             // lockForUpdate juga menutup celah dua check-in dengan serial_number yang
             // sama datang bersamaan (salah satu akan menunggu transaksi lain selesai).
             $asset = Asset::where('serial_number', $data['serial_number'])->lockForUpdate()->first();
@@ -102,6 +106,18 @@ class AgentController extends Controller
             }
 
             $asset->save();
+
+            // Catat aktivitas saat perangkat baru pertama kali didaftarkan agent,
+            // supaya muncul di notifikasi, aktivitas terbaru, dan tab Aktivitas aset.
+            if ($created && $handledBy) {
+                AssetLog::create([
+                    'asset_id' => $asset->id,
+                    'action' => 'agent_register',
+                    'status_after' => $asset->status,
+                    'notes' => 'Perangkat baru didaftarkan otomatis oleh agent',
+                    'handled_by' => $handledBy,
+                ]);
+            }
 
             // Agent lama tidak mengirim key software/licenses, jadi data inventaris yang
             // sudah ada tidak ikut terhapus.

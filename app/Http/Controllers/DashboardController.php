@@ -73,6 +73,7 @@ class DashboardController extends Controller
                             'check_in' => 'melakukan checkin',
                             'transfer' => 'memindahkan',
                             'status_change' => 'mengubah status',
+                            'agent_register' => 'mendaftarkan perangkat baru (via agent)',
                             default => $log->action,
                         },
                         'created_at' => $log->created_at,

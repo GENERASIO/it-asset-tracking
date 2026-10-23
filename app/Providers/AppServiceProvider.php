@@ -105,10 +105,27 @@ class AppServiceProvider extends ServiceProvider
                 ];
             });
 
-        return $warrantyAlerts->concat($overdueMaintenances)
+        // Perangkat baru dari agent yang belum ditinjau (belum ada pemegang & lokasi
+        // masih "Tidak Diketahui"). Ditaruh paling atas supaya mudah dikenali.
+        $newDevices = Asset::whereNotNull('last_seen_at')
+            ->whereNull('assigned_to')
+            ->whereHas('location', fn ($q) => $q->where('name', 'Tidak Diketahui'))
+            ->latest('created_at')
+            ->take(10)
+            ->get()
+            ->map(fn ($asset) => [
+                'severity' => 'info',
+                'title' => $asset->asset_code.' — '.($asset->name ?: 'Perangkat baru'),
+                'subtitle' => 'Perangkat baru terdaftar '.$asset->created_at->diffForHumans().' · perlu ditinjau',
+                'url' => route('asset-merge.create', $asset),
+            ]);
+
+        $alerts = $warrantyAlerts->concat($overdueMaintenances)
             ->concat($assetLicenseAlerts)
             ->concat($entitlementAlerts)
             ->sortBy(fn ($notif) => $notif['severity'] === 'danger' ? 0 : 1)
             ->values();
+
+        return $newDevices->concat($alerts)->values();
     }
 }

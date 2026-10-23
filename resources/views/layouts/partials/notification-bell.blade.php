@@ -26,7 +26,7 @@
             @forelse ($navNotifications as $notif)
                 <a href="{{ $notif['url'] }}"
                    class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition border-b border-gray-100 dark:border-gray-700 last:border-b-0">
-                    <span class="mt-1.5 w-2 h-2 rounded-full shrink-0 {{ $notif['severity'] === 'danger' ? 'bg-red-500' : 'bg-yellow-500' }}"></span>
+                    <span class="mt-1.5 w-2 h-2 rounded-full shrink-0 {{ ['danger' => 'bg-red-500', 'info' => 'bg-blue-500'][$notif['severity']] ?? 'bg-yellow-500' }}"></span>
                     <div class="min-w-0">
                         <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $notif['title'] }}</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">{{ $notif['subtitle'] }}</p>
