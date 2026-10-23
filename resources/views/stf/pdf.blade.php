@@ -76,10 +76,10 @@
             <td class="space"></td>
         </tr>
         <tr>
-            <td>( {{ $stf->sender_name }} )<br>Staff IT</td>
-            <td>( ................... )<br>Outlet Penerima</td>
-            <td>( {{ $stf->supervisor_name }} )<br>Atasan</td>
-            <td>( ................... )<br>Tim Asset</td>
+            <td>( {{ $stf->sender_name }} )</td>
+            <td>( ................... )</td>
+            <td>( {{ $stf->supervisor_name }} )</td>
+            <td>( ................... )</td>
         </tr>
     </table>
 </body>
