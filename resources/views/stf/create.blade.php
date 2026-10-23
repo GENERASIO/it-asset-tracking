@@ -126,7 +126,7 @@
                                 <input type="hidden" name="items[{{ $i }}][asset_no]" value="{{ $row['asset_no'] ?? '' }}">
                                 <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
                                     <div class="md:col-span-3">
-                                        <label class="{{ $label }}">Deskripsi / Spesifikasi</label>
+                                        <label class="{{ $label }}">Deskripsi</label>
                                         <input type="text" name="items[{{ $i }}][description]" required class="{{ $input }}" value="{{ $row['description'] ?? '' }}">
                                     </div>
                                     <div class="md:col-span-1">
@@ -136,6 +136,10 @@
                                     <div class="md:col-span-2">
                                         <label class="{{ $label }}">Notes</label>
                                         <input type="text" name="items[{{ $i }}][notes]" class="{{ $input }}" value="{{ $row['notes'] ?? '' }}">
+                                    </div>
+                                    <div class="md:col-span-6">
+                                        <label class="{{ $label }}">Spesifikasi (Processor, RAM, SSD)</label>
+                                        <textarea name="items[{{ $i }}][spec]" rows="2" class="{{ $input }}" placeholder="Otomatis dari data agent, bisa diubah">{{ $row['spec'] ?? '' }}</textarea>
                                     </div>
                                 </div>
                             </div>

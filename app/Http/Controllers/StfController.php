@@ -44,13 +44,23 @@ class StfController extends Controller
         $fromIds = $assets->pluck('location_id')->unique()->filter();
         $fromLocationId = $fromIds->count() === 1 ? $fromIds->first() : null;
 
-        $items = $assets->map(fn ($a) => [
-            'asset_id' => $a->id,
-            'asset_no' => $a->asset_code,
-            'description' => trim(($a->brand ?? '').' '.($a->model ?? '')) ?: $a->name,
-            'quantity' => 1,
-            'notes' => '',
-        ]);
+        $items = $assets->map(function ($a) {
+            $specParts = array_filter([
+                $a->cpu ? 'Processor: '.$a->cpu : null,
+                $a->ram_gb ? 'RAM: '.$a->ram_gb.' GB' : null,
+                $a->storage_gb ? 'Storage: '.$a->storage_gb.' GB' : null,
+            ]);
+            $spec = $specParts ? implode("\n", $specParts) : (string) $a->specification;
+
+            return [
+                'asset_id' => $a->id,
+                'asset_no' => $a->asset_code,
+                'description' => trim(($a->brand ?? '').' '.($a->model ?? '')) ?: $a->name,
+                'spec' => $spec,
+                'quantity' => 1,
+                'notes' => '',
+            ];
+        });
 
         $senders = config('bast.first_parties', []);
         $defaultSender = in_array($request->user()->name, $senders, true) ? $request->user()->name : '';
@@ -83,6 +93,7 @@ class StfController extends Controller
             'items.*.asset_id' => ['nullable', 'integer', 'exists:assets,id'],
             'items.*.asset_no' => ['required', 'string', 'max:255'],
             'items.*.description' => ['required', 'string', 'max:255'],
+            'items.*.spec' => ['nullable', 'string', 'max:500'],
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:10000'],
             'items.*.notes' => ['nullable', 'string', 'max:255'],
         ], [
@@ -108,6 +119,7 @@ class StfController extends Controller
                     'asset_id' => $item['asset_id'] ?? null,
                     'asset_no' => $item['asset_no'],
                     'description' => $item['description'],
+                    'spec' => $item['spec'] ?? null,
                     'to_location_name' => $toLocation->name,
                     'quantity' => $item['quantity'],
                     'notes' => $item['notes'] ?? null,

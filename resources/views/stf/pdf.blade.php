@@ -17,6 +17,7 @@
         table.items th { font-weight: bold; text-align: center; background: #f0f0ec; }
         table.items td.center { text-align: center; }
         .desc { font-family: Helvetica, Arial, sans-serif; font-size: 10pt; }
+        .desc .spec { font-size: 8.5pt; color: #555; margin-top: 2px; line-height: 1.25; }
         table.sign { width: 100%; margin-top: 34px; border-collapse: collapse; }
         table.sign td { width: 25%; text-align: center; vertical-align: top; font-size: 10.5pt; }
         table.sign .space { height: 80px; }
@@ -53,7 +54,12 @@
                 <tr>
                     <td class="center">{{ $loop->iteration }}</td>
                     <td class="center">{{ $item->asset_no }}</td>
-                    <td class="desc">{{ $item->description }}</td>
+                    <td class="desc">
+                        {{ $item->description }}
+                        @if ($item->spec)
+                            <div class="spec">{!! nl2br(e($item->spec)) !!}</div>
+                        @endif
+                    </td>
                     <td class="center">{{ $item->to_location_name }}</td>
                     <td class="center">{{ $item->quantity }}</td>
                     <td class="desc">{{ $item->notes }}</td>
