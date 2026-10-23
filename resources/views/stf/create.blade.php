@@ -9,13 +9,14 @@
         $rows = old('items', $items->all());
         $oldTo = old('to_location_id');
         $oldToName = $oldTo ? optional($locations->firstWhere('id', (int) $oldTo))->name : '';
+        $oldFrom = old('from_location_id', $defaults['from_location_id']);
+        $oldFromName = $oldFrom ? optional($locations->firstWhere('id', (int) $oldFrom))->name : '';
     @endphp
 
     <div class="py-8">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <form method="POST" action="{{ route('stf.store') }}" class="space-y-6">
                 @csrf
-                <input type="hidden" name="from_location_id" value="{{ old('from_location_id', $defaults['from_location_id']) }}">
 
                 @if ($errors->any())
                     <div class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">
@@ -38,8 +39,32 @@
                         </div>
                         <div>
                             <label class="{{ $label }}">Outlet Asal</label>
-                            <input type="text" class="{{ $input }} bg-gray-100 dark:bg-gray-600" value="{{ $defaults['from_location_name'] }}" readonly>
-                            <p class="text-xs text-gray-500 mt-1">Otomatis dari lokasi aset yang dipilih.</p>
+                            <div x-data="{
+                                    open: false, q: '',
+                                    id: @js((string) ($oldFrom ?? '')), label: @js($oldFromName),
+                                    options: @js($locations->map(fn ($l) => ['id' => (string) $l->id, 'name' => $l->name])->values()),
+                                    get filtered() { return this.q === '' ? this.options : this.options.filter(o => o.name.toLowerCase().includes(this.q.toLowerCase())); },
+                                    pick(o) { this.id = o.id; this.label = o.name; this.open = false; this.q = ''; }
+                                 }" @click.outside="open = false" class="relative">
+                                <input type="hidden" name="from_location_id" :value="id">
+                                <input type="text" readonly placeholder="-- Pilih outlet asal --"
+                                       @click="open = !open; if (open) $nextTick(() => $refs.searchFrom.focus())"
+                                       :value="label" class="{{ $input }} cursor-pointer">
+                                <div x-show="open" x-cloak class="absolute z-30 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden">
+                                    <input type="text" x-ref="searchFrom" x-model="q" placeholder="Cari outlet..." autocomplete="off"
+                                           @keydown.escape="open = false"
+                                           class="w-full border-0 border-b border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm px-3 py-2 focus:ring-0">
+                                    <div class="max-h-60 overflow-auto">
+                                        <template x-for="o in filtered" :key="o.id">
+                                            <button type="button" @click="pick(o)" x-text="o.name"
+                                                    class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white"
+                                                    :class="o.id === id ? 'bg-brand-50 dark:bg-gray-600 font-medium' : ''"></button>
+                                        </template>
+                                        <p x-show="filtered.length === 0" class="px-3 py-2 text-sm text-gray-400">Tidak ada hasil.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Terisi otomatis dari lokasi aset, bisa diubah.</p>
                         </div>
                         <div>
                             <label class="{{ $label }}">Outlet Tujuan</label>
