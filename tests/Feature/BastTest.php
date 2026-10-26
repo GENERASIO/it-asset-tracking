@@ -108,7 +108,7 @@ class BastTest extends TestCase
         $this->actingAs($this->staff)->get(route('bast.show', $bast))
             ->assertOk()
             ->assertSee('Outlet Kemang')
-            ->assertSee('Belum upload tanda tangan');
+            ->assertSee('Belum ditandatangani');
 
         $this->actingAs($this->staff)->get(route('bast.pdf', $bast))
             ->assertOk()

@@ -89,8 +89,8 @@
             <td>PIHAK KEDUA</td>
         </tr>
         <tr>
-            <td class="space"></td>
-            <td class="space"></td>
+            <td class="space">@if (($sig1 ?? null))<img src="{{ $sig1 }}" style="height:78px" alt="TTD">@endif</td>
+            <td class="space">@if (($sig2 ?? null))<img src="{{ $sig2 }}" style="height:78px" alt="TTD">@endif</td>
         </tr>
         <tr>
             <td>( {{ $bast->first_party_name }} )</td>

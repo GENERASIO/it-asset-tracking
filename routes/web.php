@@ -25,6 +25,10 @@ Route::get('/', function () {
 // Halaman publik (tanpa login) yang dibuka waktu scan QR di label aset - info dasar saja.
 Route::get('/scan/{asset}', [AssetController::class, 'publicInfo'])->name('assets.public-info');
 
+// Tanda tangan digital BAST oleh penerima - publik (pakai token rahasia di URL).
+Route::get('/bast/sign/{token}', [BastController::class, 'signShow'])->name('bast.sign.show');
+Route::post('/bast/sign/{token}', [BastController::class, 'signStore'])->name('bast.sign.store');
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -76,6 +80,7 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::post('/bast', [BastController::class, 'store'])->name('bast.store');
     Route::get('/bast/{bast}', [BastController::class, 'show'])->name('bast.show');
     Route::get('/bast/{bast}/pdf', [BastController::class, 'pdf'])->name('bast.pdf');
+    Route::post('/bast/{bast}/sign-first', [BastController::class, 'signFirst'])->name('bast.sign-first');
     Route::post('/bast/{bast}/signed', [BastController::class, 'uploadSigned'])->name('bast.signed.upload');
     Route::get('/bast/{bast}/signed', [BastController::class, 'signedFile'])->name('bast.signed.show');
     Route::delete('/bast/{bast}', [BastController::class, 'destroy'])->name('bast.destroy');

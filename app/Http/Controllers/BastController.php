@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class BastController extends Controller
@@ -151,10 +152,87 @@ class BastController extends Controller
 
         $logoPath = public_path('images/logo.png');
         $logo = is_file($logoPath) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath)) : null;
+        $sig1 = $this->signatureDataUri($bast->first_party_signature);
+        $sig2 = $this->signatureDataUri($bast->second_party_signature);
 
-        return Pdf::loadView('bast.pdf', compact('bast', 'logo'))
+        return Pdf::loadView('bast.pdf', compact('bast', 'logo', 'sig1', 'sig2'))
             ->setPaper('a4')
             ->stream($bast->pdf_filename);
+    }
+
+    /** Halaman publik (tanpa login) untuk tanda tangan digital oleh penerima. */
+    public function signShow(string $token)
+    {
+        $bast = BastDocument::with('items')->where('sign_token', $token)->firstOrFail();
+
+        return view('bast.sign', compact('bast'));
+    }
+
+    public function signStore(Request $request, string $token)
+    {
+        $bast = BastDocument::where('sign_token', $token)->firstOrFail();
+
+        $data = $request->validate([
+            'signature' => ['required', 'string', 'max:1200000'],
+        ]);
+
+        $path = $this->saveSignatureDataUrl($data['signature']);
+        abort_unless($path, 422, 'Tanda tangan tidak terbaca. Coba ulangi.');
+
+        if ($bast->second_party_signature) {
+            Storage::disk(BastDocument::SIGNED_DISK)->delete($bast->second_party_signature);
+        }
+
+        $bast->update(['second_party_signature' => $path, 'second_party_signed_at' => now()]);
+
+        return redirect()->route('bast.sign.show', $token)->with('signed', true);
+    }
+
+    /** Tanda tangan Pihak Pertama (IT) dari dalam aplikasi. */
+    public function signFirst(Request $request, BastDocument $bast)
+    {
+        $data = $request->validate([
+            'signature' => ['required', 'string', 'max:1200000'],
+        ]);
+
+        $path = $this->saveSignatureDataUrl($data['signature']);
+        abort_unless($path, 422, 'Tanda tangan tidak terbaca.');
+
+        if ($bast->first_party_signature) {
+            Storage::disk(BastDocument::SIGNED_DISK)->delete($bast->first_party_signature);
+        }
+
+        $bast->update(['first_party_signature' => $path, 'first_party_signed_at' => now()]);
+
+        return back()->with('success', 'Tanda tangan Pihak Pertama tersimpan.');
+    }
+
+    private function signatureDataUri(?string $path): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        $disk = Storage::disk(BastDocument::SIGNED_DISK);
+
+        return $disk->exists($path) ? 'data:image/png;base64,'.base64_encode($disk->get($path)) : null;
+    }
+
+    private function saveSignatureDataUrl(string $dataUrl): ?string
+    {
+        if (! preg_match('#^data:image/png;base64,#', $dataUrl)) {
+            return null;
+        }
+
+        $raw = base64_decode(substr($dataUrl, strlen('data:image/png;base64,')), true);
+        if ($raw === false || strlen($raw) < 100 || strlen($raw) > 800000) {
+            return null;
+        }
+
+        $path = BastDocument::SIGN_DIR.'/'.Str::random(40).'.png';
+        Storage::disk(BastDocument::SIGNED_DISK)->put($path, $raw);
+
+        return $path;
     }
 
     public function uploadSigned(Request $request, BastDocument $bast)
