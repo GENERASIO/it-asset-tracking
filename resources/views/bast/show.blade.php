@@ -156,28 +156,41 @@
             @endif
 
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Scan BAST yang Sudah Ditandatangani</h3>
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Arsip Dokumen Ditandatangani</h3>
 
-                @if ($bast->isSigned())
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                        <a href="{{ route('bast.signed.show', $bast) }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $bast->signed_file_original_name ?: 'Lihat file' }}</a>
-                        <span class="text-gray-400">· di-upload {{ $bast->signed_uploaded_at?->diffForHumans() }}</span>
+                @if ($bast->isDigitallySigned() && ! $bast->isSigned())
+                    <p class="text-sm text-green-600 dark:text-green-400">
+                        ✓ Sudah bertanda tangan digital. PDF final (tombol <b>Cetak / Unduh PDF</b> di atas) otomatis lengkap dengan tanda tangan — <b>upload scan tidak diperlukan</b>.
                     </p>
+                    <details class="mt-3">
+                        <summary class="text-sm text-gray-500 dark:text-gray-400 cursor-pointer">Upload scan manual (opsional)</summary>
+                        <form action="{{ route('bast.signed.upload', $bast) }}" method="POST" enctype="multipart/form-data" class="flex flex-wrap items-center gap-3 mt-3">
+                            @csrf
+                            <input type="file" name="signed_file" required accept=".pdf,.jpg,.jpeg,.png" class="text-sm text-gray-700 dark:text-gray-300">
+                            <button type="submit" class="bg-gray-800 dark:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 dark:hover:bg-gray-500">Upload</button>
+                            <span class="text-xs text-gray-400">PDF, JPG, atau PNG · maks 10 MB</span>
+                        </form>
+                    </details>
                 @else
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                        Cetak PDF di atas, tandatangani kedua pihak, lalu upload hasil scan / foto di sini sebagai arsip.
-                    </p>
+                    @if ($bast->isSigned())
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                            <a href="{{ route('bast.signed.show', $bast) }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $bast->signed_file_original_name ?: 'Lihat file' }}</a>
+                            <span class="text-gray-400">· di-upload {{ $bast->signed_uploaded_at?->diffForHumans() }}</span>
+                        </p>
+                    @else
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            Kalau tanda tangan dilakukan di kertas, cetak PDF di atas, tandatangani, lalu upload hasil scan / foto di sini sebagai arsip. (Atau pakai tanda tangan digital di atas — lebih cepat.)
+                        </p>
+                    @endif
+                    <form action="{{ route('bast.signed.upload', $bast) }}" method="POST" enctype="multipart/form-data" class="flex flex-wrap items-center gap-3">
+                        @csrf
+                        <input type="file" name="signed_file" required accept=".pdf,.jpg,.jpeg,.png" class="text-sm text-gray-700 dark:text-gray-300">
+                        <button type="submit" class="bg-gray-800 dark:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 dark:hover:bg-gray-500">
+                            {{ $bast->isSigned() ? 'Ganti File' : 'Upload' }}
+                        </button>
+                        <span class="text-xs text-gray-400">PDF, JPG, atau PNG · maks 10 MB</span>
+                    </form>
                 @endif
-
-                <form action="{{ route('bast.signed.upload', $bast) }}" method="POST" enctype="multipart/form-data" class="flex flex-wrap items-center gap-3">
-                    @csrf
-                    <input type="file" name="signed_file" required accept=".pdf,.jpg,.jpeg,.png"
-                           class="text-sm text-gray-700 dark:text-gray-300">
-                    <button type="submit" class="bg-gray-800 dark:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 dark:hover:bg-gray-500">
-                        {{ $bast->isSigned() ? 'Ganti File' : 'Upload' }}
-                    </button>
-                    <span class="text-xs text-gray-400">PDF, JPG, atau PNG · maks 10 MB</span>
-                </form>
             </div>
         </div>
     </div>
