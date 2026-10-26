@@ -26,7 +26,11 @@ class AssetCodeGenerator
 
             $prefix = strtoupper($category->code) . '-' . strtoupper($location->code);
 
-            $lastNumber = Asset::where('asset_code', 'like', $prefix . '-%')
+            // withTrashed(): kode aset yang sudah dihapus (soft-delete) tetap memakai slot
+            // nomornya karena unique index mencakup baris terhapus. Tanpa ini, nomor baru
+            // bisa bentrok dengan aset terhapus dan insert gagal.
+            $lastNumber = Asset::withTrashed()
+                ->where('asset_code', 'like', $prefix . '-%')
                 ->lockForUpdate()
                 ->selectRaw('MAX(CAST(SUBSTRING_INDEX(asset_code, "-", -1) AS UNSIGNED)) as max_num')
                 ->value('max_num') ?? 0;
