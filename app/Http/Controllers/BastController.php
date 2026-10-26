@@ -186,7 +186,9 @@ class BastController extends Controller
         ]);
 
         $path = $this->saveSignatureDataUrl($data['signature']);
-        abort_unless($path, 422, 'Tanda tangan tidak terbaca. Coba ulangi.');
+        if (! $path) {
+            return back()->withErrors(['signature' => 'Tanda tangan kosong atau tidak terbaca. Mohon tanda tangan ulang dengan jelas.']);
+        }
 
         if ($bast->second_party_signature) {
             Storage::disk(BastDocument::SIGNED_DISK)->delete($bast->second_party_signature);
@@ -205,7 +207,9 @@ class BastController extends Controller
         ]);
 
         $path = $this->saveSignatureDataUrl($data['signature']);
-        abort_unless($path, 422, 'Tanda tangan tidak terbaca.');
+        if (! $path) {
+            return back()->withErrors(['signature' => 'Tanda tangan kosong atau tidak terbaca. Mohon tanda tangan ulang.']);
+        }
 
         if ($bast->first_party_signature) {
             Storage::disk(BastDocument::SIGNED_DISK)->delete($bast->first_party_signature);
@@ -238,10 +242,47 @@ class BastController extends Controller
             return null;
         }
 
+        // Tolak tanda tangan kosong (hampir tanpa coretan) kalau GD tersedia.
+        if (! $this->signatureHasInk($raw)) {
+            return null;
+        }
+
         $path = BastDocument::SIGN_DIR.'/'.Str::random(40).'.png';
         Storage::disk(BastDocument::SIGNED_DISK)->put($path, $raw);
 
         return $path;
+    }
+
+    /** true kalau gambar punya cukup piksel bertinta (bukan kosong). Lewati kalau GD tak ada. */
+    private function signatureHasInk(string $png): bool
+    {
+        if (! function_exists('imagecreatefromstring')) {
+            return true;
+        }
+
+        $img = @imagecreatefromstring($png);
+        if (! $img) {
+            return true;
+        }
+
+        $w = imagesx($img);
+        $h = imagesy($img);
+        $stepX = max(1, (int) ($w / 150));
+        $stepY = max(1, (int) ($h / 80));
+        $ink = 0;
+
+        for ($x = 0; $x < $w; $x += $stepX) {
+            for ($y = 0; $y < $h; $y += $stepY) {
+                $alpha = (imagecolorat($img, $x, $y) & 0x7F000000) >> 24; // 0 = opaque, 127 = transparan
+                if ($alpha < 100) {
+                    $ink++;
+                }
+            }
+        }
+
+        imagedestroy($img);
+
+        return $ink >= 12;
     }
 
     public function uploadSigned(Request $request, BastDocument $bast)

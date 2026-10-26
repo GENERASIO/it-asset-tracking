@@ -142,15 +142,16 @@
                     (function () {
                         var canvas = document.getElementById('firstPad');
                         if (!canvas) return;
-                        var ctx = canvas.getContext('2d'); var drawing = false, empty = true;
+                        var ctx = canvas.getContext('2d'); var drawing = false;
                         function resize() { var r = window.devicePixelRatio || 1, rect = canvas.getBoundingClientRect(); canvas.width = rect.width * r; canvas.height = rect.height * r; ctx.scale(r, r); ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#111827'; }
                         function pt(e) { var rect = canvas.getBoundingClientRect(); return { x: e.clientX - rect.left, y: e.clientY - rect.top }; }
+                        function ink() { try { var d = ctx.getImageData(0, 0, canvas.width, canvas.height).data, n = 0; for (var i = 3; i < d.length; i += 4) { if (d[i] > 10) n++; } return n; } catch (e) { return 9999; } }
                         canvas.addEventListener('pointerdown', function (e) { drawing = true; var p = pt(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); });
-                        canvas.addEventListener('pointermove', function (e) { if (!drawing) return; var p = pt(e); ctx.lineTo(p.x, p.y); ctx.stroke(); empty = false; e.preventDefault(); });
+                        canvas.addEventListener('pointermove', function (e) { if (!drawing) return; var p = pt(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); });
                         window.addEventListener('pointerup', function () { drawing = false; });
                         window.addEventListener('load', resize);
-                        document.getElementById('firstClear').addEventListener('click', function () { ctx.clearRect(0, 0, canvas.width, canvas.height); empty = true; });
-                        document.getElementById('firstSignForm').addEventListener('submit', function (e) { if (empty) { e.preventDefault(); alert('Mohon tanda tangan dulu.'); return; } document.getElementById('firstSig').value = canvas.toDataURL('image/png'); });
+                        document.getElementById('firstClear').addEventListener('click', function () { ctx.clearRect(0, 0, canvas.width, canvas.height); });
+                        document.getElementById('firstSignForm').addEventListener('submit', function (e) { if (ink() < 200) { e.preventDefault(); alert('Mohon tanda tangan dulu dengan jelas.'); return; } document.getElementById('firstSig').value = canvas.toDataURL('image/png'); });
                     })();
                 </script>
             @endif
