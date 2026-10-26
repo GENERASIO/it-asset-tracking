@@ -28,6 +28,7 @@ Route::get('/scan/{asset}', [AssetController::class, 'publicInfo'])->name('asset
 // Tanda tangan digital BAST oleh penerima - publik (pakai token rahasia di URL).
 Route::get('/bast/sign/{token}', [BastController::class, 'signShow'])->name('bast.sign.show');
 Route::post('/bast/sign/{token}', [BastController::class, 'signStore'])->name('bast.sign.store');
+Route::get('/bast/sign/{token}/pdf', [BastController::class, 'signPdf'])->name('bast.sign.pdf');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');

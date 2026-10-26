@@ -54,6 +54,14 @@ class BastSignTest extends TestCase
             ->assertSessionHasErrors('signature');
     }
 
+    public function test_pdf_publik_bisa_dibuka_lewat_token(): void
+    {
+        $bast = $this->makeBast();
+        $res = $this->get(route('bast.sign.pdf', $bast->sign_token));
+        $res->assertOk();
+        $this->assertStringContainsString('application/pdf', strtolower($res->headers->get('content-type') ?? ''));
+    }
+
     public function test_token_salah_404(): void
     {
         $this->get(route('bast.sign.show', 'token-ngawur'))->assertNotFound();

@@ -25,7 +25,12 @@
                 </div>
                 <h1 class="text-base font-semibold text-gray-900">Terima kasih, {{ $bast->second_party_name }}!</h1>
                 <p class="text-sm text-gray-500 mt-1">Tanda tangan Anda sudah tersimpan @if ($bast->second_party_signed_at) pada {{ $bast->second_party_signed_at->translatedFormat('d M Y H:i') }}@endif.</p>
-                <p class="text-xs text-gray-400 mt-2">Kalau tanda tangan belum benar/kosong, Anda bisa <b>tanda tangan ulang</b> di bawah ini.</p>
+                <a href="{{ route('bast.sign.pdf', $bast->sign_token) }}" target="_blank"
+                   class="inline-flex items-center gap-1.5 mt-3 bg-brand-500 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-brand-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                    Unduh Dokumen BAST (PDF)
+                </a>
+                <p class="text-xs text-gray-400 mt-3">Kalau tanda tangan belum benar/kosong, Anda bisa <b>tanda tangan ulang</b> di bawah ini.</p>
             </div>
         @endif
 

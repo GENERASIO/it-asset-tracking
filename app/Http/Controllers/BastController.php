@@ -157,16 +157,25 @@ class BastController extends Controller
 
     public function pdf(BastDocument $bast)
     {
-        $bast->load('items.asset');
+        return $this->renderPdf($bast->load('items.asset'))->stream($bast->pdf_filename);
+    }
 
+    /** PDF dokumen lewat token (publik) - untuk dikirim ke penerima via WhatsApp. */
+    public function signPdf(string $token)
+    {
+        $bast = BastDocument::with('items.asset')->where('sign_token', $token)->firstOrFail();
+
+        return $this->renderPdf($bast)->stream($bast->pdf_filename);
+    }
+
+    private function renderPdf(BastDocument $bast)
+    {
         $logoPath = public_path('images/logo.png');
         $logo = is_file($logoPath) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath)) : null;
         $sig1 = $this->signatureDataUri($bast->first_party_signature);
         $sig2 = $this->signatureDataUri($bast->second_party_signature);
 
-        return Pdf::loadView('bast.pdf', compact('bast', 'logo', 'sig1', 'sig2'))
-            ->setPaper('a4')
-            ->stream($bast->pdf_filename);
+        return Pdf::loadView('bast.pdf', compact('bast', 'logo', 'sig1', 'sig2'))->setPaper('a4');
     }
 
     /** Halaman publik (tanpa login) untuk tanda tangan digital oleh penerima. */
