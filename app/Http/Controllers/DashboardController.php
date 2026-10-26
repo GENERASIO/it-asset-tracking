@@ -74,6 +74,8 @@ class DashboardController extends Controller
                             'transfer' => 'memindahkan',
                             'status_change' => 'mengubah status',
                             'agent_register' => 'mendaftarkan perangkat baru (via agent)',
+                            'location_update' => 'memperbarui lokasi GPS',
+                            'transfer' => 'memindahkan',
                             default => $log->action,
                         },
                         'created_at' => $log->created_at,
@@ -100,7 +102,24 @@ class DashboardController extends Controller
                 ->take(10)
                 ->values();
 
-            return view('dashboard', compact('stats', 'byCategory', 'recentAssets', 'warrantySoon', 'warrantyAlerts', 'overdueMaintenances', 'recentActivities'));
+            // Aktivitas agent: pendaftaran perangkat baru & update lokasi GPS (biar tim langsung tahu).
+            $agentActivities = AssetLog::with('asset')
+                ->whereIn('action', ['agent_register', 'location_update'])
+                ->latest()
+                ->take(8)
+                ->get()
+                ->filter(fn ($log) => $log->asset)
+                ->map(fn ($log) => [
+                    'kind' => $log->action,
+                    'asset_code' => $log->asset->asset_code,
+                    'asset_id' => $log->asset->id,
+                    'name' => $log->asset->name,
+                    'label' => $log->action === 'agent_register' ? 'Perangkat baru terdaftar' : 'Lokasi GPS diperbarui',
+                    'created_at' => $log->created_at,
+                ])
+                ->values();
+
+            return view('dashboard', compact('stats', 'byCategory', 'recentAssets', 'warrantySoon', 'warrantyAlerts', 'overdueMaintenances', 'recentActivities', 'agentActivities'));
         }
 
         // Role "user" biasa: lihat aset miliknya sendiri

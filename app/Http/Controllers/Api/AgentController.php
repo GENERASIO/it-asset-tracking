@@ -102,7 +102,14 @@ class AgentController extends Controller
 
             // Lokasi GPS hanya ditimpa kalau agent berhasil mendapatkannya, supaya posisi
             // terakhir yang diketahui tidak hilang saat Location Services sedang mati.
+            $geoUpdated = false;
             if (isset($data['latitude'], $data['longitude'])) {
+                $hadGeo = ! is_null($asset->geo_captured_at);
+                // Dianggap "update" kalau baru pertama dapat titik, atau bergeser > ~50 m.
+                $geoUpdated = ! $hadGeo
+                    || abs((float) $asset->latitude - (float) $data['latitude']) > 0.0005
+                    || abs((float) $asset->longitude - (float) $data['longitude']) > 0.0005;
+
                 $asset->latitude = $data['latitude'];
                 $asset->longitude = $data['longitude'];
                 $asset->location_accuracy_m = $data['location_accuracy_m'] ?? null;
@@ -119,6 +126,15 @@ class AgentController extends Controller
                     'action' => 'agent_register',
                     'status_after' => $asset->status,
                     'notes' => 'Perangkat baru didaftarkan otomatis oleh agent',
+                    'handled_by' => $handledBy,
+                ]);
+            } elseif ($geoUpdated && $handledBy) {
+                // Lokasi GPS baru/berpindah -> catat supaya tim tahu "maps live" sudah update.
+                AssetLog::create([
+                    'asset_id' => $asset->id,
+                    'action' => 'location_update',
+                    'status_after' => $asset->status,
+                    'notes' => 'Lokasi GPS diperbarui dari agent',
                     'handled_by' => $handledBy,
                 ]);
             }

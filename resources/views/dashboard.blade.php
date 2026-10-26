@@ -140,6 +140,37 @@
                     </div>
                 </div>
 
+                {{-- AKTIVITAS AGENT --}}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-gray-700 dark:text-gray-300">Aktivitas Agent Terbaru</h3>
+                        <span class="text-xs text-gray-400">Pendaftaran perangkat &amp; update lokasi GPS</span>
+                    </div>
+                    <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                        @forelse ($agentActivities ?? [] as $act)
+                            <a href="{{ route('assets.show', $act['asset_id']) }}" class="flex items-center gap-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-2 -mx-2">
+                                <span class="shrink-0 w-8 h-8 flex items-center justify-center rounded-full {{ $act['kind'] === 'agent_register' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300' : 'bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-300' }}">
+                                    @if ($act['kind'] === 'agent_register')
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                                    @else
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                                    @endif
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm text-gray-900 dark:text-white truncate">
+                                        <span class="font-mono font-semibold text-brand-500">{{ $act['asset_code'] }}</span>
+                                        · {{ $act['label'] }}
+                                    </p>
+                                    <p class="text-xs text-gray-400">{{ $act['name'] }}</p>
+                                </div>
+                                <span class="shrink-0 text-xs text-gray-400">{{ $act['created_at']->diffForHumans() }}</span>
+                            </a>
+                        @empty
+                            <p class="py-4 text-sm text-gray-400 text-center">Belum ada aktivitas agent.</p>
+                        @endforelse
+                    </div>
+                </div>
+
                 {{-- QUICK ACTIONS --}}
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 p-5">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aksi Cepat</h3>
