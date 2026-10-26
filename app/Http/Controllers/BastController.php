@@ -19,8 +19,8 @@ class BastController extends Controller
         $search = trim((string) $request->query('q'));
 
         $documents = BastDocument::with('items.asset')
-            ->when($status === 'unsigned', fn ($q) => $q->whereNull('signed_file'))
-            ->when($status === 'signed', fn ($q) => $q->whereNotNull('signed_file'))
+            ->when($status === 'unsigned', fn ($q) => $q->whereNull('signed_file')->whereNull('second_party_signed_at'))
+            ->when($status === 'signed', fn ($q) => $q->where(fn ($q) => $q->whereNotNull('signed_file')->orWhereNotNull('second_party_signed_at')))
             ->when($search !== '', function ($q) use ($search) {
                 $q->where(function ($q) use ($search) {
                     $q->where('second_party_name', 'like', "%{$search}%")
@@ -35,7 +35,7 @@ class BastController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        $unsignedCount = BastDocument::whereNull('signed_file')->count();
+        $unsignedCount = BastDocument::whereNull('signed_file')->whereNull('second_party_signed_at')->count();
 
         return view('bast.index', compact('documents', 'status', 'search', 'unsignedCount'));
     }

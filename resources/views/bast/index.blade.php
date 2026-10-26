@@ -17,7 +17,7 @@
                                class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm min-w-[220px]">
                         <select name="status" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
                             <option value="">Semua status</option>
-                            <option value="unsigned" @selected($status === 'unsigned')>Belum upload tanda tangan ({{ $unsignedCount }})</option>
+                            <option value="unsigned" @selected($status === 'unsigned')>Belum ditandatangani ({{ $unsignedCount }})</option>
                             <option value="signed" @selected($status === 'signed')>Sudah ditandatangani</option>
                         </select>
                         <button type="submit" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm">Cari</button>
@@ -56,9 +56,11 @@
                                     </td>
                                     <td class="px-4 py-2 whitespace-nowrap">
                                         @if ($bast->isSigned())
-                                            <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Sudah ditandatangani</span>
+                                            <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Sudah ditandatangani (scan)</span>
+                                        @elseif ($bast->isDigitallySigned())
+                                            <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Ditandatangani digital</span>
                                         @else
-                                            <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">Belum upload</span>
+                                            <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">Belum ditandatangani</span>
                                         @endif
                                     </td>
                                 </tr>
