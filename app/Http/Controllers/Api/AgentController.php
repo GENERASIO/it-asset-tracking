@@ -146,6 +146,14 @@ class AgentController extends Controller
             return [$asset, $created];
         });
 
+        if ($created) {
+            \App\Support\SlackNotifier::send(
+                "🆕 *Perangkat baru terdaftar* (via agent)\n"
+                ."`{$asset->asset_code}` — {$asset->name}".($asset->hostname ? " · host: {$asset->hostname}" : '')."\n"
+                .route('assets.show', $asset)
+            );
+        }
+
         $scriptPath = self::scriptPath($data['os_name']);
 
         return response()->json([

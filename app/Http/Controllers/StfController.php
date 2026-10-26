@@ -148,6 +148,13 @@ class StfController extends Controller
             return $document;
         });
 
+        \App\Support\SlackNotifier::send(
+            "🔁 *Mutasi aset (STF)* {$document->number}\n"
+            .(optional($document->fromLocation)->name ?? 'Beberapa lokasi').' → '.optional($document->toLocation)->name
+            ." · oleh {$document->sender_name}\n"
+            .route('stf.show', $document)
+        );
+
         return redirect()->route('stf.show', $document)
             ->with('success', 'STF berhasil dibuat & aset dipindahkan ke outlet tujuan. Cetak PDF-nya lalu tandatangani.');
     }

@@ -215,6 +215,12 @@ class BastController extends Controller
 
         $bast->update(['second_party_signature' => $path, 'second_party_signed_at' => now()]);
 
+        \App\Support\SlackNotifier::send(
+            "✍️ *BAST ditandatangani* oleh {$bast->second_party_name}\n"
+            ."{$bast->handover_date_label} — diserahkan oleh {$bast->first_party_name}\n"
+            .route('bast.show', $bast)
+        );
+
         return redirect()->route('bast.sign.show', $token)->with('signed', true);
     }
 
