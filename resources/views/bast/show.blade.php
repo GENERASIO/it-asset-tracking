@@ -194,4 +194,20 @@
             </div>
         </div>
     </div>
+
+    @if (! $bast->second_party_signed_at)
+        <script>
+            (function () {
+                var url = @js(route('bast.status', $bast));
+                var tries = 0;
+                var timer = setInterval(function () {
+                    if (++tries > 120) { clearInterval(timer); return; } // berhenti setelah ~20 menit
+                    fetch(url, { headers: { 'Accept': 'application/json' } })
+                        .then(function (r) { return r.ok ? r.json() : null; })
+                        .then(function (d) { if (d && d.second_signed) { clearInterval(timer); location.reload(); } })
+                        .catch(function () {});
+                }, 10000);
+            })();
+        </script>
+    @endif
 </x-app-layout>

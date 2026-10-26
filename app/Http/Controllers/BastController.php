@@ -146,6 +146,15 @@ class BastController extends Controller
         return view('bast.show', compact('bast'));
     }
 
+    /** Dipakai halaman detail untuk auto-refresh saat penerima tanda tangan. */
+    public function status(BastDocument $bast)
+    {
+        return response()->json([
+            'first_signed' => (bool) $bast->first_party_signed_at,
+            'second_signed' => (bool) $bast->second_party_signed_at,
+        ]);
+    }
+
     public function pdf(BastDocument $bast)
     {
         $bast->load('items.asset');

@@ -59,6 +59,22 @@ class BastSignTest extends TestCase
         $this->get(route('bast.sign.show', 'token-ngawur'))->assertNotFound();
     }
 
+    public function test_endpoint_status_untuk_auto_refresh(): void
+    {
+        Storage::fake('local');
+        $staff = User::factory()->create(['role' => 'it_staff']);
+        $bast = $this->makeBast();
+
+        $this->actingAs($staff)->getJson(route('bast.status', $bast))
+            ->assertOk()->assertJson(['second_signed' => false]);
+
+        $dataUrl = 'data:image/png;base64,'.base64_encode(str_repeat('x', 400));
+        $this->post(route('bast.sign.store', $bast->sign_token), ['signature' => $dataUrl]);
+
+        $this->actingAs($staff)->getJson(route('bast.status', $bast))
+            ->assertOk()->assertJson(['second_signed' => true]);
+    }
+
     public function test_pihak_pertama_bisa_tanda_tangan_dari_aplikasi(): void
     {
         Storage::fake('local');

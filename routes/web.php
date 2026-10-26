@@ -79,6 +79,7 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::get('/bast/create', [BastController::class, 'create'])->name('bast.create');
     Route::post('/bast', [BastController::class, 'store'])->name('bast.store');
     Route::get('/bast/{bast}', [BastController::class, 'show'])->name('bast.show');
+    Route::get('/bast/{bast}/status', [BastController::class, 'status'])->name('bast.status');
     Route::get('/bast/{bast}/pdf', [BastController::class, 'pdf'])->name('bast.pdf');
     Route::post('/bast/{bast}/sign-first', [BastController::class, 'signFirst'])->name('bast.sign-first');
     Route::post('/bast/{bast}/signed', [BastController::class, 'uploadSigned'])->name('bast.signed.upload');
