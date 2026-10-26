@@ -60,15 +60,24 @@ class BastController extends Controller
 
         $holders = $assets->pluck('assignedUser.name')->unique();
 
-        $items = $assets->map(fn ($asset) => [
-            'asset_id' => $asset->id,
-            'asset_code' => $asset->asset_code,
-            'item_type' => $asset->category->name ?? '',
-            'detail' => trim(($asset->brand ?? '').' '.($asset->model ?? '')) ?: $asset->name,
-            'serial_number' => $asset->serial_number,
-            'quantity' => 1,
-            'condition' => $asset->logs->first()?->condition ?? '',
-        ]);
+        $items = $assets->map(function ($asset) {
+            $parts = array_filter([
+                $asset->cpu ? 'Processor: '.$asset->cpu : null,
+                $asset->ram_gb ? 'RAM: '.$asset->ram_gb.' GB' : null,
+                $asset->storage_gb ? 'Storage: '.$asset->storage_gb.' GB' : null,
+            ]);
+
+            return [
+                'asset_id' => $asset->id,
+                'asset_code' => $asset->asset_code,
+                'item_type' => $asset->category->name ?? '',
+                'detail' => trim(($asset->brand ?? '').' '.($asset->model ?? '')) ?: $asset->name,
+                'spec' => $parts ? implode("\n", $parts) : (string) $asset->specification,
+                'serial_number' => $asset->serial_number,
+                'quantity' => 1,
+                'condition' => $asset->logs->first()?->condition ?? '',
+            ];
+        });
 
         $firstParties = config('bast.first_parties', []);
 
@@ -108,6 +117,7 @@ class BastController extends Controller
             'items.*.asset_id' => ['nullable', 'integer', 'exists:assets,id'],
             'items.*.item_type' => ['required', 'string', 'max:255'],
             'items.*.detail' => ['required', 'string', 'max:255'],
+            'items.*.spec' => ['nullable', 'string', 'max:500'],
             'items.*.serial_number' => ['nullable', 'string', 'max:255'],
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:10000'],
             'items.*.condition' => ['required', 'string', 'max:50'],

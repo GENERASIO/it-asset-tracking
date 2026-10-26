@@ -65,6 +65,9 @@
                                     <td class="px-3 py-2 text-gray-900 dark:text-white">{{ $item->item_type }}</td>
                                     <td class="px-3 py-2 text-gray-900 dark:text-white">
                                         {{ $item->detail }}
+                                        @if ($item->spec)
+                                            <span class="block text-xs text-gray-500 dark:text-gray-400 whitespace-pre-line">{{ $item->spec }}</span>
+                                        @endif
                                         @if ($item->asset)
                                             <a href="{{ route('assets.show', $item->asset) }}" class="block text-xs font-mono text-blue-600 dark:text-blue-400 hover:underline">{{ $item->asset->asset_code }}</a>
                                         @endif

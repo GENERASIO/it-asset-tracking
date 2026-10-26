@@ -18,6 +18,7 @@
         table.items th { font-weight: normal; text-align: center; }
         table.items td.center { text-align: center; }
         table.items td.detail { font-family: Helvetica, Arial, sans-serif; font-size: 10pt; }
+        table.items td.detail .spec { font-size: 8pt; color: #555; margin-top: 2px; line-height: 1.25; }
         table.items td.condition { font-family: Helvetica, Arial, sans-serif; font-size: 9pt; }
         .closing { text-align: justify; margin: 24px 0 28px; }
         .signatures { width: 100%; margin-top: 30px; }
@@ -68,7 +69,12 @@
                 <tr>
                     <td class="center">{{ $loop->iteration }}</td>
                     <td class="center">{{ $item->item_type }}</td>
-                    <td class="detail">{{ $item->detail }}</td>
+                    <td class="detail">
+                        {{ $item->detail }}
+                        @if ($item->spec)
+                            <div class="spec">{!! nl2br(e($item->spec)) !!}</div>
+                        @endif
+                    </td>
                     <td class="center detail">{{ $item->serial_number ?: '-' }}</td>
                     <td class="center">{{ $item->quantity }}</td>
                     <td class="condition">{{ mb_strtoupper($item->condition) }}</td>

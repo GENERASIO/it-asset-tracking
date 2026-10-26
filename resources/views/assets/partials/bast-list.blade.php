@@ -14,9 +14,11 @@
                 {{ $bast->handover_date_label }} — ke {{ $bast->second_party_name }}
             </span>
             @if ($bast->isSigned())
-                <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Sudah ditandatangani</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Sudah ditandatangani (scan)</span>
+            @elseif ($bast->isDigitallySigned())
+                <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Ditandatangani digital</span>
             @else
-                <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">Belum upload tanda tangan</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">Belum ditandatangani</span>
             @endif
         </a>
     @empty

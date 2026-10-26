@@ -112,6 +112,10 @@
                                         <label class="{{ $label }}">Kondisi</label>
                                         <input type="text" name="items[{{ $i }}][condition]" required list="bast-conditions" class="{{ $input }}" value="{{ $row['condition'] ?? '' }}">
                                     </div>
+                                    <div class="col-span-2 md:col-span-6">
+                                        <label class="{{ $label }}">Spesifikasi (Processor, RAM, SSD)</label>
+                                        <textarea name="items[{{ $i }}][spec]" rows="2" class="{{ $input }}" placeholder="Otomatis dari data agent, bisa diubah">{{ $row['spec'] ?? '' }}</textarea>
+                                    </div>
                                 </div>
                             </div>
                         @endforeach
