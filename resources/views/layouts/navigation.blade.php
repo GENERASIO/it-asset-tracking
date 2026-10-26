@@ -255,11 +255,7 @@
                     {{ __('Aset') }}
                 </x-sidebar-nav-link>
 
-                @php
-                    $mergeCount = \App\Models\Asset::whereNotNull('last_seen_at')->whereNull('assigned_to')
-                        ->whereHas('location', fn ($q) => $q->where('name', 'Tidak Diketahui'))->count();
-                @endphp
-                @if ($mergeCount > 0)
+                @if (($navMergeCount ?? 0) > 0)
                     <x-sidebar-nav-link :href="route('asset-merge.index')" :active="request()->routeIs('asset-merge.*')">
                         <x-slot name="icon">
                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -267,7 +263,7 @@
                             </svg>
                         </x-slot>
                         {{ __('Tinjau Agent') }}
-                        <span class="ml-auto text-xs bg-red-500 text-white rounded-full px-2 py-0.5">{{ $mergeCount }}</span>
+                        <span class="ml-auto text-xs bg-red-500 text-white rounded-full px-2 py-0.5">{{ $navMergeCount }}</span>
                     </x-sidebar-nav-link>
                 @endif
 

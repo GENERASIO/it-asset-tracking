@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\AssetLicense;
 use App\Models\MaintenanceLog;
 use App\Models\SoftwareEntitlement;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,7 +26,25 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('layouts.navigation', function ($view) {
-            $view->with('navNotifications', $this->buildNavNotifications());
+            $user = auth()->user();
+
+            $payload = ['notifications' => collect(), 'mergeCount' => 0];
+
+            if ($user && in_array($user->role, ['super_admin', 'it_staff'])) {
+                // Cache 60 detik per user: hilangkan ~7 query notifikasi/badge di tiap halaman.
+                $payload = Cache::remember('navbar:'.$user->id, 60, function () {
+                    return [
+                        'notifications' => $this->buildNavNotifications(),
+                        'mergeCount' => Asset::whereNotNull('last_seen_at')
+                            ->whereNull('assigned_to')
+                            ->whereHas('location', fn ($q) => $q->where('name', 'Tidak Diketahui'))
+                            ->count(),
+                    ];
+                });
+            }
+
+            $view->with('navNotifications', $payload['notifications'])
+                ->with('navMergeCount', $payload['mergeCount']);
         });
     }
 
