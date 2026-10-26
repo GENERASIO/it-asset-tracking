@@ -20,7 +20,7 @@ class SlackNotifier
         }
 
         try {
-            Http::timeout(4)->post($url, ['text' => $text]);
+            Http::timeout(3)->post($url, ['text' => $text]);
         } catch (\Throwable $e) {
             Log::warning('Slack notify gagal: '.$e->getMessage());
         }

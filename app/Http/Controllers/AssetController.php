@@ -385,6 +385,21 @@ class AssetController extends Controller
             'handled_by' => $request->user()->id,
         ]);
 
+        if ($oldStatus !== $request->status) {
+            $by = $request->user()->name;
+            $new = $request->status;
+            $url = route('assets.show', $asset);
+            // Dikirim setelah response (terminating) supaya dropdown status tetap cepat.
+            app()->terminating(function () use ($asset, $oldStatus, $new, $by, $url) {
+                $labels = ['available' => 'Available', 'in_use' => 'In Use', 'maintenance' => 'Maintenance', 'broken' => 'Broken', 'retired' => 'Retired'];
+                \App\Support\SlackNotifier::send(
+                    "🔧 *Status aset diubah* oleh {$by}\n"
+                    ."`{$asset->asset_code}` — {$asset->name}\n"
+                    .($labels[$oldStatus] ?? $oldStatus).' → *'.($labels[$new] ?? $new)."*\n".$url
+                );
+            });
+        }
+
         return response()->json(['success' => true]);
     }
 
@@ -398,6 +413,15 @@ class AssetController extends Controller
         $message = $lost
             ? 'Aset ditandai HILANG. Agent akan melacak lokasi di mana pun pada check-in berikutnya.'
             : 'Aset ditandai sudah ditemukan. Lokasi kembali hanya dicatat di Wi-Fi kantor.';
+
+        $by = $request->user()->name;
+        $url = route('assets.show', $asset);
+        app()->terminating(function () use ($asset, $lost, $by, $url) {
+            \App\Support\SlackNotifier::send(
+                ($lost ? '🚨 *Aset DITANDAI HILANG*' : '✅ *Aset ditandai DITEMUKAN*')." oleh {$by}\n"
+                ."`{$asset->asset_code}` — {$asset->name}\n".$url
+            );
+        });
 
         return back()->with('success', $message);
     }
