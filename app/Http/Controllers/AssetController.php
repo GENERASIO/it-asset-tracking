@@ -67,7 +67,7 @@ class AssetController extends Controller
             session(['assets_view' => $requestedView]);
             $view = $requestedView;
         } else {
-            $view = session('assets_view', 'board');
+            $view = session('assets_view', 'table');
         }
 
         $query = $this->filteredAssets($request)->with(['category', 'location', 'assignedUser']);
