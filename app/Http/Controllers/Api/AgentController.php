@@ -104,16 +104,26 @@ class AgentController extends Controller
             // terakhir yang diketahui tidak hilang saat Location Services sedang mati.
             $geoUpdated = false;
             if (isset($data['latitude'], $data['longitude'])) {
-                $hadGeo = ! is_null($asset->geo_captured_at);
-                // Dianggap "update" kalau baru pertama dapat titik, atau bergeser > ~50 m.
-                $geoUpdated = ! $hadGeo
-                    || abs((float) $asset->latitude - (float) $data['latitude']) > 0.0005
-                    || abs((float) $asset->longitude - (float) $data['longitude']) > 0.0005;
+                $lat = (float) $data['latitude'];
+                $lng = (float) $data['longitude'];
+                // Semua outlet YAY di Indonesia. Titik di luar batas wajar Indonesia hampir pasti
+                // salah (mis. laptop pakai VPN / Windows geolokasi via IP luar negeri) -> abaikan.
+                $inIndonesia = $lat >= -11.5 && $lat <= 6.5 && $lng >= 94.5 && $lng <= 141.5;
 
-                $asset->latitude = $data['latitude'];
-                $asset->longitude = $data['longitude'];
-                $asset->location_accuracy_m = $data['location_accuracy_m'] ?? null;
-                $asset->geo_captured_at = now();
+                if ($inIndonesia) {
+                    $hadGeo = ! is_null($asset->geo_captured_at);
+                    $geoUpdated = ! $hadGeo
+                        || abs((float) $asset->latitude - $lat) > 0.0005
+                        || abs((float) $asset->longitude - $lng) > 0.0005;
+
+                    $asset->latitude = $lat;
+                    $asset->longitude = $lng;
+                    $asset->location_accuracy_m = $data['location_accuracy_m'] ?? null;
+                    $asset->geo_captured_at = now();
+                } else {
+                    // Titik tidak masuk akal: jangan simpan, tandai supaya IT paham sebabnya.
+                    $asset->location_status = 'outside_region';
+                }
             }
 
             $asset->save();

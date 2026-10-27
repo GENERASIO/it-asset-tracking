@@ -306,6 +306,7 @@
                                     $locInfo = match ($locStatus) {
                                         'skipped_not_office_wifi' => ['Laptop sedang tidak tersambung Wi-Fi kantor.', 'Ini normal — lokasi hanya direkam saat di Wi-Fi kantor. Akan muncul otomatis saat laptop kembali ke Wi-Fi kantor dan check-in berikutnya.'],
                                         'unavailable' => ['Di Wi-Fi kantor, tapi Windows belum bisa menentukan posisi.', 'Location Services mungkin baru dinyalakan atau belum dapat sinyal. Coba jalankan check-in lagi sebentar lagi (Task Scheduler → ITAssetAgentCheckin → Run).'],
+                                        'outside_region' => ['Lokasi terbaca di luar Indonesia — diabaikan.', 'Kemungkinan laptop memakai VPN atau Windows salah menentukan posisi lewat IP. Matikan VPN saat ingin lokasi akurat, lalu check-in lagi.'],
                                         default => ['Belum ada titik GPS.', 'Pastikan Location Services aktif (jalankan Setup.exe) dan laptop pernah tersambung Wi-Fi kantor setelah agent terpasang. Titik muncul pada check-in berikutnya.'],
                                     };
                                 @endphp
