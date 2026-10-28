@@ -289,8 +289,23 @@ class AssetController extends Controller
             $validated['purchase_price_estimated'] = false;
         }
 
+        $oldAssignedTo = $asset->assigned_to;
+
         $asset->update($validated);
         $this->storePhotos($asset, $photos);
+
+        // Catat pergantian "Dipegang Oleh" ke riwayat aktivitas, supaya pemegang lama tetap terlacak.
+        if ((int) $oldAssignedTo !== (int) $asset->assigned_to) {
+            \App\Models\AssetLog::create([
+                'asset_id' => $asset->id,
+                'action' => 'assignment_change',
+                'from_user_id' => $oldAssignedTo,
+                'to_user_id' => $asset->assigned_to,
+                'status_after' => $asset->status,
+                'notes' => 'Pemegang aset diubah via Edit oleh ' . $request->user()->name,
+                'handled_by' => $request->user()->id,
+            ]);
+        }
 
         if ($request->wantsJson()) {
             return response()->json(['success' => true, 'message' => 'Aset berhasil diperbarui.']);

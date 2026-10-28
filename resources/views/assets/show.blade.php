@@ -404,9 +404,23 @@
                     <div class="border border-gray-100 dark:border-gray-700 rounded-lg p-4">
                         <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Riwayat Mutasi / Check-in-Check-out</h3>
                         @forelse ($asset->logs as $log)
+                            @php
+                                $actionLabel = [
+                                    'check_out' => 'Check-out',
+                                    'check_in' => 'Check-in',
+                                    'transfer' => 'Mutasi',
+                                    'assignment_change' => 'Ganti Pemegang',
+                                    'status_change' => 'Ubah Status',
+                                    'agent_register' => 'Didaftarkan Agent',
+                                    'location_update' => 'Update Lokasi',
+                                ][$log->action] ?? ucfirst(str_replace('_',' ',$log->action));
+                                // Untuk ganti pemegang, "tidak ada" lebih jelas daripada "Gudang".
+                                $fromLabel = $log->fromUser->name ?? ($log->action === 'assignment_change' ? '(tidak ada)' : 'Gudang');
+                                $toLabel = $log->toUser->name ?? ($log->action === 'assignment_change' ? '(tidak ada)' : 'Gudang');
+                            @endphp
                             <div class="border-b dark:border-gray-700 py-2 text-sm">
-                                <span class="font-medium text-gray-900 dark:text-white">{{ ucfirst(str_replace('_',' ',$log->action)) }}</span>
-                                — {{ $log->fromUser->name ?? 'Gudang' }} → {{ $log->toUser->name ?? 'Gudang' }}
+                                <span class="font-medium text-gray-900 dark:text-white">{{ $actionLabel }}</span>
+                                — {{ $fromLabel }} → {{ $toLabel }}
                                 @if ($log->condition)
                                     <span class="text-xs text-gray-500">(kondisi: {{ $log->condition }})</span>
                                 @endif
