@@ -512,17 +512,28 @@
                     @php
                         $historyItems = collect();
 
+                        $actionLabels = [
+                            'check_out' => 'Check-out',
+                            'check_in' => 'Check-in',
+                            'transfer' => 'Mutasi',
+                            'assignment_change' => 'Ganti Pemegang',
+                            'status_change' => 'Ubah Status',
+                            'agent_register' => 'Didaftarkan Agent',
+                            'location_update' => 'Update Lokasi',
+                        ];
+
                         foreach ($asset->logs as $log) {
                             $description = match ($log->action) {
                                 'check_out' => 'Check-out ke ' . ($log->toUser->name ?? '-'),
                                 'check_in' => 'Check-in dari ' . ($log->fromUser->name ?? '-') . ', status jadi ' . ucfirst(str_replace('_', ' ', $log->status_after)),
                                 'transfer' => 'Transfer dari ' . ($log->fromUser->name ?? 'Gudang') . ' ke ' . ($log->toUser->name ?? 'Gudang'),
+                                'assignment_change' => 'Pemegang diubah dari ' . ($log->fromUser->name ?? '(tidak ada)') . ' ke ' . ($log->toUser->name ?? '(tidak ada)'),
                                 'status_change' => 'Status berubah dari ' . ucfirst(str_replace('_', ' ', $log->status_before)) . ' ke ' . ucfirst(str_replace('_', ' ', $log->status_after)),
                                 default => ucfirst(str_replace('_', ' ', $log->action)),
                             };
 
                             $historyItems->push([
-                                'type' => 'Mutasi — ' . ucfirst(str_replace('_', ' ', $log->action)),
+                                'type' => $actionLabels[$log->action] ?? ucfirst(str_replace('_', ' ', $log->action)),
                                 'description' => $description,
                                 'user' => $log->handledBy->name ?? '-',
                                 'date' => $log->created_at,
