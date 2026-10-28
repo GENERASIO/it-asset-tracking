@@ -30,14 +30,14 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Kategori</label>
-                            <select id="category_id" name="category_id" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
+                            <x-searchable-field id="category_id" name="category_id" placeholder="-- Pilih Kategori --">
                                 <option value="">-- Pilih Kategori --</option>
                                 @foreach ($categories as $cat)
                                     <option value="{{ $cat->id }}" @selected(old('category_id') == $cat->id)>
                                         {{ $cat->name }} ({{ $cat->code }})
                                     </option>
                                 @endforeach
-                            </select>
+                            </x-searchable-field>
                             @if (auth()->user()->role === 'super_admin')
                                 <x-quick-add-category-modal target-select-id="category_id" />
                             @endif
@@ -46,14 +46,14 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Lokasi</label>
-                            <select id="location_id" name="location_id" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
+                            <x-searchable-field id="location_id" name="location_id" placeholder="-- Pilih Lokasi --">
                                 <option value="">-- Pilih Lokasi --</option>
                                 @foreach ($locations as $loc)
                                     <option value="{{ $loc->id }}" @selected(old('location_id') == $loc->id)>
                                         {{ $loc->name }} ({{ $loc->code }})
                                     </option>
                                 @endforeach
-                            </select>
+                            </x-searchable-field>
                             @if (auth()->user()->role === 'super_admin')
                                 <x-quick-add-location-modal target-select-id="location_id" />
                             @endif
@@ -89,14 +89,14 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Dipegang Oleh (opsional)</label>
-                            <select id="assigned_to" name="assigned_to" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
+                            <x-searchable-field id="assigned_to" name="assigned_to" placeholder="-- Tidak Ada --">
                                 <option value="">-- Tidak Ada --</option>
                                 @foreach ($users as $user)
                                     <option value="{{ $user->id }}" @selected(old('assigned_to') == $user->id)>
                                         {{ $user->name }}
                                     </option>
                                 @endforeach
-                            </select>
+                            </x-searchable-field>
                             @if (auth()->user()->role === 'super_admin')
                                 <x-quick-add-user-modal target-select-id="assigned_to" :locations="$locations" />
                             @endif
