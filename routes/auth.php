@@ -22,17 +22,16 @@ Route::middleware('guest')->group(function () {
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-        ->name('password.request');
-
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-        ->name('password.email');
-
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
-
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
+    // Lupa password dimatikan — server belum punya pengiriman email (MAIL_MAILER=log).
+    // Password direset oleh super_admin lewat menu Kelola User.
+    // Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+    //     ->name('password.request');
+    // Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+    //     ->name('password.email');
+    // Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+    //     ->name('password.reset');
+    // Route::post('reset-password', [NewPasswordController::class, 'store'])
+    //     ->name('password.store');
 });
 
 Route::middleware('auth')->group(function () {
