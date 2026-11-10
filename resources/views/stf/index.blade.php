@@ -1,6 +1,6 @@
-<x-app-layout title="Mutasi Aset (STF)">
+<x-app-layout title="Mutasi Asset (STF)">
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">Mutasi Aset (STF)</h2>
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">Mutasi Asset (STF)</h2>
     </x-slot>
 
     <div class="py-8">

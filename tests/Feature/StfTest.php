@@ -64,7 +64,7 @@ class StfTest extends TestCase
         $this->actingAs($staff)->get(route('stf.create', ['ids' => [$asset->id]]))
             ->assertOk()->assertSee('Outlet Tujuan')->assertSee('LTP-HO-0001');
 
-        $this->actingAs($staff)->get(route('stf.index'))->assertOk()->assertSee('Mutasi Aset');
+        $this->actingAs($staff)->get(route('stf.index'))->assertOk()->assertSee('Mutasi Asset (STF)');
     }
 
     public function test_pic_pengirim_harus_dari_daftar(): void
