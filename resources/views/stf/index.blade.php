@@ -21,6 +21,7 @@
                             <th class="px-4 py-3 text-left">Tanggal</th>
                             <th class="px-4 py-3 text-left">Asal &rarr; Tujuan</th>
                             <th class="px-4 py-3 text-left">PIC Pengirim</th>
+                            <th class="px-4 py-3 text-left">TTD Penerima</th>
                             <th class="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -33,6 +34,7 @@
                                 <td class="px-4 py-3">{{ $doc->transfer_date_long }}</td>
                                 <td class="px-4 py-3">{{ optional($doc->fromLocation)->name ?? 'Beberapa lokasi' }} &rarr; {{ optional($doc->toLocation)->name }}</td>
                                 <td class="px-4 py-3">{{ $doc->sender_name }}</td>
+                                <td class="px-4 py-3">@if ($doc->isReceiverSigned())<span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">✓ {{ $doc->receiver_name }}</span>@else<span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">Menunggu</span>@endif</td>
                                 <td class="px-4 py-3 text-right whitespace-nowrap">
                                     <div class="flex items-center justify-end gap-1">
                                         <a href="{{ route('stf.show', $doc) }}" title="Lihat"
@@ -55,7 +57,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">Belum ada STF. Buat dari halaman Aset.</td></tr>
+                            <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">Belum ada STF. Buat dari halaman Aset.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

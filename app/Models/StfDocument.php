@@ -11,14 +11,40 @@ class StfDocument extends Model
         'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
     ];
 
+    public const SIGN_DIR = 'stf/signatures';
+
     protected $fillable = [
         'transfer_date', 'from_location_id', 'to_location_id',
         'reason', 'sender_name', 'supervisor_name', 'created_by',
+        'sign_token', 'sender_signature', 'sender_signed_at',
+        'receiver_name', 'receiver_signature', 'receiver_signed_at',
     ];
 
     protected $casts = [
         'transfer_date' => 'date',
+        'sender_signed_at' => 'datetime',
+        'receiver_signed_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (StfDocument $stf) {
+            if (empty($stf->sign_token)) {
+                $stf->sign_token = \Illuminate\Support\Str::random(48);
+            }
+        });
+    }
+
+    public function isReceiverSigned(): bool
+    {
+        return (bool) $this->receiver_signed_at;
+    }
+
+    /** Link publik (tanpa login) untuk PIC Penerima tanda tangan. */
+    public function getSignUrlAttribute(): string
+    {
+        return route('stf.sign.show', $this->sign_token);
+    }
 
     public function items()
     {

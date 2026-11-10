@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\AssetLog;
 use App\Models\Location;
 use App\Models\StfDocument;
+use App\Support\SignatureImage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -156,7 +157,7 @@ class StfController extends Controller
         );
 
         return redirect()->route('stf.show', $document)
-            ->with('success', 'STF berhasil dibuat & aset dipindahkan ke outlet tujuan. Cetak PDF-nya lalu tandatangani.');
+            ->with('success', 'STF berhasil dibuat & aset dipindahkan ke outlet tujuan. Tanda tangan di bawah, lalu kirim link TTD ke PIC Penerima via WhatsApp.');
     }
 
     public function show(StfDocument $stf)
@@ -191,6 +192,84 @@ class StfController extends Controller
 
     public function pdf(StfDocument $stf)
     {
+        return $this->renderPdf($stf)->download('STF-'.$stf->id.'.pdf');
+    }
+
+    public function status(StfDocument $stf)
+    {
+        return response()->json([
+            'sender_signed' => (bool) $stf->sender_signed_at,
+            'receiver_signed' => (bool) $stf->receiver_signed_at,
+        ]);
+    }
+
+    /** Tanda tangan PIC Pengirim (Staff IT) dari halaman detail STF. */
+    public function signSender(Request $request, StfDocument $stf)
+    {
+        $data = $request->validate([
+            'signature' => ['required', 'string', 'max:1200000'],
+        ]);
+
+        $path = SignatureImage::store($data['signature'], StfDocument::SIGN_DIR);
+        if (! $path) {
+            return back()->withErrors(['signature' => 'Tanda tangan kosong atau tidak terbaca. Mohon tanda tangan ulang.']);
+        }
+
+        SignatureImage::delete($stf->sender_signature);
+        $stf->update(['sender_signature' => $path, 'sender_signed_at' => now()]);
+
+        return back()->with('success', 'Tanda tangan PIC Pengirim tersimpan.');
+    }
+
+    /** Halaman publik (tanpa login) untuk PIC Penerima tanda tangan. */
+    public function signShow(string $token)
+    {
+        $stf = StfDocument::with(['items', 'fromLocation', 'toLocation'])->where('sign_token', $token)->firstOrFail();
+
+        return view('stf.sign', compact('stf'));
+    }
+
+    public function signStore(Request $request, string $token)
+    {
+        $stf = StfDocument::with('toLocation')->where('sign_token', $token)->firstOrFail();
+
+        $data = $request->validate([
+            'receiver_name' => ['required', 'string', 'max:255'],
+            'signature' => ['required', 'string', 'max:1200000'],
+        ], [
+            'receiver_name.required' => 'Nama penerima wajib diisi.',
+        ]);
+
+        $path = SignatureImage::store($data['signature'], StfDocument::SIGN_DIR);
+        if (! $path) {
+            return back()->withInput()->withErrors(['signature' => 'Tanda tangan kosong atau tidak terbaca. Mohon tanda tangan ulang dengan jelas.']);
+        }
+
+        SignatureImage::delete($stf->receiver_signature);
+        $stf->update([
+            'receiver_name' => trim($data['receiver_name']),
+            'receiver_signature' => $path,
+            'receiver_signed_at' => now(),
+        ]);
+
+        \App\Support\SlackNotifier::send(
+            "✍️ *STF {$stf->number} ditandatangani* oleh {$stf->receiver_name}"
+            .' ('.optional($stf->toLocation)->name.")\n"
+            .route('stf.show', $stf)
+        );
+
+        return redirect()->route('stf.sign.show', $token)->with('signed', true);
+    }
+
+    public function signPdf(string $token)
+    {
+        $stf = StfDocument::where('sign_token', $token)->firstOrFail();
+
+        return $this->renderPdf($stf)->stream('STF-'.$stf->id.'.pdf');
+    }
+
+    private function renderPdf(StfDocument $stf)
+    {
         $stf->load(['items', 'fromLocation', 'toLocation']);
 
         $logoPath = public_path('images/logo.png');
@@ -200,13 +279,17 @@ class StfController extends Controller
         $arisSignPath = public_path('images/signature-aris.png');
         $arisSignature = is_file($arisSignPath) ? 'data:image/png;base64,'.base64_encode(file_get_contents($arisSignPath)) : null;
 
-        return Pdf::loadView('stf.pdf', compact('stf', 'logo', 'arisSignature'))
-            ->setPaper('a4', 'landscape')
-            ->download('STF-'.$stf->id.'.pdf');
+        $senderSignature = SignatureImage::dataUri($stf->sender_signature);
+        $receiverSignature = SignatureImage::dataUri($stf->receiver_signature);
+
+        return Pdf::loadView('stf.pdf', compact('stf', 'logo', 'arisSignature', 'senderSignature', 'receiverSignature'))
+            ->setPaper('a4', 'landscape');
     }
 
     public function destroy(StfDocument $stf)
     {
+        SignatureImage::delete($stf->sender_signature);
+        SignatureImage::delete($stf->receiver_signature);
         $stf->delete();
 
         return redirect()->route('stf.index')

@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\BastDocument;
+use App\Support\SignatureImage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class BastController extends Controller
@@ -182,8 +182,8 @@ class BastController extends Controller
     {
         $logoPath = public_path('images/logo.png');
         $logo = is_file($logoPath) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath)) : null;
-        $sig1 = $this->signatureDataUri($bast->first_party_signature);
-        $sig2 = $this->signatureDataUri($bast->second_party_signature);
+        $sig1 = SignatureImage::dataUri($bast->first_party_signature);
+        $sig2 = SignatureImage::dataUri($bast->second_party_signature);
 
         return Pdf::loadView('bast.pdf', compact('bast', 'logo', 'sig1', 'sig2'))->setPaper('a4');
     }
@@ -204,7 +204,7 @@ class BastController extends Controller
             'signature' => ['required', 'string', 'max:1200000'],
         ]);
 
-        $path = $this->saveSignatureDataUrl($data['signature']);
+        $path = SignatureImage::store($data['signature'], BastDocument::SIGN_DIR);
         if (! $path) {
             return back()->withErrors(['signature' => 'Tanda tangan kosong atau tidak terbaca. Mohon tanda tangan ulang dengan jelas.']);
         }
@@ -231,7 +231,7 @@ class BastController extends Controller
             'signature' => ['required', 'string', 'max:1200000'],
         ]);
 
-        $path = $this->saveSignatureDataUrl($data['signature']);
+        $path = SignatureImage::store($data['signature'], BastDocument::SIGN_DIR);
         if (! $path) {
             return back()->withErrors(['signature' => 'Tanda tangan kosong atau tidak terbaca. Mohon tanda tangan ulang.']);
         }
@@ -243,71 +243,6 @@ class BastController extends Controller
         $bast->update(['first_party_signature' => $path, 'first_party_signed_at' => now()]);
 
         return back()->with('success', 'Tanda tangan Pihak Pertama tersimpan.');
-    }
-
-    private function signatureDataUri(?string $path): ?string
-    {
-        if (! $path) {
-            return null;
-        }
-
-        $disk = Storage::disk(BastDocument::SIGNED_DISK);
-
-        return $disk->exists($path) ? 'data:image/png;base64,'.base64_encode($disk->get($path)) : null;
-    }
-
-    private function saveSignatureDataUrl(string $dataUrl): ?string
-    {
-        if (! preg_match('#^data:image/png;base64,#', $dataUrl)) {
-            return null;
-        }
-
-        $raw = base64_decode(substr($dataUrl, strlen('data:image/png;base64,')), true);
-        if ($raw === false || strlen($raw) < 100 || strlen($raw) > 800000) {
-            return null;
-        }
-
-        // Tolak tanda tangan kosong (hampir tanpa coretan) kalau GD tersedia.
-        if (! $this->signatureHasInk($raw)) {
-            return null;
-        }
-
-        $path = BastDocument::SIGN_DIR.'/'.Str::random(40).'.png';
-        Storage::disk(BastDocument::SIGNED_DISK)->put($path, $raw);
-
-        return $path;
-    }
-
-    /** true kalau gambar punya cukup piksel bertinta (bukan kosong). Lewati kalau GD tak ada. */
-    private function signatureHasInk(string $png): bool
-    {
-        if (! function_exists('imagecreatefromstring')) {
-            return true;
-        }
-
-        $img = @imagecreatefromstring($png);
-        if (! $img) {
-            return true;
-        }
-
-        $w = imagesx($img);
-        $h = imagesy($img);
-        $stepX = max(1, (int) ($w / 150));
-        $stepY = max(1, (int) ($h / 80));
-        $ink = 0;
-
-        for ($x = 0; $x < $w; $x += $stepX) {
-            for ($y = 0; $y < $h; $y += $stepY) {
-                $alpha = (imagecolorat($img, $x, $y) & 0x7F000000) >> 24; // 0 = opaque, 127 = transparan
-                if ($alpha < 100) {
-                    $ink++;
-                }
-            }
-        }
-
-        imagedestroy($img);
-
-        return $ink >= 12;
     }
 
     public function uploadSigned(Request $request, BastDocument $bast)

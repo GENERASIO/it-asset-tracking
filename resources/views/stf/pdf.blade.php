@@ -76,14 +76,14 @@
             <td>Mengetahui,</td>
         </tr>
         <tr>
-            <td class="space"></td>
-            <td class="space"></td>
+            <td class="space">@if ($senderSignature ?? null)<img src="{{ $senderSignature }}" style="height:72px" alt="Tanda tangan">@endif</td>
+            <td class="space">@if ($receiverSignature ?? null)<img src="{{ $receiverSignature }}" style="height:72px" alt="Tanda tangan">@endif</td>
             <td class="space">@if (($arisSignature ?? null) && $stf->supervisor_name === 'Aris Munandar')<img src="{{ $arisSignature }}" style="height:72px" alt="Tanda tangan">@endif</td>
             <td class="space"></td>
         </tr>
         <tr>
             <td>( {{ $stf->sender_name }} )</td>
-            <td>( ................... )</td>
+            <td>( {{ $stf->receiver_name ?: '...................' }} )</td>
             <td>( {{ $stf->supervisor_name }} )</td>
             <td>( ................... )</td>
         </tr>

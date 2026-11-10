@@ -29,6 +29,9 @@ Route::get('/scan/{asset}', [AssetController::class, 'publicInfo'])->name('asset
 Route::get('/bast/sign/{token}', [BastController::class, 'signShow'])->name('bast.sign.show');
 Route::post('/bast/sign/{token}', [BastController::class, 'signStore'])->name('bast.sign.store');
 Route::get('/bast/sign/{token}/pdf', [BastController::class, 'signPdf'])->name('bast.sign.pdf');
+Route::get('/stf/sign/{token}', [StfController::class, 'signShow'])->name('stf.sign.show');
+Route::post('/stf/sign/{token}', [StfController::class, 'signStore'])->name('stf.sign.store');
+Route::get('/stf/sign/{token}/pdf', [StfController::class, 'signPdf'])->name('stf.sign.pdf');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
@@ -92,6 +95,8 @@ Route::middleware(['auth', 'role:super_admin,it_staff'])->group(function () {
     Route::get('/stf/{stf}', [StfController::class, 'show'])->name('stf.show');
     Route::put('/stf/{stf}/items', [StfController::class, 'updateItems'])->name('stf.items.update');
     Route::get('/stf/{stf}/pdf', [StfController::class, 'pdf'])->name('stf.pdf');
+    Route::get('/stf/{stf}/status', [StfController::class, 'status'])->name('stf.status');
+    Route::post('/stf/{stf}/sign-sender', [StfController::class, 'signSender'])->name('stf.sign-sender');
     Route::delete('/stf/{stf}', [StfController::class, 'destroy'])->name('stf.destroy');
 });
 

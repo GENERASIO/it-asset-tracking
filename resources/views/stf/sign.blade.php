@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tanda Tangan STF · PT. YAY Enak Semua</title>
+    @vite(['resources/css/app.css'])
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+</head>
+<body class="font-sans antialiased bg-gray-100 min-h-screen py-6 px-4">
+    @php $alreadySigned = session('signed') || $stf->isReceiverSigned(); @endphp
+    <div class="w-full max-w-lg mx-auto">
+        <div class="flex items-center justify-center gap-2 mb-4">
+            <img src="{{ asset('images/logo.png') }}" alt="YAY Group" class="h-9 w-auto">
+            <div>
+                <p class="font-semibold text-gray-800 text-sm leading-tight">PT. YAY Enak Semua</p>
+                <p class="text-xs text-gray-500 leading-tight">Surat Transfer Aset (STF)</p>
+            </div>
+        </div>
+
+        @if ($alreadySigned)
+            <div class="bg-white rounded-xl shadow p-5 mb-4 text-center">
+                <div class="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-green-100 text-green-600 mb-2">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                </div>
+                <h1 class="text-base font-semibold text-gray-900">Terima kasih, {{ $stf->receiver_name }}!</h1>
+                <p class="text-sm text-gray-500 mt-1">Tanda tangan Anda sudah tersimpan @if ($stf->receiver_signed_at) pada {{ $stf->receiver_signed_at->translatedFormat('d M Y H:i') }}@endif.</p>
+                <a href="{{ route('stf.sign.pdf', $stf->sign_token) }}" target="_blank"
+                   class="inline-flex items-center gap-1.5 mt-3 bg-brand-500 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-brand-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                    Unduh Dokumen STF (PDF)
+                </a>
+                <p class="text-xs text-gray-400 mt-3">Kalau tanda tangan belum benar/kosong, Anda bisa <b>tanda tangan ulang</b> di bawah ini.</p>
+            </div>
+        @endif
+
+        <div class="bg-white rounded-xl shadow p-6">
+            <h1 class="text-lg font-semibold text-gray-900">{{ $alreadySigned ? 'Tanda Tangan Ulang' : 'Konfirmasi Penerimaan Aset' }}</h1>
+            <p class="text-sm text-gray-500 mt-1 mb-4">Mohon periksa aset yang diterima, lalu isi nama dan tanda tangan di kotak.</p>
+
+            <dl class="text-sm space-y-1.5 mb-4">
+                <div class="flex justify-between gap-3"><dt class="text-gray-500">No. STF</dt><dd class="text-gray-900 font-medium text-right">{{ $stf->number }}</dd></div>
+                <div class="flex justify-between gap-3"><dt class="text-gray-500">Tanggal</dt><dd class="text-gray-900 font-medium text-right">{{ $stf->transfer_date_long }}</dd></div>
+                <div class="flex justify-between gap-3"><dt class="text-gray-500">Dari</dt><dd class="text-gray-900 font-medium text-right">{{ optional($stf->fromLocation)->name ?? 'Beberapa lokasi' }}</dd></div>
+                <div class="flex justify-between gap-3"><dt class="text-gray-500">Ke</dt><dd class="text-gray-900 font-medium text-right">{{ optional($stf->toLocation)->name }}</dd></div>
+                <div class="flex justify-between gap-3"><dt class="text-gray-500">Dikirim oleh</dt><dd class="text-gray-900 font-medium text-right">{{ $stf->sender_name }}</dd></div>
+            </dl>
+
+            <div class="border border-gray-200 rounded-lg divide-y divide-gray-100 mb-5">
+                @foreach ($stf->items as $item)
+                    <div class="px-3 py-2 text-sm">
+                        <p class="text-gray-900 font-medium">{{ $item->description }}</p>
+                        <p class="text-xs text-gray-500">{{ $item->asset_no }} · Qty: {{ $item->quantity }}@if ($item->notes) · {{ $item->notes }}@endif</p>
+                        @if ($item->spec)
+                            <p class="text-xs text-gray-400 whitespace-pre-line">{{ $item->spec }}</p>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+
+            <form method="POST" action="{{ route('stf.sign.store', $stf->sign_token) }}" id="signForm">
+                @csrf
+                <label for="receiver_name" class="text-sm font-medium text-gray-700">Nama PIC Penerima</label>
+                <input type="text" id="receiver_name" name="receiver_name" required maxlength="255"
+                       value="{{ old('receiver_name', $stf->receiver_name) }}" placeholder="Nama lengkap Anda"
+                       class="mt-1 mb-4 block w-full border-gray-300 rounded-lg text-sm">
+                @error('receiver_name')<p class="text-xs text-red-600 mb-3">{{ $message }}</p>@enderror
+
+                <label class="text-sm font-medium text-gray-700">Tanda tangan</label>
+                <div class="mt-1 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                    <canvas id="pad" class="w-full rounded-lg" style="height:200px; touch-action:none;"></canvas>
+                </div>
+                <input type="hidden" name="signature" id="sigInput">
+                <div class="flex items-center justify-between mt-3">
+                    <button type="button" id="clear" class="text-sm text-gray-500 hover:text-gray-700">Hapus &amp; ulangi</button>
+                    <button type="submit" class="bg-brand-500 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-brand-600">Kirim Tanda Tangan</button>
+                </div>
+                @error('signature')<p class="text-xs text-red-600 mt-2">{{ $message }}</p>@enderror
+            </form>
+        </div>
+        <p class="text-center text-xs text-gray-400 mt-4">Link ini bersifat rahasia — jangan dibagikan ke pihak lain.</p>
+    </div>
+
+    <script>
+        (function () {
+            var canvas = document.getElementById('pad');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var drawing = false;
+
+            function resize() {
+                var ratio = window.devicePixelRatio || 1;
+                var rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * ratio;
+                canvas.height = rect.height * ratio;
+                ctx.scale(ratio, ratio);
+                ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#111827';
+            }
+            function point(e) { var rect = canvas.getBoundingClientRect(); return { x: e.clientX - rect.left, y: e.clientY - rect.top }; }
+            function start(e) { drawing = true; var p = point(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); }
+            function move(e) { if (!drawing) return; var p = point(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); }
+            function stop() { drawing = false; }
+
+            // Hitung jumlah piksel bertinta — untuk menolak tanda tangan kosong / asal tap.
+            function inkPixels() {
+                try {
+                    var d = ctx.getImageData(0, 0, canvas.width, canvas.height).data, n = 0;
+                    for (var i = 3; i < d.length; i += 4) { if (d[i] > 10) n++; }
+                    return n;
+                } catch (e) { return 9999; }
+            }
+
+            window.addEventListener('load', resize);
+            canvas.addEventListener('pointerdown', start);
+            canvas.addEventListener('pointermove', move);
+            window.addEventListener('pointerup', stop);
+            document.getElementById('clear').addEventListener('click', function () {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+            document.getElementById('signForm').addEventListener('submit', function (e) {
+                if (inkPixels() < 200) {
+                    e.preventDefault();
+                    alert('Mohon tanda tangan dulu dengan jelas di kotak sebelum mengirim.');
+                    return;
+                }
+                document.getElementById('sigInput').value = canvas.toDataURL('image/png');
+            });
+        })();
+    </script>
+</body>
+</html>
