@@ -19,6 +19,7 @@
 
     <div x-show="open" style="display:none" class="absolute z-20 mt-1 w-56 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden">
         <input type="text" x-model="query" x-ref="search" @keydown.escape="open = false"
+               @keydown.enter.prevent="chooseFirst()"
                placeholder="Cari..." autocomplete="off"
                class="w-full border-0 border-b border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm px-3 py-2 focus:ring-0">
         <div class="max-h-56 overflow-auto">
@@ -61,10 +62,16 @@
                     this.$nextTick(() => this.$refs.search.focus());
                 }
             },
+            // Hanya isi pilihan — filter baru jalan saat tombol "Filter" ditekan.
             choose(value) {
                 this.selectedValue = value;
                 this.open = false;
-                this.$el.closest('form').submit();
+            },
+            // Enter di kotak "Cari..." memilih hasil pertama, bukan langsung submit form.
+            chooseFirst() {
+                if (this.filteredOptions.length) {
+                    this.choose(this.filteredOptions[0].value);
+                }
             },
         };
     }
