@@ -38,6 +38,13 @@ class DashboardController extends Controller
                 'assets as retired_count' => fn ($q) => $q->where('status', 'retired'),
             ])->orderByDesc('assets_count')->get();
 
+            // Lokasi dengan aset terbanyak (untuk grafik bar di dashboard).
+            $topLocations = Location::withCount('assets')
+                ->whereHas('assets')
+                ->orderByDesc('assets_count')
+                ->take(8)
+                ->get();
+
             $recentAssets = Asset::with(['category', 'location'])->latest()->take(5)->get();
 
             $warrantySoon = Asset::whereNotNull('warranty_expired_at')
@@ -119,7 +126,7 @@ class DashboardController extends Controller
                 ])
                 ->values();
 
-            return view('dashboard', compact('stats', 'byCategory', 'recentAssets', 'warrantySoon', 'warrantyAlerts', 'overdueMaintenances', 'recentActivities', 'agentActivities'));
+            return view('dashboard', compact('stats', 'byCategory', 'topLocations', 'recentAssets', 'warrantySoon', 'warrantyAlerts', 'overdueMaintenances', 'recentActivities', 'agentActivities'));
         }
 
         // Role "user" biasa: lihat aset miliknya sendiri
