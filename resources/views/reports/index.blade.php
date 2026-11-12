@@ -21,7 +21,7 @@
     @endphp
 
     <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @php
                 $card = 'bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-5 flex flex-col';
@@ -241,6 +241,7 @@
                         <div class="relative" style="height: 200px;">
                             <canvas id="chartAge"></canvas>
                         </div>
+                        <div class="overflow-x-auto scrollbar-modern">
                         <table class="w-full text-sm">
                             <tbody>
                                 @foreach ($ageGroups as $group)
@@ -255,6 +256,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
 
@@ -313,6 +315,7 @@
                             Belum ada catatan maintenance.<br>Catat perbaikan di halaman detail aset (tab Aktivitas) supaya bagian ini terisi.
                         </div>
                     @else
+                        <div class="overflow-x-auto scrollbar-modern">
                         <table class="w-full text-sm">
                             <thead class="text-xs text-gray-500 dark:text-gray-400">
                                 <tr>
@@ -331,6 +334,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                     @endif
                 </div>
             </div>

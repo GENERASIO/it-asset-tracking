@@ -33,7 +33,7 @@
     @endphp
 
     <div class="py-8" x-data="assetsPage()">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             @if (session('success'))
                 <div class="mb-4 p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm">
@@ -168,10 +168,10 @@
 
                     @if ($view === 'board')
                         {{-- Kelima status dibagi rata selebar layar; di layar sempit baru bisa digeser ke samping. --}}
-                        <div class="flex gap-3 overflow-x-auto scroll-smooth pb-2">
+                        <div class="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory sm:snap-none scrollbar-modern pb-2">
                             @foreach ($statusColumns as $key => $meta)
                                 @php $columnAssets = $assets->get($key, collect()); @endphp
-                                <div class="board-column flex-1 min-w-[10rem] flex flex-col bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2.5 transition-colors duration-200" data-status="{{ $key }}">
+                                <div class="board-column flex-1 min-w-[78vw] sm:min-w-[10rem] snap-start flex flex-col bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2.5 transition-colors duration-200" data-status="{{ $key }}">
                                     <div class="flex items-center justify-between mb-2.5 px-3 {{ $meta['header'] }} dark:bg-gray-800 rounded-lg py-2">
                                         <span class="font-semibold text-sm {{ $meta['text'] }}">{{ $meta['label'] }}</span>
                                         <span class="text-xs px-2 py-0.5 rounded-full {{ $meta['badge'] }}">{{ $columnAssets->count() }}</span>
@@ -193,7 +193,7 @@
                                                 </button>
                                                 <div class="flex items-start justify-between gap-2 mb-1 pr-6">
                                                     <input type="checkbox" name="ids[]" value="{{ $asset->id }}"
-                                                           class="asset-checkbox mt-0.5" onclick="event.stopPropagation()">
+                                                           class="asset-checkbox w-5 h-5 sm:w-4 sm:h-4 mt-0.5 rounded" onclick="event.stopPropagation()">
                                                     @if ($asset->photo)
                                                         <img src="{{ asset('uploads/assets/' . $asset->photo) }}"
                                                              class="w-10 h-10 object-cover rounded border">
@@ -218,16 +218,33 @@
                     @else
                         {{-- Mobile card-list (< sm) --}}
                         <div class="sm:hidden space-y-3">
+                            @if ($assets->count())
+                                <label class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700/50 text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer select-none">
+                                    <input type="checkbox" class="w-5 h-5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" onclick="toggleAllAssetCheckboxes(this)">
+                                    Pilih semua di halaman ini
+                                </label>
+                            @endif
                             @forelse ($assets as $asset)
                                 <div data-asset-row="{{ $asset->id }}"
-                                     class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-white dark:bg-gray-800 transition-colors duration-300">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <div>
+                                     class="border border-gray-200 dark:border-gray-700 rounded-xl p-3 bg-white dark:bg-gray-800 transition-colors duration-300 has-[.asset-checkbox:checked]:border-brand-400 has-[.asset-checkbox:checked]:ring-2 has-[.asset-checkbox:checked]:ring-brand-200 dark:has-[.asset-checkbox:checked]:ring-brand-700">
+                                    <div class="flex items-start gap-3">
+                                        {{-- Area sentuh lebar supaya mudah dicentang di HP --}}
+                                        <label class="-m-1 p-1 shrink-0 cursor-pointer" title="Pilih aset">
+                                            <input type="checkbox" name="ids[]" value="{{ $asset->id }}"
+                                                   class="asset-checkbox w-5 h-5 mt-0.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400">
+                                        </label>
+                                        <a href="{{ route('assets.show', $asset) }}" class="flex-1 min-w-0">
                                             <p class="font-mono font-bold text-sm text-gray-800 dark:text-white">{{ $asset->asset_code }}</p>
-                                            <p class="text-sm text-gray-700 dark:text-gray-300">{{ $asset->name }}</p>
-                                        </div>
+                                            <p class="text-sm text-gray-700 dark:text-gray-300 break-words">{{ $asset->name }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                {{ $asset->category->name ?? '-' }} · {{ $asset->location->name ?? '-' }}
+                                            </p>
+                                            @if ($asset->assignedUser)
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">👤 {{ $asset->assignedUser->name }}</p>
+                                            @endif
+                                        </a>
                                         @if ($asset->photo)
-                                            <img src="{{ asset('uploads/assets/' . $asset->photo) }}" class="w-12 h-12 object-cover rounded border shrink-0">
+                                            <img src="{{ asset('uploads/assets/' . $asset->photo) }}" class="w-12 h-12 object-cover rounded-lg border shrink-0">
                                         @endif
                                     </div>
 
@@ -247,6 +264,15 @@
                                            class="flex-1 text-center bg-brand-500 text-white py-2 rounded-lg text-sm transition-all duration-150 active:scale-95">
                                             Edit
                                         </a>
+                                        <a href="{{ route('barcode.print', $asset) }}" target="_blank" title="Cetak label"
+                                           class="inline-flex items-center justify-center w-10 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 active:scale-95">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/></svg>
+                                        </a>
+                                        <button type="button" title="Hapus aset"
+                                                class="inline-flex items-center justify-center w-10 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 active:scale-95"
+                                                onclick="confirmDeleteAsset('{{ route('assets.destroy', $asset) }}')">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                                        </button>
                                     </div>
                                 </div>
                             @empty
@@ -636,8 +662,10 @@
         }
 
         function toggleAllAssetCheckboxes(source) {
+            // Hanya yang terlihat: di HP tabel desktop tersembunyi (dan sebaliknya), jangan ikut dicentang
+            // supaya aset yang sama tidak terkirim dua kali.
             document.querySelectorAll('.asset-checkbox').forEach(function (checkbox) {
-                checkbox.checked = source.checked;
+                if (checkbox.getClientRects().length) checkbox.checked = source.checked;
             });
             updateBulkPrintButtonState();
         }

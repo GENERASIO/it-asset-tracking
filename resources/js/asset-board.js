@@ -14,9 +14,12 @@ window.addEventListener('DOMContentLoaded', () => {
             ghostClass: 'sortable-ghost',
             chosenClass: 'sortable-chosen',
             dragClass: 'sortable-drag',
-            delay: 100,
+            // Di HP: tekan-tahan untuk memindah kartu, supaya geser/scroll biasa tidak dianggap drag.
+            delay: 300,
             delayOnTouchOnly: true,
-            touchStartThreshold: 5,
+            touchStartThreshold: 8,
+            filter: '.asset-checkbox, .asset-delete-btn',
+            preventOnFilter: false,
             onStart: (evt) => {
                 document.querySelectorAll('.board-column').forEach((col) => {
                     col.classList.add('board-column-droppable');

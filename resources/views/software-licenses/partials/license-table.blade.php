@@ -1,5 +1,5 @@
 <div class="overflow-x-auto">
-    <table class="w-full text-sm text-left">
+    <table class="w-full min-w-[36rem] text-sm text-left">
         <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
             <tr>
                 <th class="px-4 py-2">Aset</th>

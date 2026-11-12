@@ -4,7 +4,7 @@
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 <form action="{{ route('assets.update', $asset) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf

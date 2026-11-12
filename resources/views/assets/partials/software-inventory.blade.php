@@ -59,6 +59,7 @@
             <input type="search" x-model="q" placeholder="Cari aplikasi / publisher..."
                    class="w-full mb-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
             <div class="max-h-96 overflow-y-auto border border-gray-100 dark:border-gray-700 rounded-lg">
+                <div class="overflow-x-auto scrollbar-modern">
                 <table class="w-full text-sm text-left">
                     <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 sticky top-0">
                         <tr>
@@ -80,6 +81,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     </div>

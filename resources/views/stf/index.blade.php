@@ -14,6 +14,7 @@
             </div>
 
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 overflow-hidden">
+                <div class="overflow-x-auto scrollbar-modern">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         <tr>
@@ -61,6 +62,7 @@
                         @endforelse
                     </tbody>
                 </table>
+                </div>
             </div>
 
             {{ $documents->links() }}

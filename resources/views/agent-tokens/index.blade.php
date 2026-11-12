@@ -4,7 +4,7 @@
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @if (session('success'))
                 <div class="p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm">

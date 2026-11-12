@@ -44,7 +44,7 @@
                 </p>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left">
+                    <table class="w-full min-w-[34rem] text-sm text-left">
                         <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             <tr>
                                 <th class="px-4 py-3">Nama</th>
@@ -138,7 +138,7 @@
                     Nama edisi persis seperti yang dilaporkan Windows. Pakai sebagian nama ini (mis. <span class="font-mono">HomeBusiness2021</span>) sebagai kata kunci saat menambah lisensi.
                 </p>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left">
+                    <table class="w-full min-w-[36rem] text-sm text-left">
                         <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             <tr>
                                 <th class="px-4 py-3">Produk</th>
@@ -151,7 +151,7 @@
                             @forelse ($editions as $edition)
                                 <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
                                     <td class="px-4 py-3 uppercase text-xs text-gray-500">{{ $edition['product'] }}</td>
-                                    <td class="px-4 py-3 font-mono text-xs text-gray-900 dark:text-white break-all">{{ $edition['name'] }}</td>
+                                    <td class="px-4 py-3 font-mono text-xs text-gray-900 dark:text-white break-words min-w-[14rem]">{{ $edition['name'] }}</td>
                                     <td class="px-4 py-3 text-right text-gray-900 dark:text-white">{{ $edition['total'] }}</td>
                                     <td class="px-4 py-3 text-right {{ $edition['suspected'] ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-400' }}">{{ $edition['suspected'] }}</td>
                                 </tr>
