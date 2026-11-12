@@ -96,6 +96,34 @@ body {
     cursor: grabbing !important;
 }
 
+/* Scrollbar tipis & membulat (kolom Board, dll). Track transparan, thumb samar lalu jelas saat di-hover. */
+.scrollbar-modern {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(139 92 246 / 0.35) transparent;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+}
+.scrollbar-modern:hover { scrollbar-color: rgb(139 92 246 / 0.7) transparent; }
+.scrollbar-modern::-webkit-scrollbar { width: 6px; height: 6px; }
+.scrollbar-modern::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-modern::-webkit-scrollbar-button { display: none; height: 0; }
+.scrollbar-modern::-webkit-scrollbar-thumb {
+    background: rgb(139 92 246 / 0.35);
+    border-radius: 9999px;
+}
+.scrollbar-modern:hover::-webkit-scrollbar-thumb { background: rgb(139 92 246 / 0.7); }
+.scrollbar-modern::-webkit-scrollbar-thumb:active { background: rgb(124 58 237); }
+.dark .scrollbar-modern { scrollbar-color: rgb(167 139 250 / 0.3) transparent; }
+.dark .scrollbar-modern:hover { scrollbar-color: rgb(167 139 250 / 0.6) transparent; }
+.dark .scrollbar-modern::-webkit-scrollbar-thumb { background: rgb(167 139 250 / 0.3); }
+.dark .scrollbar-modern:hover::-webkit-scrollbar-thumb { background: rgb(167 139 250 / 0.6); }
+
+/* Bayangan lembut di atas/bawah kolom Board saat isinya bisa di-scroll. */
+.scroll-fade {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 16px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 16px), transparent 100%);
+}
+
 .board-column-droppable {
     transition: background-color 0.2s ease;
 }

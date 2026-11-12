@@ -63,7 +63,7 @@
                                class="w-full pl-9 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
 
                         <div x-show="open && results.length" style="display: none;"
-                             class="absolute z-20 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-64 overflow-auto">
+                             class="absolute z-20 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-64 overflow-auto scrollbar-modern">
                             <template x-for="item in results" :key="item.id">
                                 <button type="button" @click="select(item)"
                                         class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2">
@@ -178,7 +178,7 @@
                                     </div>
 
                                     {{-- Tiap kolom scroll sendiri, supaya kolom berisi ratusan aset tidak bikin halaman sangat panjang. --}}
-                                    <div class="board-column-body space-y-2.5 min-h-[80px] max-h-[70vh] overflow-y-auto pr-0.5">
+                                    <div class="board-column-body scrollbar-modern scroll-fade space-y-2.5 min-h-[80px] max-h-[70vh] overflow-y-auto py-2 pr-1.5 -mr-1">
                                         @forelse ($columnAssets as $asset)
                                             <div class="asset-card relative bg-white dark:bg-gray-700 shadow rounded-lg p-3 cursor-move transition-shadow duration-200 hover:shadow-md"
                                                  data-asset-id="{{ $asset->id }}"
@@ -396,7 +396,7 @@
                         </div>
 
                         <!-- Body: mode lihat -->
-                        <div x-show="!editing" class="flex-1 overflow-y-auto p-5 space-y-4">
+                        <div x-show="!editing" class="flex-1 overflow-y-auto scrollbar-modern p-5 space-y-4">
                             <template x-if="quickView.photo">
                                 <img :src="quickView.photo" class="w-full h-40 object-cover rounded-lg border dark:border-gray-700">
                             </template>
@@ -440,7 +440,7 @@
                         </div>
 
                         <!-- Body: mode edit (form disuntik via fetch, tanpa pindah halaman) -->
-                        <div x-show="editing" class="flex-1 overflow-y-auto p-5">
+                        <div x-show="editing" class="flex-1 overflow-y-auto scrollbar-modern p-5">
                             <template x-if="editLoading">
                                 <p class="text-sm text-gray-400">Memuat form edit...</p>
                             </template>

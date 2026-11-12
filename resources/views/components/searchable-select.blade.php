@@ -22,7 +22,7 @@
                @keydown.enter.prevent="chooseFirst()"
                placeholder="Cari..." autocomplete="off"
                class="w-full border-0 border-b border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm px-3 py-2 focus:ring-0">
-        <div class="max-h-56 overflow-auto">
+        <div class="max-h-56 overflow-auto scrollbar-modern">
             <button type="button" @click="choose('')"
                     class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-300">
                 <span x-text="placeholder"></span>
