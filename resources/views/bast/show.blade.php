@@ -7,18 +7,18 @@
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @if (session('success'))
-                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
+                <div class="p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm">{{ session('success') }}</div>
             @endif
 
             @if ($errors->any())
-                <div class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                <div class="p-3 bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800 rounded-xl text-sm">
                     @foreach ($errors->all() as $error)
                         <p>{{ $error }}</p>
                     @endforeach
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-5">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6 space-y-5">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ $bast->city }}, {{ $bast->handover_date_label }}</p>
@@ -48,7 +48,7 @@
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                        <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             <tr>
                                 <th class="px-3 py-2">No.</th>
                                 <th class="px-3 py-2">Jenis</th>
@@ -60,7 +60,7 @@
                         </thead>
                         <tbody>
                             @foreach ($bast->items as $item)
-                                <tr class="border-b dark:border-gray-700">
+                                <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
                                     <td class="px-3 py-2 text-gray-900 dark:text-white">{{ $loop->iteration }}</td>
                                     <td class="px-3 py-2 text-gray-900 dark:text-white">{{ $item->item_type }}</td>
                                     <td class="px-3 py-2 text-gray-900 dark:text-white">
@@ -115,7 +115,7 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6 space-y-4">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300">Tanda Tangan Digital</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Kirim link ke penerima lewat tombol <b>Kirim via WhatsApp</b> di atas. Begitu penerima tanda tangan di HP-nya, hasilnya otomatis tersimpan di sini &amp; masuk ke PDF.</p>
 
@@ -170,7 +170,7 @@
                 </script>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Arsip Dokumen Ditandatangani</h3>
 
                 @if ($bast->isDigitallySigned() && ! $bast->isSigned())

@@ -7,7 +7,7 @@
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @if (session('success'))
-                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
+                <div class="p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm">{{ session('success') }}</div>
             @endif
 
             <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-sm space-y-2">
@@ -20,9 +20,9 @@
                 </ul>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 overflow-hidden">
                 <table class="w-full text-sm">
-                    <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         <tr>
                             <th class="px-4 py-3 text-left">Kode</th>
                             <th class="px-4 py-3 text-left">Model</th>

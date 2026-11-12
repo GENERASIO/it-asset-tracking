@@ -7,7 +7,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             @if (session('success'))
-                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-sm">
+                <div class="p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm">
                     {{ session('success') }}
                 </div>
             @endif
@@ -48,7 +48,7 @@
                 </ul>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Buat Token Baru</h3>
                 <form method="POST" action="{{ route('agent-tokens.store') }}" class="flex flex-wrap gap-2">
                     @csrf
@@ -60,7 +60,7 @@
                 </form>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 flex flex-wrap items-center justify-between gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6 flex flex-wrap items-center justify-between gap-4">
                 <div class="min-w-[240px] flex-1">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Perbarui Agent yang Sudah Terpasang</h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -75,35 +75,35 @@
                 </a>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Daftar Token</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                        <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             <tr>
-                                <th class="px-4 py-2">Nama</th>
-                                <th class="px-4 py-2">Dibuat Oleh</th>
-                                <th class="px-4 py-2">Terakhir Dipakai</th>
-                                <th class="px-4 py-2">Status</th>
-                                <th class="px-4 py-2 text-right">Aksi</th>
+                                <th class="px-4 py-3">Nama</th>
+                                <th class="px-4 py-3">Dibuat Oleh</th>
+                                <th class="px-4 py-3">Terakhir Dipakai</th>
+                                <th class="px-4 py-3">Status</th>
+                                <th class="px-4 py-3 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($tokens as $token)
-                                <tr class="border-b dark:border-gray-700">
-                                    <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $token->name }}</td>
-                                    <td class="px-4 py-2 text-gray-500">{{ $token->creator->name ?? '-' }}</td>
-                                    <td class="px-4 py-2 text-gray-500">
+                                <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
+                                    <td class="px-4 py-3 text-gray-900 dark:text-white">{{ $token->name }}</td>
+                                    <td class="px-4 py-3 text-gray-500">{{ $token->creator->name ?? '-' }}</td>
+                                    <td class="px-4 py-3 text-gray-500">
                                         {{ $token->last_used_at?->diffForHumans() ?? 'Belum pernah' }}
                                     </td>
-                                    <td class="px-4 py-2">
+                                    <td class="px-4 py-3">
                                         @if ($token->revoked_at)
                                             <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Dicabut</span>
                                         @else
                                             <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Aktif</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-2 text-right">
+                                    <td class="px-4 py-3 text-right">
                                         @unless ($token->revoked_at)
                                             <form method="POST" action="{{ route('agent-tokens.destroy', $token) }}"
                                                   onsubmit="event.preventDefault(); confirmAction('Agent yang memakainya akan berhenti bisa check-in.', () => this.submit(), 'Cabut token ini?');">
@@ -124,27 +124,27 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aktivitas Agent Terbaru</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                        <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             <tr>
-                                <th class="px-4 py-2">Kode Aset</th>
-                                <th class="px-4 py-2">Hostname</th>
-                                <th class="px-4 py-2">OS</th>
-                                <th class="px-4 py-2">Terakhir Check-in</th>
+                                <th class="px-4 py-3">Kode Aset</th>
+                                <th class="px-4 py-3">Hostname</th>
+                                <th class="px-4 py-3">OS</th>
+                                <th class="px-4 py-3">Terakhir Check-in</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($recentCheckins as $checkin)
-                                <tr class="border-b dark:border-gray-700">
-                                    <td class="px-4 py-2 font-mono">
+                                <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
+                                    <td class="px-4 py-3 font-mono">
                                         <a href="{{ route('assets.show', $checkin) }}" class="text-brand-500 hover:underline">{{ $checkin->asset_code }}</a>
                                     </td>
-                                    <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $checkin->hostname ?? '-' }}</td>
-                                    <td class="px-4 py-2 text-gray-500">{{ $checkin->os_label ?? '-' }}</td>
-                                    <td class="px-4 py-2">
+                                    <td class="px-4 py-3 text-gray-900 dark:text-white">{{ $checkin->hostname ?? '-' }}</td>
+                                    <td class="px-4 py-3 text-gray-500">{{ $checkin->os_label ?? '-' }}</td>
+                                    <td class="px-4 py-3">
                                         <span class="text-xs px-2 py-1 rounded-full {{ $checkin->last_seen_at->gt(now()->subDays(2)) ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
                                             {{ $checkin->last_seen_at->diffForHumans() }}
                                         </span>
@@ -160,7 +160,7 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 text-sm text-gray-600 dark:text-gray-400 space-y-2">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6 text-sm text-gray-600 dark:text-gray-400 space-y-2">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Cara Pasang di Laptop</h3>
                 <p>
                     1. Klik <strong>Buat Token</strong> di atas, lalu langsung download paket agent (sudah berisi token, tinggal pakai) dari tombol yang muncul.

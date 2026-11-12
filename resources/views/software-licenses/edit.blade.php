@@ -5,7 +5,7 @@
 
     <div class="py-8">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <form method="POST" action="{{ route('software-licenses.update', $entitlement) }}" class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <form method="POST" action="{{ route('software-licenses.update', $entitlement) }}" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 @csrf @method('PUT')
                 @include('software-licenses.partials.form')
                 <div class="mt-4 flex gap-2">

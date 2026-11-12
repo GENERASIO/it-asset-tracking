@@ -6,18 +6,18 @@
     <div class="py-8">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             @if (session('success'))
-                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
+                <div class="p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm">{{ session('success') }}</div>
             @endif
 
             @if ($errors->any())
-                <div class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                <div class="p-3 bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800 rounded-xl text-sm">
                     @foreach ($errors->all() as $error)
                         <p>{{ $error }}</p>
                     @endforeach
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6 space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <h3 class="font-semibold text-gray-900 dark:text-white">Detail Transfer</h3>
                     <div class="flex gap-2">
@@ -51,7 +51,7 @@
                 }
                 $copyLabel = $stf->isReceiverSigned() ? 'Salin link dokumen' : 'Salin link TTD';
             @endphp
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6 space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <h3 class="font-semibold text-gray-900 dark:text-white">Tanda Tangan Digital</h3>
                     @if ($stf->isReceiverSigned())
@@ -143,7 +143,7 @@
             @php
                 $input = 'block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm';
             @endphp
-            <form method="POST" action="{{ route('stf.items.update', $stf) }}" class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-4">
+            <form method="POST" action="{{ route('stf.items.update', $stf) }}" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6 space-y-4">
                 @csrf @method('PUT')
                 <div class="flex items-center justify-between">
                     <h3 class="font-semibold text-gray-900 dark:text-white">Rincian Aset</h3>

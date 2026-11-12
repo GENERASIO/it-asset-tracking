@@ -9,7 +9,7 @@ class LocationController extends Controller
 {
     public function index()
     {
-        $locations = Location::latest()->paginate(10);
+        $locations = Location::withCount('assets')->latest()->paginate(10);
         return view('locations.index', compact('locations'));
     }
 

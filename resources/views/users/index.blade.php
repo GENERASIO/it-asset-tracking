@@ -7,24 +7,24 @@
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
 
             @if (session('success'))
-                <div class="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm">
+                <div class="mb-4 p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm">
                     {{ session('success') }}
                 </div>
             @endif
 
             @if (session('error'))
-                <div class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                <div class="mb-4 p-3 bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800 rounded-xl text-sm">
                     {{ session('error') }}
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
                     <form method="GET" class="flex flex-wrap gap-2">
                         <input type="text" name="search" value="{{ request('search') }}"
                                placeholder="Cari nama / email..."
                                class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
-                        <button type="submit" class="bg-gray-200 px-3 py-2 rounded-lg text-sm">Cari</button>
+                        <button type="submit" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 px-4 py-2 rounded-lg text-sm font-medium">Cari</button>
                     </form>
 
                     <div class="flex flex-wrap gap-2">
@@ -37,35 +37,46 @@
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                        <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             <tr>
-                                <th class="px-4 py-2">Nama</th>
-                                <th class="px-4 py-2">Email</th>
-                                <th class="px-4 py-2">Role</th>
-                                <th class="px-4 py-2">Lokasi</th>
-                                <th class="px-4 py-2">Status Aktif</th>
-                                <th class="px-4 py-2 text-right">Aksi</th>
+                                <th class="px-4 py-3">Nama</th>
+                                <th class="px-4 py-3">Email</th>
+                                <th class="px-4 py-3">Role</th>
+                                <th class="px-4 py-3">Lokasi</th>
+                                <th class="px-4 py-3">Status Aktif</th>
+                                <th class="px-4 py-3 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($users as $user)
-                                <tr class="border-b dark:border-gray-700">
-                                    <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $user->name }}</td>
-                                    <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $user->email }}</td>
-                                    <td class="px-4 py-2">
-                                        <span class="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200">
-                                            {{ ucfirst(str_replace('_', ' ', $user->role)) }}
-                                        </span>
+                                <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
+                                    @php
+                                        $initials = collect(explode(' ', trim($user->name)))->filter()->map(fn ($n) => mb_strtoupper(mb_substr($n, 0, 1)))->take(2)->join('');
+                                        $roleStyle = [
+                                            'super_admin' => ['Super Admin', 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'],
+                                            'it_staff' => ['IT Staff', 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'],
+                                            'user' => ['User', 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'],
+                                        ][$user->role] ?? [ucfirst(str_replace('_', ' ', $user->role)), 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'];
+                                    @endphp
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-3">
+                                            <span class="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-xs font-semibold text-white">{{ $initials ?: '?' }}</span>
+                                            <span class="font-medium text-gray-900 dark:text-white">{{ $user->name }}</span>
+                                        </div>
                                     </td>
-                                    <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $user->location->name ?? '-' }}</td>
-                                    <td class="px-4 py-2">
+                                    <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $user->email ?: '-' }}</td>
+                                    <td class="px-4 py-3">
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap {{ $roleStyle[1] }}">{{ $roleStyle[0] }}</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-gray-900 dark:text-white">{{ $user->location->name ?? '-' }}</td>
+                                    <td class="px-4 py-3">
                                         @if ($user->is_active)
                                             <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Aktif</span>
                                         @else
                                             <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Nonaktif</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-2 text-right whitespace-nowrap">
+                                    <td class="px-4 py-3 text-right whitespace-nowrap">
                                         <div class="flex items-center justify-end gap-1">
                                             <a href="{{ route('users.edit', $user) }}" title="Edit"
                                                class="inline-flex p-1.5 rounded-lg text-brand-500 hover:bg-brand-50 dark:hover:bg-gray-700">

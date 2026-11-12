@@ -7,11 +7,11 @@
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @if (session('success'))
-                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
+                <div class="p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm">{{ session('success') }}</div>
             @endif
 
             @if ($errors->any())
-                <div class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{{ $errors->first() }}</div>
+                <div class="p-3 bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800 rounded-xl text-sm">{{ $errors->first() }}</div>
             @endif
 
             <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-sm">
@@ -20,7 +20,7 @@
             </div>
 
             {{-- Form tambah --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-5">
                 <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Tambah / Perbarui Harga Model</h3>
                 <form method="POST" action="{{ route('price-references.store') }}" class="flex flex-col sm:flex-row sm:items-end gap-3">
                     @csrf
@@ -51,9 +51,9 @@
             </div>
 
             {{-- Daftar harga --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 overflow-hidden">
                 <table class="w-full text-sm">
-                    <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         <tr>
                             <th class="px-4 py-3 text-left">Nama Model</th>
                             <th class="px-4 py-3 text-right">Harga Beli</th>

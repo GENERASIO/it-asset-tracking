@@ -24,7 +24,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             @php
-                $card = 'bg-white dark:bg-gray-800 rounded-xl shadow p-5 flex flex-col';
+                $card = 'bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-5 flex flex-col';
                 $field = 'mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm';
                 $label = 'block text-xs font-medium text-gray-500 dark:text-gray-400';
                 $stats = [
@@ -81,7 +81,7 @@
             </div>
 
             {{-- Filter --}}
-            <form method="GET" class="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
+            <form method="GET" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-5">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">Filter Laporan</h3>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">

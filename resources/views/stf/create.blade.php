@@ -19,7 +19,7 @@
                 @csrf
 
                 @if ($errors->any())
-                    <div class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                    <div class="p-3 bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800 rounded-xl text-sm">
                         @foreach ($errors->all() as $error)
                             <p>{{ $error }}</p>
                         @endforeach
@@ -30,7 +30,7 @@
                     Saat disimpan, lokasi aset di bawah <strong>otomatis dipindahkan</strong> ke Outlet Tujuan dan tercatat di log aktivitas.
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="{{ $label }}">Tanggal</label>
@@ -116,7 +116,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Aset yang Dipindahkan</h3>
                     <div class="space-y-4">
                         @foreach ($rows as $i => $row)

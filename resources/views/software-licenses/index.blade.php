@@ -17,7 +17,7 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @if (session('success'))
-                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
+                <div class="p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm">{{ session('success') }}</div>
             @endif
 
             {{-- Ringkasan --}}
@@ -29,7 +29,7 @@
                     ['Windows terindikasi tidak resmi', $summary['windows_suspected'], 'text-red-600 dark:text-red-400'],
                     ['Perlu perhatian', $summary['needs_attention'], 'text-yellow-600 dark:text-yellow-400'],
                 ] as [$label, $value, $color])
-                    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-4">
                         <p class="text-xs text-gray-500 dark:text-gray-400">{{ $label }}</p>
                         <p class="text-2xl font-semibold {{ $color }}">{{ $value }}</p>
                     </div>
@@ -37,7 +37,7 @@
             </div>
 
             {{-- Lisensi yang dibeli vs dipakai --}}
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Lisensi yang Dibeli</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                     "Terpakai" dihitung dari laptop yang lisensinya resmi dan nama edisinya mengandung kata kunci. Laptop yang terindikasi tidak resmi tidak ikut dihitung.
@@ -45,30 +45,30 @@
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                        <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             <tr>
-                                <th class="px-4 py-2">Nama</th>
-                                <th class="px-4 py-2">Jenis</th>
-                                <th class="px-4 py-2 text-right">Terpakai / Dibeli</th>
-                                <th class="px-4 py-2">Berlaku Sampai</th>
-                                <th class="px-4 py-2 text-right">Aksi</th>
+                                <th class="px-4 py-3">Nama</th>
+                                <th class="px-4 py-3">Jenis</th>
+                                <th class="px-4 py-3 text-right">Terpakai / Dibeli</th>
+                                <th class="px-4 py-3">Berlaku Sampai</th>
+                                <th class="px-4 py-3 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($entitlements as $entitlement)
-                                <tr class="border-b dark:border-gray-700">
-                                    <td class="px-4 py-2">
+                                <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
+                                    <td class="px-4 py-3">
                                         <p class="text-gray-900 dark:text-white">{{ $entitlement->name }}</p>
                                         <p class="text-xs text-gray-500 font-mono">cocok: "{{ $entitlement->match }}"</p>
                                     </td>
-                                    <td class="px-4 py-2 text-gray-600 dark:text-gray-300">{{ \App\Models\SoftwareEntitlement::TYPES[$entitlement->license_type] ?? $entitlement->license_type }}</td>
-                                    <td class="px-4 py-2 text-right whitespace-nowrap">
+                                    <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ \App\Models\SoftwareEntitlement::TYPES[$entitlement->license_type] ?? $entitlement->license_type }}</td>
+                                    <td class="px-4 py-3 text-right whitespace-nowrap">
                                         <span class="font-semibold {{ $entitlement->over ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">{{ $entitlement->used }} / {{ $entitlement->quantity }}</span>
                                         @if ($entitlement->over)
                                             <p class="text-xs text-red-600 dark:text-red-400">Melebihi {{ $entitlement->used - $entitlement->quantity }}</p>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-2 whitespace-nowrap">
+                                    <td class="px-4 py-3 whitespace-nowrap">
                                         @if ($entitlement->expires_at)
                                             <span class="{{ $entitlement->expiring ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-600 dark:text-gray-300' }}">
                                                 {{ $entitlement->expires_at->translatedFormat('d M Y') }}
@@ -77,7 +77,7 @@
                                             <span class="text-gray-400">Permanen</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-2 text-right whitespace-nowrap">
+                                    <td class="px-4 py-3 text-right whitespace-nowrap">
                                         <div class="flex items-center justify-end gap-1">
                                             <a href="{{ route('software-licenses.edit', $entitlement) }}" title="Edit"
                                                class="inline-flex p-1.5 rounded-lg text-brand-500 hover:bg-brand-50 dark:hover:bg-gray-700">
@@ -114,7 +114,7 @@
             </div>
 
             {{-- Perlu perhatian (lisensi resmi) --}}
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Perlu Perhatian</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                     Lisensi resmi yang tidak aktif, dalam masa tenggang, atau habis dalam {{ $reminderDays }} hari. Juga muncul di lonceng notifikasi.
@@ -123,7 +123,7 @@
             </div>
 
             {{-- Terindikasi tidak resmi --}}
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Terindikasi Tidak Resmi</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                     Laptop yang perlu diganti ke lisensi resmi. Tidak semua jenis crack bisa terdeteksi, jadi daftar ini bisa lebih sedikit dari kenyataannya.
@@ -132,28 +132,28 @@
             </div>
 
             {{-- Edisi terdeteksi --}}
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Edisi Terdeteksi</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                     Nama edisi persis seperti yang dilaporkan Windows. Pakai sebagian nama ini (mis. <span class="font-mono">HomeBusiness2021</span>) sebagai kata kunci saat menambah lisensi.
                 </p>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                        <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             <tr>
-                                <th class="px-4 py-2">Produk</th>
-                                <th class="px-4 py-2">Edisi</th>
-                                <th class="px-4 py-2 text-right">Laptop</th>
-                                <th class="px-4 py-2 text-right">Terindikasi</th>
+                                <th class="px-4 py-3">Produk</th>
+                                <th class="px-4 py-3">Edisi</th>
+                                <th class="px-4 py-3 text-right">Laptop</th>
+                                <th class="px-4 py-3 text-right">Terindikasi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($editions as $edition)
-                                <tr class="border-b dark:border-gray-700">
-                                    <td class="px-4 py-2 uppercase text-xs text-gray-500">{{ $edition['product'] }}</td>
-                                    <td class="px-4 py-2 font-mono text-xs text-gray-900 dark:text-white break-all">{{ $edition['name'] }}</td>
-                                    <td class="px-4 py-2 text-right text-gray-900 dark:text-white">{{ $edition['total'] }}</td>
-                                    <td class="px-4 py-2 text-right {{ $edition['suspected'] ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-400' }}">{{ $edition['suspected'] }}</td>
+                                <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
+                                    <td class="px-4 py-3 uppercase text-xs text-gray-500">{{ $edition['product'] }}</td>
+                                    <td class="px-4 py-3 font-mono text-xs text-gray-900 dark:text-white break-all">{{ $edition['name'] }}</td>
+                                    <td class="px-4 py-3 text-right text-gray-900 dark:text-white">{{ $edition['total'] }}</td>
+                                    <td class="px-4 py-3 text-right {{ $edition['suspected'] ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-400' }}">{{ $edition['suspected'] }}</td>
                                 </tr>
                             @empty
                                 <tr>

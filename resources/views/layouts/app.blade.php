@@ -25,18 +25,15 @@
         <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900 lg:flex">
+        <div class="min-h-screen bg-gray-50 dark:bg-gray-900 lg:flex">
             @include('layouts.navigation')
 
             <div class="flex-1 min-w-0">
                 <!-- Page Heading -->
-                @isset($header)
-                    <header class="bg-white dark:bg-gray-800 shadow">
-                        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                            {{ $header }}
-                        </div>
-                    </header>
-                @endisset
+                {{-- Dashboard sudah punya hero sendiri. --}}
+                @if (isset($header) && ! request()->routeIs('dashboard'))
+                    @include('layouts.page-header', ['header' => $header])
+                @endif
 
                 <!-- Page Content -->
                 <main>

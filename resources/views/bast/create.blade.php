@@ -15,14 +15,14 @@
                 @csrf
 
                 @if ($errors->any())
-                    <div class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                    <div class="p-3 bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800 rounded-xl text-sm">
                         @foreach ($errors->all() as $error)
                             <p>{{ $error }}</p>
                         @endforeach
                     </div>
                 @endif
 
-                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                         Semua isian bisa diubah. Penerima boleh nama outlet / orang yang tidak terdaftar sebagai user.
                     </p>
@@ -80,7 +80,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Barang yang Diserahkan</h3>
 
                     <div class="space-y-4">

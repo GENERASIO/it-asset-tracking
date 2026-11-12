@@ -7,10 +7,10 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
 
             @if (session('success'))
-                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
+                <div class="p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm">{{ session('success') }}</div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <form method="GET" class="flex flex-wrap gap-2">
                         <input type="search" name="q" value="{{ $search }}" placeholder="Cari nama / kode aset / serial..."
@@ -29,24 +29,24 @@
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                        <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             <tr>
-                                <th class="px-4 py-2">Tanggal</th>
-                                <th class="px-4 py-2">Diserahkan ke</th>
-                                <th class="px-4 py-2">Barang</th>
-                                <th class="px-4 py-2">Status</th>
+                                <th class="px-4 py-3">Tanggal</th>
+                                <th class="px-4 py-3">Diserahkan ke</th>
+                                <th class="px-4 py-3">Barang</th>
+                                <th class="px-4 py-3">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($documents as $bast)
                                 <tr class="border-b dark:border-gray-700 align-top hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
                                     onclick="window.location='{{ route('bast.show', $bast) }}'">
-                                    <td class="px-4 py-2 whitespace-nowrap text-gray-900 dark:text-white">{{ $bast->handover_date_label }}</td>
-                                    <td class="px-4 py-2">
+                                    <td class="px-4 py-3 whitespace-nowrap text-gray-900 dark:text-white">{{ $bast->handover_date_label }}</td>
+                                    <td class="px-4 py-3">
                                         <a href="{{ route('bast.show', $bast) }}" class="text-gray-900 dark:text-white hover:underline">{{ $bast->second_party_name }}</a>
                                         <p class="text-xs text-gray-500">{{ $bast->second_party_position }}</p>
                                     </td>
-                                    <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
+                                    <td class="px-4 py-3 text-gray-600 dark:text-gray-300">
                                         @foreach ($bast->items as $item)
                                             <p>
                                                 @if ($item->asset)<span class="font-mono text-xs">{{ $item->asset->asset_code }}</span> · @endif
@@ -54,7 +54,7 @@
                                             </p>
                                         @endforeach
                                     </td>
-                                    <td class="px-4 py-2 whitespace-nowrap">
+                                    <td class="px-4 py-3 whitespace-nowrap">
                                         @if ($bast->isSigned())
                                             <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Sudah ditandatangani (scan)</span>
                                         @elseif ($bast->isDigitallySigned())

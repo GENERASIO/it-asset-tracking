@@ -7,11 +7,11 @@
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @if ($errors->any())
-                <div class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{{ $errors->first() }}</div>
+                <div class="p-3 bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800 rounded-xl text-sm">{{ $errors->first() }}</div>
             @endif
 
             {{-- Data agent dari record ini --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-5">
                 <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Record dari agent (akan dipindahkan)</h3>
                 <dl class="grid grid-cols-2 gap-3 text-sm">
                     <div><dt class="text-gray-500">Model</dt><dd class="text-gray-900 dark:text-white">{{ $asset->name }}</dd></div>
@@ -23,7 +23,7 @@
 
             {{-- Pilih aset tujuan --}}
             <form method="POST" action="{{ route('asset-merge.store', $asset) }}"
-                  x-data="{ q: '', target: '' }" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 space-y-3">
+                  x-data="{ q: '', target: '' }" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-5 space-y-3">
                 @csrf
                 <h3 class="font-semibold text-gray-900 dark:text-white">Pilih aset lama tujuan</h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400">

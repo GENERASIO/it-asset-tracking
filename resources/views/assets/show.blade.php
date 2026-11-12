@@ -7,7 +7,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-4">
 
             @if (session('success'))
-                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-sm flex flex-wrap items-center justify-between gap-2">
+                <div class="p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm flex flex-wrap items-center justify-between gap-2">
                     <span>{{ session('success') }}</span>
                     @if (session('offer_bast'))
                         <a href="{{ route('bast.create', ['ids' => [$asset->id]]) }}"
@@ -19,13 +19,13 @@
             @endif
 
             @if (session('error'))
-                <div class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                <div class="p-3 bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800 rounded-xl text-sm">
                     {{ session('error') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                <div class="p-3 bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800 rounded-xl text-sm">
                     @foreach ($errors->all() as $error)
                         <p>{{ $error }}</p>
                     @endforeach
@@ -99,7 +99,7 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6" x-data="{ tab: 'detail', photoIndex: 0 }">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6" x-data="{ tab: 'detail', photoIndex: 0 }">
                 <!-- Hero Photo -->
                 @if ($asset->photos->isNotEmpty())
                     <div class="relative rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 mb-4" style="aspect-ratio: 16 / 9;">

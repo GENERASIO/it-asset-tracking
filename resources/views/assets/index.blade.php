@@ -36,7 +36,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if (session('success'))
-                <div class="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm">
+                <div class="mb-4 p-3 bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800 rounded-xl text-sm">
                     {{ session('success') }}
                 </div>
             @endif
@@ -46,7 +46,7 @@
                 $btnPrimary = 'inline-flex items-center gap-1.5 bg-brand-500 text-white px-3.5 py-2 rounded-lg text-sm hover:bg-brand-600 whitespace-nowrap transition-colors duration-150 active:scale-95 disabled:opacity-40 disabled:pointer-events-none';
             @endphp
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-700/60 p-6">
 
                 {{-- Baris 1: pencarian & filter --}}
                 <form method="GET" class="flex flex-wrap items-center gap-2">
@@ -257,29 +257,29 @@
                         {{-- Desktop table (>= sm) --}}
                         <div class="hidden sm:block overflow-x-auto">
                             <table class="w-full text-sm text-left">
-                                <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 sticky top-0">
+                                <thead class="bg-gray-50 dark:bg-gray-700/60 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 sticky top-0">
                                     <tr>
-                                        <th class="px-4 py-2">
+                                        <th class="px-4 py-3">
                                             <input type="checkbox" id="select-all-assets" onclick="toggleAllAssetCheckboxes(this)">
                                         </th>
-                                        <th class="px-4 py-2 hidden md:table-cell">Foto</th>
-                                        <th class="px-4 py-2">
+                                        <th class="px-4 py-3 hidden md:table-cell">Foto</th>
+                                        <th class="px-4 py-3">
                                             <a href="{{ $sortUrl('asset_code') }}" class="hover:underline">Kode Aset {{ $sortArrow('asset_code') }}</a>
                                         </th>
-                                        <th class="px-4 py-2">
+                                        <th class="px-4 py-3">
                                             <a href="{{ $sortUrl('name') }}" class="hover:underline">Nama {{ $sortArrow('name') }}</a>
                                         </th>
-                                        <th class="px-4 py-2 hidden md:table-cell">
+                                        <th class="px-4 py-3 hidden md:table-cell">
                                             <a href="{{ $sortUrl('category') }}" class="hover:underline">Kategori {{ $sortArrow('category') }}</a>
                                         </th>
-                                        <th class="px-4 py-2 hidden lg:table-cell">
+                                        <th class="px-4 py-3 hidden lg:table-cell">
                                             <a href="{{ $sortUrl('location') }}" class="hover:underline">Lokasi {{ $sortArrow('location') }}</a>
                                         </th>
-                                        <th class="px-4 py-2 hidden lg:table-cell">Dipegang Oleh</th>
-                                        <th class="px-4 py-2">
+                                        <th class="px-4 py-3 hidden lg:table-cell">Dipegang Oleh</th>
+                                        <th class="px-4 py-3">
                                             <a href="{{ $sortUrl('status') }}" class="hover:underline">Status {{ $sortArrow('status') }}</a>
                                         </th>
-                                        <th class="px-4 py-2 text-right sticky right-0 z-10 bg-gray-50 dark:bg-gray-700 border-l border-gray-200 dark:border-gray-600">Aksi</th>
+                                        <th class="px-4 py-3 text-right sticky right-0 z-10 bg-gray-50 dark:bg-gray-700 border-l border-gray-200 dark:border-gray-600">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -302,26 +302,26 @@
                                             ]) }}"
                                             @click="if (!$event.target.closest('a, button, .asset-checkbox, .status-select')) { openQuickView(JSON.parse($el.dataset.asset)) }"
                                             class="cursor-pointer border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-300">
-                                            <td class="px-4 py-2">
+                                            <td class="px-4 py-3">
                                                 <input type="checkbox" name="ids[]" value="{{ $asset->id }}" class="asset-checkbox">
                                             </td>
-                                            <td class="px-4 py-2 hidden md:table-cell">
+                                            <td class="px-4 py-3 hidden md:table-cell">
                                                 @if ($asset->photo)
                                                     <img src="{{ asset('uploads/assets/' . $asset->photo) }}" class="w-10 h-10 object-cover rounded border">
                                                 @else
                                                     <div class="w-10 h-10 rounded border bg-gray-50 dark:bg-gray-600"></div>
                                                 @endif
                                             </td>
-                                            <td class="px-4 py-2 font-mono font-semibold whitespace-nowrap">
+                                            <td class="px-4 py-3 font-mono font-semibold whitespace-nowrap">
                                                 <span class="text-brand-500">
                                                     {{ $asset->asset_code }}
                                                 </span>
                                             </td>
-                                            <td class="px-4 py-2 text-gray-900 dark:text-white">{{ $asset->name }}</td>
-                                            <td class="px-4 py-2 text-gray-900 dark:text-white hidden md:table-cell">{{ $asset->category->name ?? '-' }}</td>
-                                            <td class="px-4 py-2 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->location->name ?? '-' }}</td>
-                                            <td class="px-4 py-2 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->assignedUser->name ?? '-' }}</td>
-                                            <td class="px-4 py-2">
+                                            <td class="px-4 py-3 text-gray-900 dark:text-white">{{ $asset->name }}</td>
+                                            <td class="px-4 py-3 text-gray-900 dark:text-white hidden md:table-cell">{{ $asset->category->name ?? '-' }}</td>
+                                            <td class="px-4 py-3 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->location->name ?? '-' }}</td>
+                                            <td class="px-4 py-3 text-gray-900 dark:text-white hidden lg:table-cell">{{ $asset->assignedUser->name ?? '-' }}</td>
+                                            <td class="px-4 py-3">
                                                 <select class="status-select {{ $statusColumns[$asset->status]['badge'] ?? 'bg-gray-100 text-gray-600' }} border-0 rounded-full text-xs font-medium py-1 pl-2.5 pr-7 cursor-pointer focus:ring-2 focus:ring-brand-400"
                                                         data-asset-id="{{ $asset->id }}" onchange="handleStatusChange(this)" title="Ubah status">
                                                     @foreach ($statusColumns as $key => $meta)
@@ -329,7 +329,7 @@
                                                     @endforeach
                                                 </select>
                                             </td>
-                                            <td class="px-4 py-2 text-right whitespace-nowrap sticky right-0 z-10 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700">
+                                            <td class="px-4 py-3 text-right whitespace-nowrap sticky right-0 z-10 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700">
                                                 <div class="flex items-center justify-end gap-1">
                                                     <a href="{{ route('assets.edit', $asset) }}" title="Edit aset"
                                                        class="inline-flex p-1.5 rounded-lg text-brand-500 hover:bg-brand-50 dark:hover:bg-gray-700">
