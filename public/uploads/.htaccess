@@ -1,0 +1,5 @@
+# Folder upload hanya untuk gambar. Jangan pernah jalankan script dari sini,
+# walaupun ada file .php yang berhasil lolos ter-upload.
+<FilesMatch "\.(php\d?|phtml|phar|pht|phps|cgi|pl|py|sh|asp|aspx|jsp)$">
+    Require all denied
+</FilesMatch>

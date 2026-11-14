@@ -26,11 +26,12 @@ class UserController extends Controller
         return view('users.index', compact('users'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $locations = Location::orderBy('name')->get();
+        $roles = $this->assignableRoles($request);
 
-        return view('users.create', compact('locations'));
+        return view('users.create', compact('locations', 'roles'));
     }
 
     public function store(Request $request)
@@ -45,7 +46,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => ($isQuickAdd ? 'nullable' : 'required').'|email|unique:users,email',
             'password' => ($isQuickAdd ? 'nullable' : 'required').'|min:8|confirmed',
-            'role' => 'required|in:super_admin,it_staff,user',
+            'role' => 'required|in:'.implode(',', $this->assignableRoles($request)),
             'location_id' => 'nullable|exists:locations,id',
             'employee_id' => 'nullable|string|max:255|unique:users,employee_id',
         ]);
@@ -72,20 +73,28 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan.');
     }
 
-    public function edit(User $user)
+    public function edit(Request $request, User $user)
     {
-        $locations = Location::orderBy('name')->get();
+        $this->ensureCanManage($request, $user);
 
-        return view('users.edit', compact('user', 'locations'));
+        $locations = Location::orderBy('name')->get();
+        $roles = $this->assignableRoles($request);
+
+        return view('users.edit', compact('user', 'locations', 'roles'));
     }
 
     public function update(Request $request, User $user)
     {
+        $this->ensureCanManage($request, $user);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:8|confirmed',
-            'role' => 'required|in:super_admin,it_staff,user',
+            // Role akun sendiri tidak bisa diubah, jadi tidak perlu divalidasi.
+            'role' => $user->id === $request->user()->id
+                ? 'nullable'
+                : 'required|in:'.implode(',', $this->assignableRoles($request)),
             'location_id' => 'nullable|exists:locations,id',
             'employee_id' => 'nullable|string|max:255|unique:users,employee_id,' . $user->id,
         ]);
@@ -93,7 +102,8 @@ class UserController extends Controller
         $data = [
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'role' => $validated['role'],
+            // Role akun sendiri tidak bisa diubah (cegah menaikkan diri jadi super_admin).
+            'role' => $user->id === $request->user()->id ? $user->role : $validated['role'],
             'location_id' => $validated['location_id'] ?? null,
             'employee_id' => $validated['employee_id'] ?? null,
             'is_active' => $user->id === $request->user()->id ? true : $request->boolean('is_active'),
@@ -106,6 +116,27 @@ class UserController extends Controller
         $user->update($data);
 
         return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
+    }
+
+    /**
+     * Role yang boleh diberikan oleh user yang sedang login. IT Staff tidak boleh
+     * membuat / menaikkan siapa pun menjadi super_admin.
+     */
+    protected function assignableRoles(Request $request): array
+    {
+        return $request->user()->role === 'super_admin'
+            ? ['super_admin', 'it_staff', 'user']
+            : ['it_staff', 'user'];
+    }
+
+    /** Akun super_admin hanya boleh diubah / dihapus oleh super_admin. */
+    protected function ensureCanManage(Request $request, User $user): void
+    {
+        abort_if(
+            $user->role === 'super_admin' && $request->user()->role !== 'super_admin',
+            403,
+            'Hanya Super Admin yang bisa mengubah akun Super Admin.'
+        );
     }
 
     protected function generatePlaceholderEmail(string $name): string
@@ -121,6 +152,8 @@ class UserController extends Controller
 
     public function destroy(Request $request, User $user)
     {
+        $this->ensureCanManage($request, $user);
+
         if ($user->id === $request->user()->id) {
             return back()->with('error', 'Anda tidak bisa menghapus akun Anda sendiri.');
         }

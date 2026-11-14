@@ -40,7 +40,7 @@
                         <label class="block text-sm font-medium text-gray-700">Role</label>
                         <select name="role" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
                             <option value="">-- Pilih Role --</option>
-                            @foreach (['super_admin', 'it_staff', 'user'] as $role)
+                            @foreach ($roles as $role)
                                 <option value="{{ $role }}" @selected(old('role') == $role)>
                                     {{ ucfirst(str_replace('_', ' ', $role)) }}
                                 </option>

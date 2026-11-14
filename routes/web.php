@@ -23,15 +23,20 @@ Route::get('/', function () {
 });
 
 // Halaman publik (tanpa login) yang dibuka waktu scan QR di label aset - info dasar saja.
-Route::get('/scan/{asset}', [AssetController::class, 'publicInfo'])->name('assets.public-info');
+// Dibatasi per IP supaya tidak bisa di-scrape massal (/scan/1, /scan/2, ...).
+Route::get('/scan/{asset}', [AssetController::class, 'publicInfo'])
+    ->middleware('throttle:60,1')->name('assets.public-info');
 
 // Tanda tangan digital BAST oleh penerima - publik (pakai token rahasia di URL).
-Route::get('/bast/sign/{token}', [BastController::class, 'signShow'])->name('bast.sign.show');
-Route::post('/bast/sign/{token}', [BastController::class, 'signStore'])->name('bast.sign.store');
-Route::get('/bast/sign/{token}/pdf', [BastController::class, 'signPdf'])->name('bast.sign.pdf');
-Route::get('/stf/sign/{token}', [StfController::class, 'signShow'])->name('stf.sign.show');
-Route::post('/stf/sign/{token}', [StfController::class, 'signStore'])->name('stf.sign.store');
-Route::get('/stf/sign/{token}/pdf', [StfController::class, 'signPdf'])->name('stf.sign.pdf');
+// Rate limit 30/menit per IP: cegah tebak-tebakan token & spam kiriman tanda tangan.
+Route::middleware('throttle:30,1')->group(function () {
+    Route::get('/bast/sign/{token}', [BastController::class, 'signShow'])->name('bast.sign.show');
+    Route::post('/bast/sign/{token}', [BastController::class, 'signStore'])->name('bast.sign.store');
+    Route::get('/bast/sign/{token}/pdf', [BastController::class, 'signPdf'])->name('bast.sign.pdf');
+    Route::get('/stf/sign/{token}', [StfController::class, 'signShow'])->name('stf.sign.show');
+    Route::post('/stf/sign/{token}', [StfController::class, 'signStore'])->name('stf.sign.store');
+    Route::get('/stf/sign/{token}/pdf', [StfController::class, 'signPdf'])->name('stf.sign.pdf');
+});
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');

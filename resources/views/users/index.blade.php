@@ -77,6 +77,9 @@
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 text-right whitespace-nowrap">
+                                        @if ($user->role === 'super_admin' && auth()->user()->role !== 'super_admin')
+                                            <span class="text-xs text-gray-400" title="Hanya Super Admin yang bisa mengubah akun ini">🔒</span>
+                                        @else
                                         <div class="flex items-center justify-end gap-1">
                                             <a href="{{ route('users.edit', $user) }}" title="Edit"
                                                class="inline-flex p-1.5 rounded-lg text-brand-500 hover:bg-brand-50 dark:hover:bg-gray-700">
@@ -91,6 +94,7 @@
                                                 </button>
                                             </form>
                                         </div>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty

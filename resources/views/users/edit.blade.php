@@ -40,14 +40,17 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Role</label>
-                        <select name="role" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm">
-                            @foreach (['super_admin', 'it_staff', 'user'] as $role)
+                        <select name="role" class="mt-1 w-full border-gray-300 rounded-lg shadow-sm disabled:opacity-60" @disabled($user->id === auth()->id())>
+                            @foreach (array_unique([...$roles, $user->role]) as $role)
                                 <option value="{{ $role }}" @selected(old('role', $user->role) == $role)>
                                     {{ ucfirst(str_replace('_', ' ', $role)) }}
                                 </option>
                             @endforeach
                         </select>
                         @error('role') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                        @if ($user->id === auth()->id())
+                            <p class="text-xs text-gray-500 mt-1">Role akun sendiri tidak bisa diubah.</p>
+                        @endif
                     </div>
 
                     <div>

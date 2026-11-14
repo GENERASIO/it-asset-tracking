@@ -369,7 +369,7 @@ class AssetController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls,csv',
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
         ]);
 
         Excel::import(new AssetsImport, $request->file('file'));
